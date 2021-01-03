@@ -37,26 +37,26 @@ namespace TensorSharp.CUDA.KernelOps
         public void CopyGpu(Tensor result, Tensor src, long totalElements)
         {
             // We assume here that we are using the default stream for both devices.
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
 
-            CudaStorage resultStorage = (CudaStorage)result.Storage;
-            CudaContext resultContext = context.CudaContextForTensor(result);
-            CUdeviceptr resultPtr = resultStorage.DevicePtrAtElement(result.StorageOffset);
+            var resultStorage = (CudaStorage)result.Storage;
+            var resultContext = context.CudaContextForTensor(result);
+            var resultPtr = resultStorage.DevicePtrAtElement(result.StorageOffset);
 
-            CudaStorage srcStorage = (CudaStorage)src.Storage;
-            CudaContext srcContext = context.CudaContextForTensor(src);
-            CUdeviceptr srcPtr = srcStorage.DevicePtrAtElement(src.StorageOffset);
+            var srcStorage = (CudaStorage)src.Storage;
+            var srcContext = context.CudaContextForTensor(src);
+            var srcPtr = srcStorage.DevicePtrAtElement(src.StorageOffset);
 
 
             if (CudaHelpers.GetDeviceId(result) != CudaHelpers.GetDeviceId(src))
             {
                 // Cross-device copy. Perform two-way barrier between both devices' default streams.
                 resultContext.SetCurrent();
-                CudaEvent dstReady = new CudaEvent(CUEventFlags.DisableTiming);
+                var dstReady = new CudaEvent(CUEventFlags.DisableTiming);
                 dstReady.Record();
 
                 srcContext.SetCurrent();
-                CUResult res = DriverAPINativeMethods.Streams.cuStreamWaitEvent(CUstream.NullStream, dstReady.Event, 0);
+                var res = DriverAPINativeMethods.Streams.cuStreamWaitEvent(CUstream.NullStream, dstReady.Event, 0);
                 if (res != CUResult.Success)
                 {
                     throw new CudaException(res);
@@ -69,12 +69,12 @@ namespace TensorSharp.CUDA.KernelOps
                 srcContext.SetCurrent();
             }
 
-            bool canMemcpy = CanMemcpy(result, src, totalElements);
+            var canMemcpy = CanMemcpy(result, src, totalElements);
 
             if (canMemcpy)
             {
-                CUResult res = DriverAPINativeMethods.AsynchronousMemcpy_v2.cuMemcpyAsync(
-                    resultPtr, srcPtr, totalElements * src.ElementType.Size(), CUstream.NullStream);
+                var res = DriverAPINativeMethods.AsynchronousMemcpy_v2.cuMemcpyAsync(
+                                                                                     resultPtr, srcPtr, totalElements * src.ElementType.Size(), CUstream.NullStream);
                 if (res != CUResult.Success)
                 {
                     throw new CudaException(res);
@@ -84,23 +84,23 @@ namespace TensorSharp.CUDA.KernelOps
             {
                 if (result.ElementType != src.ElementType)
                 {
-                    CopyGpuConvertTypes(result, src, totalElements);
+                    this.CopyGpuConvertTypes(result, src, totalElements);
                 }
                 else if (context.CanAccessPeer(CudaHelpers.GetDeviceId(src), CudaHelpers.GetDeviceId(result)))
                 {
-                    CopyGpuDirect(result, src, srcContext);
+                    this.CopyGpuDirect(result, src, srcContext);
                 }
                 else
                 {
-                    CopyGpuIndirect(result, src, totalElements);
+                    this.CopyGpuIndirect(result, src, totalElements);
                 }
             }
         }
 
         private void CopyGpuDirect(Tensor result, Tensor src, CudaContext srcContext)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CopyOp.Invoke(fillCopyKernels, context, srcContext, result, src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            CopyOp.Invoke(this.fillCopyKernels, context, srcContext, result, src);
         }
 
         private void CopyGpuIndirect(Tensor result, Tensor src, long totalElements)
@@ -111,45 +111,41 @@ namespace TensorSharp.CUDA.KernelOps
             // We will make contiguous proxy tensors as necessary, so we can use cuMemcpy to perform the copy.
             // If result needs to be proxied, we then copy back from the contiguous proxy to result on the same GPU
 
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            bool isResultContig = result.IsContiguous();
-            Tensor resultContig = result;
+            var context = CudaHelpers.TSContextForTensor(src);
+            var isResultContig = result.IsContiguous();
+            var resultContig = result;
 
-            using (Tensor srcContig = Ops.AsContiguous(src))
+            using var srcContig = Ops.AsContiguous(src);
+            if (!isResultContig)
             {
-                if (!isResultContig)
-                {
-                    resultContig = new Tensor(result.Allocator, result.ElementType, result.Sizes);
-                }
+                resultContig = new Tensor(result.Allocator, result.ElementType, result.Sizes);
+            }
 
-                CUdeviceptr resultContigPtr = ((CudaStorage)resultContig.Storage).DevicePtrAtElement(resultContig.StorageOffset);
-                CUdeviceptr srcContigPtr = ((CudaStorage)srcContig.Storage).DevicePtrAtElement(srcContig.StorageOffset);
+            var resultContigPtr = ((CudaStorage)resultContig.Storage).DevicePtrAtElement(resultContig.StorageOffset);
+            var srcContigPtr = ((CudaStorage)srcContig.Storage).DevicePtrAtElement(srcContig.StorageOffset);
 
-                CUResult res = DriverAPINativeMethods.AsynchronousMemcpy_v2.cuMemcpyAsync(
-                    resultContigPtr, srcContigPtr, totalElements * srcContig.ElementType.Size(), CUstream.NullStream);
-                if (res != CUResult.Success)
-                {
-                    throw new CudaException(res);
-                }
+            var res = DriverAPINativeMethods.AsynchronousMemcpy_v2.cuMemcpyAsync(
+                                                                                 resultContigPtr, srcContigPtr, totalElements * srcContig.ElementType.Size(), CUstream.NullStream);
+            if (res != CUResult.Success)
+            {
+                throw new CudaException(res);
+            }
 
-                if (!isResultContig)
-                {
-                    CopyGpuDirect(result, resultContig, context.CudaContextForTensor(result));
-                    resultContig.Dispose();
-                }
+            if (!isResultContig)
+            {
+                this.CopyGpuDirect(result, resultContig, context.CudaContextForTensor(result));
+                resultContig.Dispose();
             }
         }
 
         private void CopyGpuConvertTypes(Tensor result, Tensor src, long totalElements)
         {
             // Type conversions are currently done via CPU
-            using (Tensor srcCopy = new Tensor(cpuAllocator, src.ElementType, src.Sizes))
-            using (Tensor srcConverted = new Tensor(cpuAllocator, result.ElementType, src.Sizes))
-            {
-                CopyGpuToCpu(srcCopy, src, totalElements);
-                Ops.Copy(srcConverted, srcCopy); // Do type conversion on CPU
-                CopyCpuToGpu(result, srcConverted, totalElements);
-            }
+            using var srcCopy = new Tensor(this.cpuAllocator, src.ElementType, src.Sizes);
+            using var srcConverted = new Tensor(this.cpuAllocator, result.ElementType, src.Sizes);
+            this.CopyGpuToCpu(srcCopy, src, totalElements);
+            Ops.Copy(srcConverted, srcCopy); // Do type conversion on CPU
+            this.CopyCpuToGpu(result, srcConverted, totalElements);
         }
 
 
@@ -162,7 +158,7 @@ namespace TensorSharp.CUDA.KernelOps
             }
             else
             {
-                Tensor result = new Tensor(cpuAllocator, elementType, tensor.Sizes);
+                var result = new Tensor(this.cpuAllocator, elementType, tensor.Sizes);
                 Ops.Copy(result, tensor);
                 return result;
             }
@@ -170,50 +166,46 @@ namespace TensorSharp.CUDA.KernelOps
 
         public void CopyCpuToGpu(Tensor result, Tensor src, long totalElements)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(result);
-            CudaContext resultContext = context.CudaContextForTensor(result);
+            var context = CudaHelpers.TSContextForTensor(result);
+            var resultContext = context.CudaContextForTensor(result);
 
             // If types of src and result are different, convert on the CPU first.
-            using (Tensor srcContig = AsTypeCpu(src, result.ElementType, true))
-            using (Tensor resultContig = Ops.AsContiguous(result))
+            using var srcContig = this.AsTypeCpu(src, result.ElementType, true);
+            using var resultContig = Ops.AsContiguous(result);
+            var resultContigPtr = ((CudaStorage)resultContig.Storage).DevicePtrAtElement(resultContig.StorageOffset);
+            var srcContigPtr = ((Cpu.CpuStorage)srcContig.Storage).PtrAtElement(srcContig.StorageOffset);
+
+            resultContext.CopyToDevice(resultContigPtr, srcContigPtr, totalElements * srcContig.ElementType.Size());
+
+            if (result.Storage != resultContig.Storage)
             {
-                CUdeviceptr resultContigPtr = ((CudaStorage)resultContig.Storage).DevicePtrAtElement(resultContig.StorageOffset);
-                IntPtr srcContigPtr = ((Cpu.CpuStorage)srcContig.Storage).PtrAtElement(srcContig.StorageOffset);
-
-                resultContext.CopyToDevice(resultContigPtr, srcContigPtr, totalElements * srcContig.ElementType.Size());
-
-                if (result.Storage != resultContig.Storage)
-                {
-                    CopyGpuDirect(result, resultContig, resultContext);
-                }
+                this.CopyGpuDirect(result, resultContig, resultContext);
             }
         }
 
         public void CopyGpuToCpu(Tensor result, Tensor src, long totalElements)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext srcContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var srcContext = context.CudaContextForTensor(src);
 
-            using (Tensor srcContig = Ops.AsContiguous(src))
-            using (Tensor resultContig = AsTypeCpu(result, src.ElementType, true))
+            using var srcContig = Ops.AsContiguous(src);
+            using var resultContig = this.AsTypeCpu(result, src.ElementType, true);
+            var resultContigPtr = ((Cpu.CpuStorage)resultContig.Storage).PtrAtElement(resultContig.StorageOffset);
+            var srcContigPtr = ((CudaStorage)srcContig.Storage).DevicePtrAtElement(srcContig.StorageOffset);
+
+            var totalBytes = totalElements * srcContig.ElementType.Size();
+
+            // Use DriverAPINativeMethods directly here instead of CudaContext.CopyToHost, because CopyToHost only has an overload
+            // for specifying totalBytes as a uint, but we may exceed the range of a uint here.
+            var res = DriverAPINativeMethods.SynchronousMemcpy_v2.cuMemcpyDtoH_v2(resultContigPtr, srcContigPtr, totalBytes);
+            if (res != CUResult.Success)
             {
-                IntPtr resultContigPtr = ((Cpu.CpuStorage)resultContig.Storage).PtrAtElement(resultContig.StorageOffset);
-                CUdeviceptr srcContigPtr = ((CudaStorage)srcContig.Storage).DevicePtrAtElement(srcContig.StorageOffset);
+                throw new CudaException(res);
+            }
 
-                long totalBytes = totalElements * srcContig.ElementType.Size();
-
-                // Use DriverAPINativeMethods directly here instead of CudaContext.CopyToHost, because CopyToHost only has an overload
-                // for specifying totalBytes as a uint, but we may exceed the range of a uint here.
-                CUResult res = DriverAPINativeMethods.SynchronousMemcpy_v2.cuMemcpyDtoH_v2(resultContigPtr, srcContigPtr, totalBytes);
-                if (res != CUResult.Success)
-                {
-                    throw new CudaException(res);
-                }
-
-                if (result.Storage != resultContig.Storage)
-                {
-                    Ops.Copy(result, resultContig); // copy on CPU
-                }
+            if (result.Storage != resultContig.Storage)
+            {
+                Ops.Copy(result, resultContig); // copy on CPU
             }
         }
 

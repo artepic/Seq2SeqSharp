@@ -10,7 +10,7 @@
 
         private static string GetFullCode()
         {
-            PermutationGenerator result = new PermutationGenerator();
+            var result = new PermutationGenerator();
             result.AddApplyTS("fill", "*a = b;");
 
             result.AddApplyTT("copy", "*a = *b;");

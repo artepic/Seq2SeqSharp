@@ -32,7 +32,7 @@ namespace TensorSharp
 
         public override bool SatisfiedFor(object[] args)
         {
-            return this.requiredType.IsAssignableFrom(args[this.argIndex].GetType());
+            return this.requiredType.IsInstanceOfType(args[this.argIndex]);
         }
     }
 
@@ -55,13 +55,14 @@ namespace TensorSharp
             {
                 return true;
             }
-            else if (!this.allowNull && args[this.argIndex] == null)
+
+            if (!this.allowNull && args[this.argIndex] == null)
             {
                 return false;
             }
 
             var argStorage = ((Tensor)args[this.argIndex]).Storage;
-            return this.requiredType.IsAssignableFrom(argStorage.GetType());
+            return this.requiredType.IsInstanceOfType(argStorage);
         }
     }
 }

@@ -7,14 +7,13 @@ using Seq2SeqSharp.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Seq2SeqSharp
 {
     public class RoundArray<T>
     {
         private readonly T[] m_array;
-        private int currentIdx = 0;
+        private int currentIdx;
         public RoundArray(T[] a)
         {
             this.m_array = a;
@@ -42,7 +41,7 @@ namespace Seq2SeqSharp
         private MultiProcessorNetworkWrapper<IWeightTensor> m_posEmbedding;
 
         // optimization  hyperparameters
-        private readonly float m_dropoutRatio = 0.0f;
+        private readonly float m_dropoutRatio;
         private readonly int m_defaultDeviceId = 0;
 
         private readonly int m_maxSrcSntSize = 128;
@@ -271,7 +270,7 @@ namespace Seq2SeqSharp
         /// <returns>The cost of forward part</returns>
         private float RunForwardOnSingleDevice(IComputeGraph computeGraph, List<List<string>> srcSnts, List<List<string>> tgtSnts, int deviceIdIdx, bool isTraining)
         {
-            (var encoder, var decoder, var srcEmbedding, var tgtEmbedding, var posEmbedding) = this.GetNetworksOnDeviceAt(deviceIdIdx);            
+            var (encoder, decoder, srcEmbedding, tgtEmbedding, posEmbedding) = this.GetNetworksOnDeviceAt(deviceIdIdx);            
 
             // Reset networks
             encoder.Reset(computeGraph.GetWeightFactory(), srcSnts.Count);
@@ -553,7 +552,7 @@ namespace Seq2SeqSharp
                                     var lcost = (float)-Math.Log(score_k);
                                     if (float.IsNaN(lcost))
                                     {
-                                        throw new ArithmeticException($"Score = '{score_k}' Cost = Nan at index '{i}' word '{outputSnts[k][i]}', Output Sentence = '{String.Join(" ", outputSnts[k])}'");
+                                        throw new ArithmeticException($"Score = '{score_k}' Cost = Nan at index '{i}' word '{outputSnts[k][i]}', Output Sentence = '{string.Join(" ", outputSnts[k])}'");
                                     }
                                     else
                                     {
@@ -626,7 +625,7 @@ namespace Seq2SeqSharp
         /// <returns></returns>
         public List<List<string>> Predict(List<string> input, int beamSearchSize = 1, int maxOutputLength = 100)
         {
-            (var encoder, var decoder, var srcEmbedding, var tgtEmbedding, var posEmbedding) = this.GetNetworksOnDeviceAt(-1);
+            var (encoder, decoder, srcEmbedding, tgtEmbedding, posEmbedding) = this.GetNetworksOnDeviceAt(-1);
             var inputSeqs = ParallelCorpus.ConstructInputTokens(input);
             var batchSize = 1; // For predict with beam search, we currently only supports one sentence per call
 

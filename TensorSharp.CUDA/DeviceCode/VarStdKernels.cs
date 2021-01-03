@@ -168,72 +168,72 @@ extern ""C"" {
 
         private void VarOuterDim(TSCudaContext context, Tensor result, Tensor src, int dimension, bool normByN, bool applySqrt)
         {
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
-            int ndim = src.DimensionCount;
+            var ndim = src.DimensionCount;
             long num_orows = 1;
-            for (int dim = 0; dim < dimension; dim++)
+            for (var dim = 0; dim < dimension; dim++)
             {
                 num_orows *= src.Sizes[dim];
             }
-            long row_size = src.Sizes[dimension];
+            var row_size = src.Sizes[dimension];
             // Treat all inner dimensions (i.e. dim > dimension) as one.
             long num_irows = 1;
-            for (int dim = dimension + 1; dim < ndim; dim++)
+            for (var dim = dimension + 1; dim < ndim; dim++)
             {
                 num_irows *= src.Sizes[dim];
             }
 
-            dim3 threads = new dim3((uint)Math.Min(512, num_irows));
-            int maxGridDim = 1024;
-            dim3 grid = new dim3((uint)Math.Min(maxGridDim, num_orows), (uint)Math.Min(maxGridDim, ApplyUtils.CeilDiv(num_irows, threads.x)));
+            var threads = new dim3((uint)Math.Min(512, num_irows));
+            var maxGridDim = 1024;
+            var grid = new dim3((uint)Math.Min(maxGridDim, num_orows), (uint)Math.Min(maxGridDim, ApplyUtils.CeilDiv(num_irows, threads.x)));
 
-            CUdeviceptr resultPtr = CudaHelpers.GetBufferStart(result);
-            CUdeviceptr srcPtr = CudaHelpers.GetBufferStart(src);
-            string kernelName = "kernel_varOuterDim" + GetMangledNameSuffix(normByN, applySqrt);
+            var resultPtr = CudaHelpers.GetBufferStart(result);
+            var srcPtr = CudaHelpers.GetBufferStart(src);
+            var kernelName = "kernel_varOuterDim" + GetMangledNameSuffix(normByN, applySqrt);
 
-            Invoke(context, cudaContext, kernelName, grid, threads, 0, CUstream.NullStream, resultPtr, srcPtr, num_orows, num_irows, row_size);
+            this.Invoke(context, cudaContext, kernelName, grid, threads, 0, CUstream.NullStream, resultPtr, srcPtr, num_orows, num_irows, row_size);
         }
 
 
         private void VarInnermostDim(TSCudaContext context, Tensor result, Tensor src, bool normByN, bool applySqrt)
         {
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
-            int ndim = src.DimensionCount;
+            var ndim = src.DimensionCount;
             long num_rows = 1;
-            for (int dim = 0; dim < ndim - 1; dim++)
+            for (var dim = 0; dim < ndim - 1; dim++)
             {
                 num_rows *= src.Sizes[dim];
             }
-            long row_size = src.Sizes[ndim - 1];
+            var row_size = src.Sizes[ndim - 1];
 
             // (Comment from cuTorch source): From limited testing, 16x32 seemed a good compromise for handling both long and short dimensions.
-            dim3 threads = new dim3(16, 32);
-            dim3 grid = new dim3((uint)Math.Min(1024, ApplyUtils.CeilDiv(num_rows, threads.y)));
+            var threads = new dim3(16, 32);
+            var grid = new dim3((uint)Math.Min(1024, ApplyUtils.CeilDiv(num_rows, threads.y)));
 
-            CUdeviceptr resultPtr = CudaHelpers.GetBufferStart(result);
-            CUdeviceptr srcPtr = CudaHelpers.GetBufferStart(src);
-            string kernelName = "kernel_varInnermostDim" + GetMangledNameSuffix(normByN, applySqrt);
+            var resultPtr = CudaHelpers.GetBufferStart(result);
+            var srcPtr = CudaHelpers.GetBufferStart(src);
+            var kernelName = "kernel_varInnermostDim" + GetMangledNameSuffix(normByN, applySqrt);
 
-            Invoke(context, cudaContext, kernelName, grid, threads, 0, CUstream.NullStream, resultPtr, srcPtr, num_rows, row_size);
+            this.Invoke(context, cudaContext, kernelName, grid, threads, 0, CUstream.NullStream, resultPtr, srcPtr, num_rows, row_size);
         }
 
 
         private Tensor RunVarOp(Tensor result, Tensor src, int dimension, bool normByN, bool applySqrt)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            long[] requiredOutputSize = (long[])src.Sizes.Clone();
+            var context = CudaHelpers.TSContextForTensor(src);
+            var requiredOutputSize = (long[])src.Sizes.Clone();
             requiredOutputSize[dimension] = 1;
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, true, requiredOutputSize);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, true, requiredOutputSize);
 
             if (dimension == src.DimensionCount - 1)
             {
-                VarInnermostDim(context, writeTarget, src, normByN, applySqrt);
+                this.VarInnermostDim(context, writeTarget, src, normByN, applySqrt);
             }
             else
             {
-                VarOuterDim(context, writeTarget, src, dimension, normByN, applySqrt);
+                this.VarOuterDim(context, writeTarget, src, dimension, normByN, applySqrt);
             }
 
             return writeTarget;
@@ -241,18 +241,18 @@ extern ""C"" {
 
         public Tensor Var(Tensor result, Tensor src, int dimension, bool normByN)
         {
-            return RunVarOp(result, src, dimension, normByN, false);
+            return this.RunVarOp(result, src, dimension, normByN, false);
         }
 
         public Tensor Std(Tensor result, Tensor src, int dimension, bool normByN)
         {
-            return RunVarOp(result, src, dimension, normByN, true);
+            return this.RunVarOp(result, src, dimension, normByN, true);
         }
 
         private void Invoke(TSCudaContext context, CudaContext cudaContext, string kernelName, dim3 grid, dim3 block, uint smemSize, CUstream stream, params object[] args)
         {
-            byte[] ptx = GetPtx(context.Compiler);
-            CudaKernel kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
+            var ptx = this.GetPtx(context.Compiler);
+            var kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
             kernel.GridDimensions = grid;
             kernel.BlockDimensions = block;
             kernel.DynamicSharedMemory = smemSize;

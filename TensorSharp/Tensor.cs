@@ -15,7 +15,7 @@ namespace TensorSharp
         private readonly Storage storage;
         private readonly long storageOffset;
 
-        private bool isDisposed = false;
+        private bool isDisposed;
 
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace TensorSharp
             return TensorFormatting.Format(this);
         }
 
-        private long? elementCount = null;
+        private long? elementCount;
         public long ElementCount()
         {
             if (this.elementCount.HasValue)
@@ -196,6 +196,7 @@ namespace TensorSharp
         /// <summary>
         /// Note: this does not check whether indices are in range
         /// </summary>
+        /// <param name="value"></param>
         /// <param name="indices"></param>
         /// <returns></returns>
         public void SetElementAsFloat(float value, params long[] indices)
@@ -425,7 +426,6 @@ namespace TensorSharp
         /// <summary>
         /// Return a new tensor where **all** singleton dimensions have been removed
         /// </summary>
-        /// <param name="tensor"></param>
         /// <returns></returns>
         public Tensor Squeeze()
         {
@@ -728,13 +728,12 @@ namespace TensorSharp
         // must be performed in the given order.
         private static IEnumerable<Tuple<int, int>> SwapsForPermutation(int[] perm)
         {
-            int j;
             for (var i = 0; i < perm.Length; ++i)
             {
                 var p = perm[i];
                 if (p != i && p != -1)
                 {
-                    j = i;
+                    var j = i;
                     do
                     {
                         if (perm[j] < 0 || perm[j] >= perm.Length)

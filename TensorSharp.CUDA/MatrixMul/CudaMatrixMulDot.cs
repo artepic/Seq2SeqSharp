@@ -41,7 +41,7 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", "rhs");
             }
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, 1);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, 1);
 
             if (writeTarget.ElementType == DType.Float32)
             {
@@ -61,49 +61,45 @@ namespace TensorSharp.CUDA.MatrixMul
 
         private static void Run_Dot_float(TSCudaContext context, Tensor result, Tensor lhs, Tensor rhs)
         {
-            using (Util.PooledObject<CudaBlas> blas = context.BlasForTensor(lhs))
+            using var blas = context.BlasForTensor(lhs);
+            //var resultPtr = CudaNativeHelpers.GetBufferStart(result);
+            var lhsPtr = CudaHelpers.GetBufferStart(lhs);
+            var rhsPtr = CudaHelpers.GetBufferStart(rhs);
+
+            var n = (int)lhs.Sizes[0];
+            var incx = (int)lhs.Strides[0];
+            var incy = (int)rhs.Strides[0];
+
+            float resultVal = 0;
+            var _status = CudaBlasNativeMethods.cublasSdot_v2(blas.Value.CublasHandle, n, lhsPtr, incx, rhsPtr, incy, ref resultVal);
+            if (_status != CublasStatus.Success)
             {
-                //var resultPtr = CudaNativeHelpers.GetBufferStart(result);
-                CUdeviceptr lhsPtr = CudaHelpers.GetBufferStart(lhs);
-                CUdeviceptr rhsPtr = CudaHelpers.GetBufferStart(rhs);
-
-                int n = (int)lhs.Sizes[0];
-                int incx = (int)lhs.Strides[0];
-                int incy = (int)rhs.Strides[0];
-
-                float resultVal = 0;
-                CublasStatus _status = CudaBlasNativeMethods.cublasSdot_v2(blas.Value.CublasHandle, n, lhsPtr, incx, rhsPtr, incy, ref resultVal);
-                if (_status != CublasStatus.Success)
-                {
-                    throw new CudaBlasException(_status);
-                }
-
-                result.Storage.SetElementAsFloat(result.StorageOffset, resultVal);
+                throw new CudaBlasException(_status);
             }
+
+            result.Storage.SetElementAsFloat(result.StorageOffset, resultVal);
         }
 
         private static void Run_Dot_double(TSCudaContext context, Tensor result, Tensor lhs, Tensor rhs)
         {
-            using (Util.PooledObject<CudaBlas> blas = context.BlasForTensor(lhs))
+            using var blas = context.BlasForTensor(lhs);
+            //var resultPtr = CudaNativeHelpers.GetBufferStart(result);
+            var lhsPtr = CudaHelpers.GetBufferStart(lhs);
+            var rhsPtr = CudaHelpers.GetBufferStart(rhs);
+
+            var n = (int)lhs.Sizes[0];
+            var incx = (int)lhs.Strides[0];
+            var incy = (int)rhs.Strides[0];
+
+            // TODO add SetElementAsDouble to prevent need to round to float here
+            double resultVal = 0;
+            var _status = CudaBlasNativeMethods.cublasDdot_v2(blas.Value.CublasHandle, n, lhsPtr, incx, rhsPtr, incy, ref resultVal);
+            if (_status != CublasStatus.Success)
             {
-                //var resultPtr = CudaNativeHelpers.GetBufferStart(result);
-                CUdeviceptr lhsPtr = CudaHelpers.GetBufferStart(lhs);
-                CUdeviceptr rhsPtr = CudaHelpers.GetBufferStart(rhs);
-
-                int n = (int)lhs.Sizes[0];
-                int incx = (int)lhs.Strides[0];
-                int incy = (int)rhs.Strides[0];
-
-                // TODO add SetElementAsDouble to prevent need to round to float here
-                double resultVal = 0;
-                CublasStatus _status = CudaBlasNativeMethods.cublasDdot_v2(blas.Value.CublasHandle, n, lhsPtr, incx, rhsPtr, incy, ref resultVal);
-                if (_status != CublasStatus.Success)
-                {
-                    throw new CudaBlasException(_status);
-                }
-
-                result.Storage.SetElementAsFloat(result.StorageOffset, (float)resultVal);
+                throw new CudaBlasException(_status);
             }
+
+            result.Storage.SetElementAsFloat(result.StorageOffset, (float)resultVal);
         }
     }
 }

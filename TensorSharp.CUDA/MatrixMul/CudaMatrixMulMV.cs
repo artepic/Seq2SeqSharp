@@ -53,7 +53,7 @@ namespace TensorSharp.CUDA.MatrixMul
                 lhsClone = Ops.NewContiguous(lhs);
             }
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, rhs, false, lhs.Sizes[0]);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, rhs, false, lhs.Sizes[0]);
 
             try
             {
@@ -86,23 +86,21 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new ArgumentException("lhs must be contiguous in the last dimension");
             }
 
-            using (Util.PooledObject<CudaBlas> blas = context.BlasForTensor(mat))
-            {
-                ManagedCuda.BasicTypes.CUdeviceptr yPtr = CudaHelpers.GetBufferStart(result);
-                ManagedCuda.BasicTypes.CUdeviceptr aPtr = CudaHelpers.GetBufferStart(mat);
-                ManagedCuda.BasicTypes.CUdeviceptr xPtr = CudaHelpers.GetBufferStart(vec);
+            using var blas = context.BlasForTensor(mat);
+            var yPtr = CudaHelpers.GetBufferStart(result);
+            var aPtr = CudaHelpers.GetBufferStart(mat);
+            var xPtr = CudaHelpers.GetBufferStart(vec);
 
-                Operation trans = Operation.Transpose;
-                int m = (int)mat.Sizes[1];
-                int n = (int)mat.Sizes[0];
-                int incx = (int)vec.Strides[0];
-                int lda = (int)mat.Strides[0];
-                int incy = (int)result.Strides[0];
-                float alpha = 1;
-                float beta = 0;
+            var trans = Operation.Transpose;
+            var m = (int)mat.Sizes[1];
+            var n = (int)mat.Sizes[0];
+            var incx = (int)vec.Strides[0];
+            var lda = (int)mat.Strides[0];
+            var incy = (int)result.Strides[0];
+            float alpha = 1;
+            float beta = 0;
 
-                CudaBlasNativeMethods.cublasSgemv_v2(blas.Value.CublasHandle, trans, m, n, ref alpha, aPtr, lda, xPtr, incx, ref beta, yPtr, incy);
-            }
+            CudaBlasNativeMethods.cublasSgemv_v2(blas.Value.CublasHandle, trans, m, n, ref alpha, aPtr, lda, xPtr, incx, ref beta, yPtr, incy);
         }
 
         private static void Run_M_V_double(TSCudaContext context, Tensor result, Tensor mat, Tensor vec)
@@ -113,23 +111,21 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new ArgumentException("lhs must be contiguous in the last dimension");
             }
 
-            using (Util.PooledObject<CudaBlas> blas = context.BlasForTensor(mat))
-            {
-                ManagedCuda.BasicTypes.CUdeviceptr yPtr = CudaHelpers.GetBufferStart(result);
-                ManagedCuda.BasicTypes.CUdeviceptr aPtr = CudaHelpers.GetBufferStart(mat);
-                ManagedCuda.BasicTypes.CUdeviceptr xPtr = CudaHelpers.GetBufferStart(vec);
+            using var blas = context.BlasForTensor(mat);
+            var yPtr = CudaHelpers.GetBufferStart(result);
+            var aPtr = CudaHelpers.GetBufferStart(mat);
+            var xPtr = CudaHelpers.GetBufferStart(vec);
 
-                Operation trans = Operation.Transpose;
-                int m = (int)mat.Sizes[1];
-                int n = (int)mat.Sizes[0];
-                int incx = (int)vec.Strides[0];
-                int lda = (int)mat.Strides[0];
-                int incy = (int)result.Strides[0];
-                double alpha = 1;
-                double beta = 0;
+            var trans = Operation.Transpose;
+            var m = (int)mat.Sizes[1];
+            var n = (int)mat.Sizes[0];
+            var incx = (int)vec.Strides[0];
+            var lda = (int)mat.Strides[0];
+            var incy = (int)result.Strides[0];
+            double alpha = 1;
+            double beta = 0;
 
-                CudaBlasNativeMethods.cublasDgemv_v2(blas.Value.CublasHandle, trans, m, n, ref alpha, aPtr, lda, xPtr, incx, ref beta, yPtr, incy);
-            }
+            CudaBlasNativeMethods.cublasDgemv_v2(blas.Value.CublasHandle, trans, m, n, ref alpha, aPtr, lda, xPtr, incx, ref beta, yPtr, incy);
         }
     }
 }

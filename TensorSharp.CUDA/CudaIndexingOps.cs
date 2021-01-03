@@ -14,15 +14,15 @@ namespace TensorSharp.CUDA
         }
 
         [RegisterOpStorageType("index_select", typeof(CudaStorage))]
-        public Tensor IndexSelect(Tensor result, Tensor src, int dimension, Tensor indices) { return indexSelect.IndexSelect(result, src, dimension, indices); }
+        public Tensor IndexSelect(Tensor result, Tensor src, int dimension, Tensor indices) { return this.indexSelect.IndexSelect(result, src, dimension, indices); }
 
         [RegisterOpStorageType("gather", typeof(CudaStorage))]
-        public Tensor Gather(Tensor result, Tensor src, int dimension, Tensor indices) { return gather.Gather(result, src, dimension, indices); }
+        public Tensor Gather(Tensor result, Tensor src, int dimension, Tensor indices) { return this.gather.Gather(result, src, dimension, indices); }
 
         [RegisterOpStorageType("scatter", typeof(CudaStorage))]
-        public Tensor Scatter(Tensor result, Tensor src, int dimension, Tensor indices) { return gather.Scatter(result, src, dimension, indices); }
+        public Tensor Scatter(Tensor result, Tensor src, int dimension, Tensor indices) { return this.gather.Scatter(result, src, dimension, indices); }
 
         [RegisterOpStorageType("scatter_fill", typeof(CudaStorage))]
-        public Tensor ScatterFill(Tensor result, float value, int dimension, Tensor indices) { return gather.ScatterFill(result, value, dimension, indices); }
+        public Tensor ScatterFill(Tensor result, float value, int dimension, Tensor indices) { return this.gather.ScatterFill(result, value, dimension, indices); }
     }
 }

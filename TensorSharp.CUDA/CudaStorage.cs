@@ -18,73 +18,79 @@ namespace TensorSharp.CUDA
         public CudaStorage(IAllocator allocator, TSCudaContext tsContext, CudaContext context, DType ElementType, long elementCount)
             : base(allocator, ElementType, elementCount)
         {
-            TSContext = tsContext;
+            this.TSContext = tsContext;
             this.context = context;
 
-            bufferHandle = tsContext.AllocatorForDevice(DeviceId).Allocate(ByteLength);
-            deviceBuffer = bufferHandle.Pointer;
+            this.bufferHandle = tsContext.AllocatorForDevice(this.DeviceId).Allocate(this.ByteLength);
+            this.deviceBuffer = this.bufferHandle.Pointer;
         }
 
         public TSCudaContext TSContext { get; private set; }
 
         protected override void Destroy()
         {
-            if (bufferHandle != null)
+            if (this.bufferHandle != null)
             {
-                bufferHandle.Free();
-                bufferHandle = null;
+                this.bufferHandle.Free();
+                this.bufferHandle = null;
             }
         }
 
         public override int[] GetElementsAsInt(long index, int length)
         {
-            CUdeviceptr ptr = DevicePtrAtElement(index);
+            var ptr = this.DevicePtrAtElement(index);
 
-            if (ElementType == DType.Int32) { int[] result = new int[length]; context.CopyToHost(result, ptr); return result; }
+            if (this.ElementType == DType.Int32) { var result = new int[length];
+                this.context.CopyToHost(result, ptr); return result; }
             else
             {
-                throw new NotSupportedException("Element type " + ElementType + " not supported");
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
         public override void SetElementsAsInt(long index, int[] value)
         {
-            CUdeviceptr ptr = DevicePtrAtElement(index);
+            var ptr = this.DevicePtrAtElement(index);
 
-            if (ElementType == DType.Int32) { context.CopyToDevice(ptr, value); }
+            if (this.ElementType == DType.Int32) {
+                this.context.CopyToDevice(ptr, value); }
             else
             {
-                throw new NotSupportedException("Element type " + ElementType + " not supported");
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
 
         public override string LocationDescription()
         {
-            return "CUDA:" + context.DeviceId;
+            return "CUDA:" + this.context.DeviceId;
         }
 
-        public int DeviceId => context.DeviceId;
+        public int DeviceId => this.context.DeviceId;
 
         public CUdeviceptr DevicePtrAtElement(long index)
         {
-            long offset = ElementType.Size() * index;
-            return new CUdeviceptr(deviceBuffer.Pointer + offset);
+            var offset = this.ElementType.Size() * index;
+            return new CUdeviceptr(this.deviceBuffer.Pointer + offset);
         }
 
         public override float GetElementAsFloat(long index)
         {
-            CUdeviceptr ptr = DevicePtrAtElement(index);
+            var ptr = this.DevicePtrAtElement(index);
 
             try
             {
-                if (ElementType == DType.Float32) { float[] result = new float[1]; context.CopyToHost(result, ptr); return result[0]; }
-                else if (ElementType == DType.Float64) { double[] result = new double[1]; context.CopyToHost(result, ptr); return (float)result[0]; }
-                else if (ElementType == DType.Int32) { int[] result = new int[1]; context.CopyToHost(result, ptr); return result[0]; }
-                else if (ElementType == DType.UInt8) { byte[] result = new byte[1]; context.CopyToHost(result, ptr); return result[0]; }
+                if (this.ElementType == DType.Float32) { var result = new float[1];
+                    this.context.CopyToHost(result, ptr); return result[0]; }
+                else if (this.ElementType == DType.Float64) { var result = new double[1];
+                    this.context.CopyToHost(result, ptr); return (float)result[0]; }
+                else if (this.ElementType == DType.Int32) { var result = new int[1];
+                    this.context.CopyToHost(result, ptr); return result[0]; }
+                else if (this.ElementType == DType.UInt8) { var result = new byte[1];
+                    this.context.CopyToHost(result, ptr); return result[0]; }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
             catch (Exception err)
@@ -100,54 +106,60 @@ namespace TensorSharp.CUDA
 
         public override float[] GetElementsAsFloat(long index, int length)
         {
-            CUdeviceptr ptr = DevicePtrAtElement(index);
+            var ptr = this.DevicePtrAtElement(index);
 
-            if (ElementType == DType.Float32) { float[] result = new float[length]; context.CopyToHost(result, ptr); return result; }
+            if (this.ElementType == DType.Float32) { var result = new float[length];
+                this.context.CopyToHost(result, ptr); return result; }
             else
             {
-                throw new NotSupportedException("Element type " + ElementType + " not supported");
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
         public override void SetElementAsFloat(long index, float value)
         {
-            CUdeviceptr ptr = DevicePtrAtElement(index);
+            var ptr = this.DevicePtrAtElement(index);
 
-            if (ElementType == DType.Float32) { context.CopyToDevice(ptr, value); }
-            else if (ElementType == DType.Float64) { context.CopyToDevice(ptr, (double)value); }
-            else if (ElementType == DType.Int32) { context.CopyToDevice(ptr, (int)value); }
-            else if (ElementType == DType.UInt8) { context.CopyToDevice(ptr, (byte)value); }
+            if (this.ElementType == DType.Float32) {
+                this.context.CopyToDevice(ptr, value); }
+            else if (this.ElementType == DType.Float64) {
+                this.context.CopyToDevice(ptr, (double)value); }
+            else if (this.ElementType == DType.Int32) {
+                this.context.CopyToDevice(ptr, (int)value); }
+            else if (this.ElementType == DType.UInt8) {
+                this.context.CopyToDevice(ptr, (byte)value); }
             else
             {
-                throw new NotSupportedException("Element type " + ElementType + " not supported");
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
         public override void SetElementsAsFloat(long index, float[] value)
         {
-            CUdeviceptr ptr = DevicePtrAtElement(index);
+            var ptr = this.DevicePtrAtElement(index);
 
-            if (ElementType == DType.Float32) { context.CopyToDevice(ptr, value); }
+            if (this.ElementType == DType.Float32) {
+                this.context.CopyToDevice(ptr, value); }
             else
             {
-                throw new NotSupportedException("Element type " + ElementType + " not supported");
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
         public override void CopyToStorage(long storageIndex, IntPtr src, long byteCount)
         {
-            CUdeviceptr dstPtr = DevicePtrAtElement(storageIndex);
-            context.SetCurrent();
-            context.CopyToDevice(dstPtr, src, byteCount);
+            var dstPtr = this.DevicePtrAtElement(storageIndex);
+            this.context.SetCurrent();
+            this.context.CopyToDevice(dstPtr, src, byteCount);
         }
 
         public override void CopyFromStorage(IntPtr dst, long storageIndex, long byteCount)
         {
-            CUdeviceptr srcPtr = DevicePtrAtElement(storageIndex);
+            var srcPtr = this.DevicePtrAtElement(storageIndex);
 
             // Call this method directly instead of CudaContext.CopyToHost because this method supports a long byteCount
             // CopyToHost only supports uint byteCount.
-            CUResult res = DriverAPINativeMethods.SynchronousMemcpy_v2.cuMemcpyDtoH_v2(dst, srcPtr, byteCount);
+            var res = DriverAPINativeMethods.SynchronousMemcpy_v2.cuMemcpyDtoH_v2(dst, srcPtr, byteCount);
             if (res != CUResult.Success)
             {
                 throw new CudaException(res);

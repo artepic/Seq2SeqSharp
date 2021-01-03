@@ -7,10 +7,6 @@ namespace TensorSharp.Cpu
     [OpsClass]
     public class CpuIndexingOps
     {
-        public CpuIndexingOps()
-        {
-        }
-
         private readonly MethodInfo gather_func = NativeWrapper.GetMethod("TS_Gather");
         private readonly MethodInfo scatter_func = NativeWrapper.GetMethod("TS_Scatter");
         private readonly MethodInfo scatterFill_func = NativeWrapper.GetMethod("TS_ScatterFill");

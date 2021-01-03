@@ -22,7 +22,7 @@ namespace Seq2SeqSharp.Tools
     {
         private const int MaxSize = 1024000;
         private T[] array;
-        private int count = 0;
+        private int count;
         public int Count => this.count;
 
         public T this[int key]
@@ -1290,14 +1290,7 @@ namespace Seq2SeqSharp.Tools
                 var w = TensorSharp.RandomGenerator.BuildRandomBernoulliWeight(new long[] {rows / batchSize, columns }, prob);                
                 noise.SetElementsAsFloat(w);
 
-                if (rows / batchSize == 1)
-                {
-                    return noise.Expand(rows, columns);
-                }
-                else
-                {
-                    return noise.RepeatTensor(batchSize, 1);
-                }
+                return rows / batchSize == 1 ? noise.Expand(rows, columns) : noise.RepeatTensor(batchSize, 1);
             }
         }
 

@@ -15,11 +15,11 @@ namespace Seq2SeqConsole
     {
         private static void ss_IterationDone(object sender, EventArgs e)
         {
-            CostEventArg ep = e as CostEventArg;
+            var ep = e as CostEventArg;
 
             if (float.IsInfinity(ep.CostPerWord) == false)
             {
-                TimeSpan ts = DateTime.Now - ep.StartDateTime;
+                var ts = DateTime.Now - ep.StartDateTime;
                 double sentPerMin = 0;
                 double wordPerSec = 0;
                 if (ts.TotalMinutes > 0)
@@ -50,8 +50,8 @@ namespace Seq2SeqConsole
                 ShowOptions(args);
 
                 //Parse command line
-                Options opts = new Options();
-                ArgParser argParser = new ArgParser(args, opts);
+                var opts = new Options();
+                var argParser = new ArgParser(args, opts);
 
                 if (string.IsNullOrEmpty(opts.ConfigFilePath) == false)
                 {
@@ -60,39 +60,39 @@ namespace Seq2SeqConsole
                 }
 
                 AttentionSeq2Seq ss = null;
-                ProcessorTypeEnums processorType = (ProcessorTypeEnums)Enum.Parse(typeof(ProcessorTypeEnums), opts.ProcessorType);
-                EncoderTypeEnums encoderType = (EncoderTypeEnums)Enum.Parse(typeof(EncoderTypeEnums), opts.EncoderType);
-                DecoderTypeEnums decoderType = (DecoderTypeEnums)Enum.Parse(typeof(DecoderTypeEnums), opts.DecoderType);
-                ModeEnums mode = (ModeEnums)Enum.Parse(typeof(ModeEnums), opts.TaskName);
-                ShuffleEnums shuffleType = (ShuffleEnums)Enum.Parse(typeof(ShuffleEnums), opts.ShuffleType);
+                var processorType = (ProcessorTypeEnums)Enum.Parse(typeof(ProcessorTypeEnums), opts.ProcessorType);
+                var encoderType = (EncoderTypeEnums)Enum.Parse(typeof(EncoderTypeEnums), opts.EncoderType);
+                var decoderType = (DecoderTypeEnums)Enum.Parse(typeof(DecoderTypeEnums), opts.DecoderType);
+                var mode = (ModeEnums)Enum.Parse(typeof(ModeEnums), opts.TaskName);
+                var shuffleType = (ShuffleEnums)Enum.Parse(typeof(ShuffleEnums), opts.ShuffleType);
 
-                string[] cudaCompilerOptions = String.IsNullOrEmpty(opts.CompilerOptions) ? null : opts.CompilerOptions.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var cudaCompilerOptions = string.IsNullOrEmpty(opts.CompilerOptions) ? null : opts.CompilerOptions.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 //Parse device ids from options          
-                int[] deviceIds = opts.DeviceIds.Split(',').Select(x => int.Parse(x)).ToArray();
+                var deviceIds = opts.DeviceIds.Split(',').Select(x => int.Parse(x)).ToArray();
                 if (mode == ModeEnums.Train)
                 {
                     // Load train corpus
-                    ParallelCorpus trainCorpus = new ParallelCorpus(corpusFilePath: opts.TrainCorpusPath, srcLangName: opts.SrcLang, tgtLangName: opts.TgtLang, batchSize: opts.BatchSize, shuffleBlockSize: opts.ShuffleBlockSize,
-                        maxSrcSentLength: opts.MaxSrcSentLength, maxTgtSentLength: opts.MaxTgtSentLength, shuffleEnums: shuffleType);
+                    var trainCorpus = new ParallelCorpus(corpusFilePath: opts.TrainCorpusPath, srcLangName: opts.SrcLang, tgtLangName: opts.TgtLang, batchSize: opts.BatchSize, shuffleBlockSize: opts.ShuffleBlockSize,
+                                                         maxSrcSentLength: opts.MaxSrcSentLength, maxTgtSentLength: opts.MaxTgtSentLength, shuffleEnums: shuffleType);
                     // Load valid corpus
-                    ParallelCorpus validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new ParallelCorpus(opts.ValidCorpusPath, opts.SrcLang, opts.TgtLang, opts.ValBatchSize, opts.ShuffleBlockSize, opts.MaxSrcSentLength, opts.MaxTgtSentLength);
+                    var validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new ParallelCorpus(opts.ValidCorpusPath, opts.SrcLang, opts.TgtLang, opts.ValBatchSize, opts.ShuffleBlockSize, opts.MaxSrcSentLength, opts.MaxTgtSentLength);
 
                     // Create learning rate
                     ILearningRate learningRate = new DecayLearningRate(opts.StartLearningRate, opts.WarmUpSteps, opts.WeightsUpdateCount);
 
                     // Create optimizer
-                    AdamOptimizer optimizer = new AdamOptimizer(opts.GradClip, opts.Beta1, opts.Beta2);
+                    var optimizer = new AdamOptimizer(opts.GradClip, opts.Beta1, opts.Beta2);
 
                     // Create metrics
-                    List<IMetric> metrics = new List<IMetric>
+                    var metrics = new List<IMetric>
                 {
                     new BleuMetric(),
                     new LengthRatioMetric()
                 };
 
 
-                    if (!String.IsNullOrEmpty(opts.ModelFilePath) && File.Exists(opts.ModelFilePath))
+                    if (!string.IsNullOrEmpty(opts.ModelFilePath) && File.Exists(opts.ModelFilePath))
                     {
                         //Incremental training
                         Logger.WriteLine($"Loading model from '{opts.ModelFilePath}'...");
@@ -133,14 +133,14 @@ namespace Seq2SeqConsole
                     Logger.WriteLine($"Evaluate model '{opts.ModelFilePath}' by valid corpus '{opts.ValidCorpusPath}'");
 
                     // Create metrics
-                    List<IMetric> metrics = new List<IMetric>
+                    var metrics = new List<IMetric>
                 {
                     new BleuMetric(),
                     new LengthRatioMetric()
                 };
 
                     // Load valid corpus
-                    ParallelCorpus validCorpus = new ParallelCorpus(opts.ValidCorpusPath, opts.SrcLang, opts.TgtLang, opts.ValBatchSize, opts.ShuffleBlockSize, opts.MaxSrcSentLength, opts.MaxTgtSentLength);
+                    var validCorpus = new ParallelCorpus(opts.ValidCorpusPath, opts.SrcLang, opts.TgtLang, opts.ValBatchSize, opts.ShuffleBlockSize, opts.MaxSrcSentLength, opts.MaxTgtSentLength);
 
                     ss = new AttentionSeq2Seq(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, memoryUsageRatio: opts.MemoryUsageRatio, shuffleType: shuffleType, compilerOptions: cudaCompilerOptions);
                     ss.Valid(validCorpus: validCorpus, metrics: metrics);
@@ -153,20 +153,20 @@ namespace Seq2SeqConsole
                     ss = new AttentionSeq2Seq(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, memoryUsageRatio: opts.MemoryUsageRatio, 
                         shuffleType: shuffleType, maxSrcSntSize: opts.MaxSrcSentLength, maxTgtSntSize: opts.MaxTgtSentLength, compilerOptions: cudaCompilerOptions);
 
-                    List<string> outputLines = new List<string>();
-                    string[] data_sents_raw1 = File.ReadAllLines(opts.InputTestFile);
-                    foreach (string line in data_sents_raw1)
+                    var outputLines = new List<string>();
+                    var data_sents_raw1 = File.ReadAllLines(opts.InputTestFile);
+                    foreach (var line in data_sents_raw1)
                     {
                         if (opts.BeamSearch > 1)
                         {
                             // Below support beam search
-                            List<List<string>> outputWordsList = ss.Predict(line.ToLower().Trim().Split(' ').ToList(), opts.BeamSearch);
+                            var outputWordsList = ss.Predict(line.ToLower().Trim().Split(' ').ToList(), opts.BeamSearch);
                             outputLines.AddRange(outputWordsList.Select(x => string.Join(" ", x)));
                         }
                         else
                         {
                             var outputTokensBatch = ss.Test(ParallelCorpus.ConstructInputTokens(line.ToLower().Trim().Split(' ').ToList()));
-                            outputLines.AddRange(outputTokensBatch.Select(x => String.Join(" ", x)));
+                            outputLines.AddRange(outputTokensBatch.Select(x => string.Join(" ", x)));
                         }
                     }
 
@@ -191,7 +191,7 @@ namespace Seq2SeqConsole
 
         private static void ShowOptions(string[] args)
         {
-            string commandLine = string.Join(" ", args);
+            var commandLine = string.Join(" ", args);
             Logger.WriteLine($"Seq2SeqSharp v2.1.1 written by Zhongkai Fu(fuzhongkai@gmail.com)");
             Logger.WriteLine($"Command Line = '{commandLine}'");
         }

@@ -1,11 +1,6 @@
-﻿using AdvUtils;
-using Seq2SeqSharp.Tools;
+﻿using Seq2SeqSharp.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TensorSharp;
 
 namespace Seq2SeqSharp.Utils
 {

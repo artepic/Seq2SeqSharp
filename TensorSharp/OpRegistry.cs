@@ -27,7 +27,7 @@ namespace TensorSharp
 
         public static void Register(string opName, OpHandler handler, IEnumerable<OpConstraint> constraints)
         {
-            var newInstance = new OpInstance() { handler = handler, constraints = constraints };
+            var newInstance = new OpInstance { handler = handler, constraints = constraints };
 
             if (opInstances.TryGetValue(opName, out var instanceList))
             {
@@ -47,20 +47,15 @@ namespace TensorSharp
         {
             if (opInstances.TryGetValue(opName, out var instanceList))
             {
-                foreach (var instance in instanceList)
+                foreach (var instance in instanceList.Where(instance => instance.constraints.All(x => x.SatisfiedFor(args))))
                 {
-                    if (instance.constraints.All(x => x.SatisfiedFor(args)))
-                    {
-                        return instance.handler.Invoke(args);
-                    }
+                    return instance.handler.Invoke(args);
                 }
 
                 throw new ApplicationException("None of the registered handlers match the arguments for " + opName);
             }
-            else
-            {
-                throw new ApplicationException("No handlers have been registered for op " + opName);
-            }
+
+            throw new ApplicationException("No handlers have been registered for op " + opName);
         }
 
         public static void RegisterAssembly(Assembly assembly)
@@ -94,10 +89,7 @@ namespace TensorSharp
             var result = Enumerable.Empty<OpConstraint>();
             foreach (var parameter in method.ParametersWithAttribute<ArgConstraintAttribute>(false))
             {
-                foreach (var attribute in parameter.Item2)
-                {
-                    result = Enumerable.Concat(result, attribute.GetConstraints(parameter.Item1, instance));
-                }
+                result = parameter.Item2.Aggregate(result, (current, attribute) => current.Concat(attribute.GetConstraints(parameter.Item1, instance)));
             }
 
             return result;

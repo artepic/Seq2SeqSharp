@@ -9,14 +9,7 @@ namespace TensorSharp
     {
         public static IEnumerable<Tuple<Type, IEnumerable<T>>> TypesWithAttribute<T>(this Assembly assembly, bool inherit)
         {
-            foreach (var type in assembly.GetTypes())
-            {
-                var attributes = type.GetCustomAttributes(typeof(T), inherit);
-                if (attributes.Any())
-                {
-                    yield return Tuple.Create(type, attributes.Cast<T>());
-                }
-            }
+            return from type in assembly.GetTypes() let attributes = type.GetCustomAttributes(typeof(T), inherit) where attributes.Any() select Tuple.Create(type, attributes.Cast<T>());
         }
     }
 
@@ -24,14 +17,7 @@ namespace TensorSharp
     {
         public static IEnumerable<Tuple<MethodInfo, IEnumerable<T>>> MethodsWithAttribute<T>(this Type type, bool inherit)
         {
-            foreach (var method in type.GetMethods())
-            {
-                var attributes = method.GetCustomAttributes(typeof(T), inherit);
-                if (attributes.Any())
-                {
-                    yield return Tuple.Create(method, attributes.Cast<T>());
-                }
-            }
+            return from method in type.GetMethods() let attributes = method.GetCustomAttributes(typeof(T), inherit) where attributes.Any() select Tuple.Create(method, attributes.Cast<T>());
         }
     }
 
@@ -39,14 +25,7 @@ namespace TensorSharp
     {
         public static IEnumerable<Tuple<ParameterInfo, IEnumerable<T>>> ParametersWithAttribute<T>(this MethodInfo method, bool inherit)
         {
-            foreach (var paramter in method.GetParameters())
-            {
-                var attributes = paramter.GetCustomAttributes(typeof(T), inherit);
-                if (attributes.Any())
-                {
-                    yield return Tuple.Create(paramter, attributes.Cast<T>());
-                }
-            }
+            return from parameter in method.GetParameters() let attributes = parameter.GetCustomAttributes(typeof(T), inherit) where attributes.Any() select Tuple.Create(parameter, attributes.Cast<T>());
         }
     }
 }

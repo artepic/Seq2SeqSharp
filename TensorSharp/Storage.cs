@@ -5,7 +5,7 @@ namespace TensorSharp
     [Serializable]
     public abstract class Storage : RefCounted
     {
-        public Storage(IAllocator allocator, DType elementType, long elementCount)
+        protected Storage(IAllocator allocator, DType elementType, long elementCount)
         {
             this.Allocator = allocator;
             this.ElementType = elementType;

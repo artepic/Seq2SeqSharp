@@ -21,13 +21,13 @@ namespace TensorSharp.CUDA
     {
         public static void PrecompileAllFields(object instance, CudaCompiler compiler)
         {
-            Type type = instance.GetType();
+            var type = instance.GetType();
 
-            foreach (FieldInfo field in type.GetFields())
+            foreach (var field in type.GetFields())
             {
                 if (typeof(IPrecompilable).IsAssignableFrom(field.FieldType))
                 {
-                    IPrecompilable precompilableField = (IPrecompilable)field.GetValue(instance);
+                    var precompilableField = (IPrecompilable)field.GetValue(instance);
                     Console.WriteLine("Compiling field " + field.Name);
                     precompilableField.Precompile(compiler);
                 }

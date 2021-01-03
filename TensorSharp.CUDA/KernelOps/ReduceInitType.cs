@@ -6,7 +6,7 @@ namespace TensorSharp.CUDA.KernelOps
     {
         GivenValue,
         MinValue,
-        MaxValue,
+        MaxValue
     }
 
     public static class ReduceInitConverter

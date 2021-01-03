@@ -26,31 +26,31 @@ namespace TensorSharp.CUDA
 
         public DeviceState(int deviceId, float memoryUsageRatio = 0.9f)
         {
-            CudaContext = new CudaContext(deviceId);
-            DeviceInfo = CudaContext.GetDeviceInfo();
+            this.CudaContext = new CudaContext(deviceId);
+            this.DeviceInfo = this.CudaContext.GetDeviceInfo();
 
-            BlasHandles = new ObjectPool<CudaBlas>(1, () =>
-            {
-                CudaContext.SetCurrent();
-                return new CudaBlas();
-            },
-                blas => blas.Dispose());
+            this.BlasHandles = new ObjectPool<CudaBlas>(1, () =>
+                                                        {
+                                                            this.CudaContext.SetCurrent();
+                                                            return new CudaBlas();
+                                                        },
+                                                        blas => blas.Dispose());
 
-            MemoryAllocator = new PoolingDeviceAllocator(CudaContext, memoryUsageRatio);
-            ScratchSpace = AllocScratchSpace(CudaContext, DeviceInfo);
+            this.MemoryAllocator = new PoolingDeviceAllocator(this.CudaContext, memoryUsageRatio);
+            this.ScratchSpace = AllocScratchSpace(this.CudaContext, this.DeviceInfo);
         }
 
         public void Dispose()
         {
-            BlasHandles.Dispose();
-            CudaContext.Dispose();
-            MemoryAllocator.Dispose();
+            this.BlasHandles.Dispose();
+            this.CudaContext.Dispose();
+            this.MemoryAllocator.Dispose();
         }
 
         private static ScratchSpace AllocScratchSpace(CudaContext context, CudaDeviceProperties deviceProps)
         {
-            int size = ScratchSpacePerSMStream * deviceProps.MultiProcessorCount;
-            ManagedCuda.BasicTypes.CUdeviceptr buffer = context.AllocateMemory(size);
+            var size = ScratchSpacePerSMStream * deviceProps.MultiProcessorCount;
+            var buffer = context.AllocateMemory(size);
             return new ScratchSpace() { size = size, buffer = buffer };
         }
     }

@@ -29,7 +29,7 @@ namespace Seq2SeqSharp
         private readonly string m_name;
         private readonly float m_dropoutRatio;
         private readonly float m_inputDim;
-        private readonly bool m_sharedQKV = false;
+        private readonly bool m_sharedQKV;
 
         public MultiHeadAttention(string name, int multiHeadNum, int hiddenDim, int inputDim, float dropoutRatio, int deviceId, bool isTrainable, bool sharedQKV = false)
         {

@@ -1,21 +1,12 @@
-﻿namespace TensorSharp
+﻿using System.Linq;
+
+namespace TensorSharp
 {
     public static class TensorDimensionHelpers
     {
         public static long ElementCount(long[] sizes)
         {
-            if (sizes.Length == 0)
-            {
-                return 0;
-            }
-
-            var total = 1L;
-            for (var i = 0; i < sizes.Length; ++i)
-            {
-                total *= sizes[i];
-            }
-
-            return total;
+            return sizes.Length == 0 ? 0 : sizes.Aggregate(1L, (current, t) => current * t);
         }
 
         public static long GetStorageSize(long[] sizes, long[] strides)

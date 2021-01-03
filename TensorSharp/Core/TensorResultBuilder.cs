@@ -16,18 +16,14 @@ namespace TensorSharp.Core
             {
                 if (!MatchesRequirements(maybeResult, requireContiguous, requiredSizes))
                 {
-                    var message = string.Format("output tensor does not match requirements. Tensor must have sizes {0}{1}",
-                                                string.Join(", ", requiredSizes),
-                                                requireContiguous ? "; and must be contiguous" : "");
+                    var message = $"output tensor does not match requirements. Tensor must have sizes {string.Join(", ", requiredSizes)}{(requireContiguous ? "; and must be contiguous" : "")}";
 
                     throw new InvalidOperationException(message);
                 }
                 return maybeResult;
             }
-            else
-            {
-                return new Tensor(allocatorForNew, elementTypeForNew, requiredSizes);
-            }
+
+            return new Tensor(allocatorForNew, elementTypeForNew, requiredSizes);
         }
 
         private static bool MatchesRequirements(Tensor tensor, bool requireContiguous, params long[] requiredSizes)

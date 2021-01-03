@@ -10,7 +10,7 @@
 
         private static string GetFullCode()
         {
-            PermutationGenerator result = new PermutationGenerator();
+            var result = new PermutationGenerator();
 
             AppendTTFunc(result, "sigmoid", "Sigmoid");
             AppendTTTTFunc(result, "addsigmoidD", "AddSigmoidD");

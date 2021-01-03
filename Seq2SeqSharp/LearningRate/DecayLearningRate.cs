@@ -6,7 +6,7 @@ namespace Seq2SeqSharp
     public class DecayLearningRate : ILearningRate
     {
         private readonly float m_startLearningRate = 0.001f;
-        private int m_weightsUpdateCount = 0;
+        private int m_weightsUpdateCount;
         private readonly int m_warmupSteps = 8000;
 
         public DecayLearningRate(float startLearningRate, int warmupSteps, int weightsUpdatesCount)

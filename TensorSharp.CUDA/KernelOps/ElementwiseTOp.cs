@@ -17,20 +17,20 @@ namespace TensorSharp.CUDA.KernelOps
 
             cudaContext.SetCurrent();
 
-            CudaDeviceProperties deviceInfo = context.DeviceInfoForContext(cudaContext);
+            var deviceInfo = context.DeviceInfoForContext(cudaContext);
 
-            IEnumerable<Tensor> allTensors = args.OfType<Tensor>();
-            Tensor firstTensor = allTensors.First();
-            long elementCount = firstTensor.ElementCount();
-            ApplySpecialization spec = new ApplySpecialization(allTensors.ToArray());
+            var allTensors = args.OfType<Tensor>();
+            var firstTensor = allTensors.First();
+            var elementCount = firstTensor.ElementCount();
+            var spec = new ApplySpecialization(allTensors.ToArray());
 
             ConvertTensorArgs.Convert(cudaContext, spec.Use32BitIndices, args);
 
-            ManagedCuda.VectorTypes.dim3 block = ApplyUtils.GetApplyBlock();
-            ManagedCuda.VectorTypes.dim3 grid = ApplyUtils.GetApplyGrid(deviceInfo, elementCount);
+            var block = ApplyUtils.GetApplyBlock();
+            var grid = ApplyUtils.GetApplyGrid(deviceInfo, elementCount);
 
-            string fullKernelName = PermutationGenerator.GetMangledName(baseName, spec);
-            CudaKernel kernel = context.KernelCache.Get(cudaContext, ptx, fullKernelName);
+            var fullKernelName = PermutationGenerator.GetMangledName(baseName, spec);
+            var kernel = context.KernelCache.Get(cudaContext, ptx, fullKernelName);
 
             kernel.GridDimensions = grid;
             kernel.BlockDimensions = block;
@@ -41,7 +41,7 @@ namespace TensorSharp.CUDA.KernelOps
 
         private static void ThrowIfAnyTensorInvalid(object[] args)
         {
-            foreach (Tensor tensor in args.OfType<Tensor>())
+            foreach (var tensor in args.OfType<Tensor>())
             {
                 if (tensor.DimensionCount > TSCudaContext.MaxDims)
                 {
@@ -53,7 +53,7 @@ namespace TensorSharp.CUDA.KernelOps
 
         public static void ApplyPrecompile(CudaCompiler compiler, DeviceKernelTemplate template, int tensorCount)
         {
-            foreach (ApplySpecialization spec in ApplySpecialization.AllSpecializations(tensorCount))
+            foreach (var spec in ApplySpecialization.AllSpecializations(tensorCount))
             {
                 template.PtxForConfig(compiler, spec.GetConfig());
             }
@@ -64,15 +64,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(CudaCode kernels, string funcName, Tensor result, Tensor src)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -91,15 +91,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(CudaCode kernels, string funcName, Tensor result, Tensor src, float value)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -118,15 +118,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(CudaCode kernels, string funcName, Tensor result, Tensor src, Tensor src2, float value)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -145,15 +145,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(ElementwiseKernels kernels, string funcName, Tensor result, Tensor src, Tensor src2, Tensor src3, float value)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -172,15 +172,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(ElementwiseKernels kernels, string funcName, Tensor result, Tensor src, Tensor src2, Tensor src3, float step_size, float value)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -199,15 +199,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(ElementwiseKernels kernels, string funcName, Tensor result, Tensor src, Tensor src2, float step_size, float value)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -226,15 +226,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(CudaCode kernels, string funcName, Tensor result, Tensor lhs, Tensor rhs)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(lhs);
-            CudaContext cudaContext = context.CudaContextForTensor(lhs);
+            var context = CudaHelpers.TSContextForTensor(lhs);
+            var cudaContext = context.CudaContextForTensor(lhs);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == lhs)
             {
@@ -253,15 +253,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(CudaCode kernels, string funcName, Tensor result, Tensor lhs, Tensor rhs, Tensor rhs2)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(lhs);
-            CudaContext cudaContext = context.CudaContextForTensor(lhs);
+            var context = CudaHelpers.TSContextForTensor(lhs);
+            var cudaContext = context.CudaContextForTensor(lhs);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == lhs)
             {
@@ -280,15 +280,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(ElementwiseKernels kernels, string funcName, Tensor result, Tensor lhs, Tensor rhs, Tensor rhs2, Tensor rhs3)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(lhs);
-            CudaContext cudaContext = context.CudaContextForTensor(lhs);
+            var context = CudaHelpers.TSContextForTensor(lhs);
+            var cudaContext = context.CudaContextForTensor(lhs);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == lhs)
             {
@@ -307,16 +307,16 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(ElementwiseKernels kernels, Tensor result, Tensor src, float min, float max)
         {
-            string funcName = "clamp";
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var funcName = "clamp";
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, src.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
 
             if (result == src)
             {
@@ -335,15 +335,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(CudaCode kernels, Tensor result, Tensor srcY, Tensor srcX)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(srcY);
-            CudaContext cudaContext = context.CudaContextForTensor(srcY);
+            var context = CudaHelpers.TSContextForTensor(srcY);
+            var cudaContext = context.CudaContextForTensor(srcY);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, srcY, false, srcY.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, srcY, false, srcY.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
             ApplyOpInvoke.Invoke(context, cudaContext, ptx, "atan2", writeTarget, srcY, srcX, elementCount);
 
             return writeTarget;
@@ -354,15 +354,15 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static Tensor Invoke(ElementwiseKernels kernels, Tensor result, Tensor srcA, Tensor srcB, float weight)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(srcA);
-            CudaContext cudaContext = context.CudaContextForTensor(srcA);
+            var context = CudaHelpers.TSContextForTensor(srcA);
+            var cudaContext = context.CudaContextForTensor(srcA);
 
             cudaContext.SetCurrent();
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, srcA, false, srcA.Sizes);
-            long elementCount = writeTarget.ElementCount();
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, srcA, false, srcA.Sizes);
+            var elementCount = writeTarget.ElementCount();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
+            var ptx = kernels.GetPtx(context.Compiler);
             ApplyOpInvoke.Invoke(context, cudaContext, ptx, "lerp", writeTarget, srcA, srcB, weight, elementCount);
 
             return writeTarget;
@@ -375,8 +375,8 @@ namespace TensorSharp.CUDA.KernelOps
         {
             //    cudaContext.SetCurrent();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
-            long elementCount = result.ElementCount();
+            var ptx = kernels.GetPtx(context.Compiler);
+            var elementCount = result.ElementCount();
             ApplyOpInvoke.Invoke(context, cudaContext, ptx, "copy", result, src, elementCount);
         }
     }
@@ -385,13 +385,13 @@ namespace TensorSharp.CUDA.KernelOps
     {
         public static void Invoke(FillCopyKernels kernels, Tensor result, float value)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(result);
-            CudaContext cudaContext = context.CudaContextForTensor(result);
+            var context = CudaHelpers.TSContextForTensor(result);
+            var cudaContext = context.CudaContextForTensor(result);
 
             cudaContext.SetCurrent();
 
-            byte[] ptx = kernels.GetPtx(context.Compiler);
-            long elementCount = result.ElementCount();
+            var ptx = kernels.GetPtx(context.Compiler);
+            var elementCount = result.ElementCount();
             ApplyOpInvoke.Invoke(context, cudaContext, ptx, "fill", result, value, elementCount);
         }
     }

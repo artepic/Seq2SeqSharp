@@ -39,24 +39,25 @@ namespace TensorSharp.CUDA
         {
             this.deviceIds = deviceIds;
 
-            devices = new DeviceState[deviceIds.Length];
-            for (int i = 0; i < deviceIds.Length; i++)
+            this.devices = new DeviceState[deviceIds.Length];
+            for (var i = 0; i < deviceIds.Length; i++)
             {
-                devices[i] = new DeviceState(deviceIds[i], memoryUsageRatio);
+                this.devices[i] = new DeviceState(deviceIds[i], memoryUsageRatio);
             }
-            p2pAccess = EnablePeerAccess(devices.Select(x => x.CudaContext).ToArray(), devices[0].CudaContext);
 
-            diskCache = new RuntimeCompiler.KernelDiskCache(Path.Combine(Environment.CurrentDirectory, CacheDir));
-            compiler = new RuntimeCompiler.CudaCompiler(diskCache, compilerOptions);
+            this.p2pAccess = EnablePeerAccess(this.devices.Select(x => x.CudaContext).ToArray(), this.devices[0].CudaContext);
+
+            this.diskCache = new RuntimeCompiler.KernelDiskCache(Path.Combine(Environment.CurrentDirectory, CacheDir));
+            this.compiler = new RuntimeCompiler.CudaCompiler(this.diskCache, compilerOptions);
 
             OpRegistry.RegisterAssembly(Assembly.GetExecutingAssembly());
         }
 
         private int GetDeviceIdIndex(int id)
         {
-            for (int i = 0; i < deviceIds.Length; i++)
+            for (var i = 0; i < this.deviceIds.Length; i++)
             {
-                if (deviceIds[i] == id)
+                if (this.deviceIds[i] == id)
                 {
                     return i;
                 }
@@ -66,15 +67,15 @@ namespace TensorSharp.CUDA
         }
 
 
-        public RuntimeCompiler.CudaCompiler Compiler => compiler;
-        public CudaKernelCache KernelCache => kernelCache;
+        public RuntimeCompiler.CudaCompiler Compiler => this.compiler;
+        public CudaKernelCache KernelCache => this.kernelCache;
         //  public int DeviceCount { get { return deviceCount; } }
 
         public void Dispose()
         {
-            kernelCache.Dispose();
+            this.kernelCache.Dispose();
 
-            foreach (DeviceState device in devices)
+            foreach (var device in this.devices)
             {
                 device.Dispose();
             }
@@ -82,13 +83,13 @@ namespace TensorSharp.CUDA
 
         public void Synchronize(int deviceId)
         {
-            int idx = GetDeviceIdIndex(deviceId);
-            devices[idx].CudaContext.Synchronize();
+            var idx = this.GetDeviceIdIndex(deviceId);
+            this.devices[idx].CudaContext.Synchronize();
         }
 
         public void SynchronizeAll()
         {
-            foreach (DeviceState device in devices)
+            foreach (var device in this.devices)
             {
                 device.CudaContext.Synchronize();
             }
@@ -96,49 +97,49 @@ namespace TensorSharp.CUDA
 
         public CudaContext CudaContextForDevice(int deviceId)
         {
-            int idx = GetDeviceIdIndex(deviceId);
-            return devices[idx].CudaContext;
+            var idx = this.GetDeviceIdIndex(deviceId);
+            return this.devices[idx].CudaContext;
         }
 
         public IDeviceAllocator AllocatorForDevice(int deviceId)
         {
-            int idx = GetDeviceIdIndex(deviceId);
-            return devices[idx].MemoryAllocator;
+            var idx = this.GetDeviceIdIndex(deviceId);
+            return this.devices[idx].MemoryAllocator;
         }
 
         public CudaContext CudaContextForTensor(Tensor tensor)
         {
-            return CudaContextForDevice(CudaHelpers.GetDeviceId(tensor));
+            return this.CudaContextForDevice(CudaHelpers.GetDeviceId(tensor));
         }
 
         public ScratchSpace ScratchSpaceForDevice(int deviceId)
         {
-            int idx = GetDeviceIdIndex(deviceId);
-            return devices[idx].ScratchSpace;
+            var idx = this.GetDeviceIdIndex(deviceId);
+            return this.devices[idx].ScratchSpace;
         }
 
         public PooledObject<CudaBlas> BlasForDevice(int deviceId)
         {
-            int idx = GetDeviceIdIndex(deviceId);
-            return devices[idx].BlasHandles.Get();
+            var idx = this.GetDeviceIdIndex(deviceId);
+            return this.devices[idx].BlasHandles.Get();
         }
 
         public PooledObject<CudaBlas> BlasForTensor(Tensor tensor)
         {
-            return BlasForDevice(CudaHelpers.GetDeviceId(tensor));
+            return this.BlasForDevice(CudaHelpers.GetDeviceId(tensor));
         }
 
         public bool CanAccessPeer(int srcDevice, int peerDevice)
         {
-            int srcDeviceIdx = GetDeviceIdIndex(srcDevice);
-            int peerDeviceIdx = GetDeviceIdIndex(peerDevice);
-            return p2pAccess[srcDeviceIdx, peerDeviceIdx];
+            var srcDeviceIdx = this.GetDeviceIdIndex(srcDevice);
+            var peerDeviceIdx = this.GetDeviceIdIndex(peerDevice);
+            return this.p2pAccess[srcDeviceIdx, peerDeviceIdx];
         }
 
         public CudaDeviceProperties DeviceInfoForContext(CudaContext cudaContext)
         {
-            int idx = GetDeviceIdIndex(cudaContext.DeviceId);
-            return devices[idx].DeviceInfo;
+            var idx = this.GetDeviceIdIndex(cudaContext.DeviceId);
+            return this.devices[idx].DeviceInfo;
         }
 
 
@@ -146,11 +147,11 @@ namespace TensorSharp.CUDA
         // Returns a matrix of [i, j] values where [i, j] is true iff device i can access device j
         private static bool[,] EnablePeerAccess(CudaContext[] cudaContexts, CudaContext restoreCurrent)
         {
-            bool[,] result = new bool[cudaContexts.Length, cudaContexts.Length];
+            var result = new bool[cudaContexts.Length, cudaContexts.Length];
 
-            for (int i = 0; i < cudaContexts.Length; ++i)
+            for (var i = 0; i < cudaContexts.Length; ++i)
             {
-                for (int j = 0; j < cudaContexts.Length; ++j)
+                for (var j = 0; j < cudaContexts.Length; ++j)
                 {
                     if (i == j)
                     {
@@ -190,24 +191,24 @@ namespace TensorSharp.CUDA
 
         public void Precompile()
         {
-            Precompile(Console.Write);
+            this.Precompile(Console.Write);
         }
 
         public void Precompile(Action<string> precompileProgressWriter)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            foreach (Tuple<Type, IEnumerable<PrecompileAttribute>> applyType in assembly.TypesWithAttribute<PrecompileAttribute>(true).Where(x => !x.Item1.IsAbstract))
+            var assembly = Assembly.GetExecutingAssembly();
+            foreach (var applyType in assembly.TypesWithAttribute<PrecompileAttribute>(true).Where(x => !x.Item1.IsAbstract))
             {
                 precompileProgressWriter("Precompiling " + applyType.Item1.Name + "\n");
 
-                IPrecompilable instance = (IPrecompilable)Activator.CreateInstance(applyType.Item1);
-                instance.Precompile(Compiler);
+                var instance = (IPrecompilable)Activator.CreateInstance(applyType.Item1);
+                instance.Precompile(this.Compiler);
             }
         }
 
         public void CleanUnusedPTX()
         {
-            diskCache.CleanUnused();
+            this.diskCache.CleanUnused();
         }
     }
 }

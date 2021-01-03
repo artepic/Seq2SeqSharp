@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Seq2SeqSharp.Tools
@@ -15,8 +14,8 @@ namespace Seq2SeqSharp.Tools
         public string SrcSnt;
         public string TgtSnt;
 
-        public int SrcLength = 0;
-        public int TgtLength = 0;
+        public int SrcLength;
+        public int TgtLength;
         public RawSntPair(string s, string t)
         {
             this.SrcSnt = s;
@@ -29,7 +28,7 @@ namespace Seq2SeqSharp.Tools
 
         private int CountWhiteSpace(string s)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
             {
                 return 0;
             }
@@ -55,7 +54,7 @@ namespace Seq2SeqSharp.Tools
 
         public bool IsEmptyPair()
         {
-            return String.IsNullOrEmpty(this.SrcSnt) && String.IsNullOrEmpty(this.TgtSnt);
+            return string.IsNullOrEmpty(this.SrcSnt) && string.IsNullOrEmpty(this.TgtSnt);
         }
     }
 
@@ -87,7 +86,7 @@ namespace Seq2SeqSharp.Tools
         private readonly List<string> m_srcFileList;
         private readonly List<string> m_tgtFileList;
 
-        public int CorpusSize = 0;
+        public int CorpusSize;
 
         public int BatchSize => this.m_batchSize;
 
@@ -341,7 +340,7 @@ namespace Seq2SeqSharp.Tools
 
         public IEnumerator<SntPairBatch> GetEnumerator()
         {
-            (var srcShuffledFilePath, var tgtShuffledFilePath) = this.ShuffleAll();
+            var (srcShuffledFilePath, tgtShuffledFilePath) = this.ShuffleAll();
 
             using (var srSrc = new StreamReader(srcShuffledFilePath))
             {
@@ -428,7 +427,7 @@ namespace Seq2SeqSharp.Tools
                 inputSeq.Add(EOS);
             }
 
-            var inputSeqs = new List<List<string>>() { inputSeq };
+            var inputSeqs = new List<List<string>> { inputSeq };
 
             return inputSeqs;
         }

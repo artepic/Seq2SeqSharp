@@ -7,7 +7,7 @@ namespace TensorSharp.Cpu
     {
         NonTranspose = (byte)'n',
         Transpose = (byte)'t',
-        ConjugateTranspose = (byte)'c',
+        ConjugateTranspose = (byte)'c'
     }
 
 

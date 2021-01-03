@@ -6,11 +6,6 @@ namespace TensorSharp.Cpu
     [OpsClass]
     public class CpuFillCopyOps
     {
-        public CpuFillCopyOps()
-        {
-        }
-
-
         private readonly MethodInfo fill_func = NativeWrapper.GetMethod("TS_Fill");
         [RegisterOpStorageType("fill", typeof(CpuStorage))]
         public void Fill(Tensor result, float value)

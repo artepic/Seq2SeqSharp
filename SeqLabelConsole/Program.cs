@@ -14,11 +14,11 @@ namespace SeqLabelConsole
     {
         private static void ss_IterationDone(object sender, EventArgs e)
         {
-            CostEventArg ep = e as CostEventArg;
-
+            var ep = e as CostEventArg;
+            
             if (float.IsInfinity(ep.CostPerWord) == false)
             {
-                TimeSpan ts = DateTime.Now - ep.StartDateTime;
+                var ts = DateTime.Now - ep.StartDateTime;
                 double sentPerMin = 0;
                 double wordPerSec = 0;
                 if (ts.TotalMinutes > 0)
@@ -48,8 +48,8 @@ namespace SeqLabelConsole
             Logger.LogFile = $"{nameof(SeqLabelConsole)}_{GetTimeStamp(DateTime.Now)}.log";
 
             //Parse command line
-            Options opts = new Options();
-            ArgParser argParser = new ArgParser(args, opts);
+            var opts = new Options();
+            var argParser = new ArgParser(args, opts);
 
             if (string.IsNullOrEmpty(opts.ConfigFilePath) == false)
             {
@@ -59,19 +59,19 @@ namespace SeqLabelConsole
 
 
             SequenceLabel sl = null;
-            ProcessorTypeEnums processorType = (ProcessorTypeEnums)Enum.Parse(typeof(ProcessorTypeEnums), opts.ProcessorType);
-            EncoderTypeEnums encoderType = (EncoderTypeEnums)Enum.Parse(typeof(EncoderTypeEnums), opts.EncoderType);
-            ModeEnums mode = (ModeEnums)Enum.Parse(typeof(ModeEnums), opts.TaskName);
+            var processorType = (ProcessorTypeEnums)Enum.Parse(typeof(ProcessorTypeEnums), opts.ProcessorType);
+            var encoderType = (EncoderTypeEnums)Enum.Parse(typeof(EncoderTypeEnums), opts.EncoderType);
+            var mode = (ModeEnums)Enum.Parse(typeof(ModeEnums), opts.TaskName);
 
             //Parse device ids from options          
-            int[] deviceIds = opts.DeviceIds.Split(',').Select(x => int.Parse(x)).ToArray();
+            var deviceIds = opts.DeviceIds.Split(',').Select(x => int.Parse(x)).ToArray();
             if (mode == ModeEnums.Train)
             {
                 // Load train corpus
-                SequenceLabelingCorpus trainCorpus = new SequenceLabelingCorpus(opts.TrainCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, maxSentLength: opts.MaxSentLength);
+                var trainCorpus = new SequenceLabelingCorpus(opts.TrainCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, maxSentLength: opts.MaxSentLength);
 
                 // Load valid corpus
-                SequenceLabelingCorpus validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new SequenceLabelingCorpus(opts.ValidCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, maxSentLength: opts.MaxSentLength);
+                var validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new SequenceLabelingCorpus(opts.ValidCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, maxSentLength: opts.MaxSentLength);
 
                 // Load or build vocabulary
                 Vocab vocab = null;
@@ -90,11 +90,11 @@ namespace SeqLabelConsole
                 ILearningRate learningRate = new DecayLearningRate(opts.StartLearningRate, opts.WarmUpSteps, opts.WeightsUpdateCount);
 
                 // Create optimizer
-                AdamOptimizer optimizer = new AdamOptimizer(opts.GradClip, opts.Beta1, opts.Beta2);
+                var optimizer = new AdamOptimizer(opts.GradClip, opts.Beta1, opts.Beta2);
 
                 // Create metrics
-                List<IMetric> metrics = new List<IMetric>();
-                foreach (string word in vocab.TgtVocab)
+                var metrics = new List<IMetric>();
+                foreach (var word in vocab.TgtVocab)
                 {
                     metrics.Add(new SequenceLabelFscoreMetric(word));
                 }
@@ -126,12 +126,12 @@ namespace SeqLabelConsole
                 Logger.WriteLine($"Evaluate model '{opts.ModelFilePath}' by valid corpus '{opts.ValidCorpusPath}'");
 
                 // Load valid corpus
-                SequenceLabelingCorpus validCorpus = new SequenceLabelingCorpus(opts.ValidCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, opts.MaxSentLength);
+                var validCorpus = new SequenceLabelingCorpus(opts.ValidCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, opts.MaxSentLength);
 
-                Vocab vocab = new Vocab(validCorpus);
+                var vocab = new Vocab(validCorpus);
                 // Create metrics
-                List<IMetric> metrics = new List<IMetric>();
-                foreach (string word in vocab.TgtVocab)
+                var metrics = new List<IMetric>();
+                foreach (var word in vocab.TgtVocab)
                 {
                     metrics.Add(new SequenceLabelFscoreMetric(word));
                 }
@@ -146,11 +146,11 @@ namespace SeqLabelConsole
                 //Test trained model
                 sl = new SequenceLabel(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, maxSntSize: opts.MaxSentLength);
 
-                List<string> outputLines = new List<string>();
-                string[] data_sents_raw1 = File.ReadAllLines(opts.InputTestFile);
-                foreach (string line in data_sents_raw1)
+                var outputLines = new List<string>();
+                var data_sents_raw1 = File.ReadAllLines(opts.InputTestFile);
+                foreach (var line in data_sents_raw1)
                 {
-                    List<List<string>> outputTokensBatch = sl.Test(ParallelCorpus.ConstructInputTokens(line.ToLower().Trim().Split(' ').ToList(), false));
+                    var outputTokensBatch = sl.Test(ParallelCorpus.ConstructInputTokens(line.ToLower().Trim().Split(' ').ToList(), false));
                     outputLines.AddRange(outputTokensBatch.Select(x => string.Join(" ", x)));
                 }
 
@@ -164,7 +164,7 @@ namespace SeqLabelConsole
 
         private static void ShowOptions(string[] args)
         {
-            string commandLine = string.Join(" ", args);
+            var commandLine = string.Join(" ", args);
             Logger.WriteLine($"Seq2SeqSharp v2.0 written by Zhongkai Fu(fuzhongkai@gmail.com)");
             Logger.WriteLine($"Command Line = '{commandLine}'");
         }

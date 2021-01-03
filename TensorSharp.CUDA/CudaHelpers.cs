@@ -14,15 +14,15 @@ namespace TensorSharp.CUDA
 
         public static void ThrowIfDifferentDevices(params Tensor[] tensors)
         {
-            IEnumerable<Tensor> nonNull = tensors.Where(x => x != null);
+            var nonNull = tensors.Where(x => x != null);
             if (!nonNull.Any())
             {
                 return;
             }
 
-            int device = CudaHelpers.GetDeviceId(nonNull.First());
+            var device = GetDeviceId(nonNull.First());
 
-            if (nonNull.Any(x => CudaHelpers.GetDeviceId(x) != device))
+            if (nonNull.Any(x => GetDeviceId(x) != device))
             {
                 throw new InvalidOperationException("All tensors must reside on the same device");
             }

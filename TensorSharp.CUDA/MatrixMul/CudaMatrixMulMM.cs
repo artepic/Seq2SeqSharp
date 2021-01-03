@@ -16,9 +16,9 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new InvalidOperationException("Size mismatch");
             }
 
-            BlasOp aOp = default(BlasOp);
-            BlasOp bOp = default(BlasOp);
-            bool copyC = false;
+            var aOp = default(BlasOp);
+            var bOp = default(BlasOp);
+            var copyC = false;
 
             Tensor aClone = null;
             Tensor bClone = null;
@@ -47,7 +47,7 @@ namespace TensorSharp.CUDA.MatrixMul
             }
             else
             {
-                Tensor cNew = new Tensor(c.Allocator, c.ElementType, c.Sizes[1], c.Sizes[0]);
+                var cNew = new Tensor(c.Allocator, c.ElementType, c.Sizes[1], c.Sizes[0]);
                 cClone = cNew.Transpose();
                 Ops.Copy(cClone, c);
                 cNew.Dispose();
@@ -69,14 +69,14 @@ namespace TensorSharp.CUDA.MatrixMul
                     aClone.Strides[0] != 0 && aClone.Strides[0] != 1)
                 {
                     aOp = BlasOp.Transpose;
-                    Tensor aNew = aClone.Transpose();
+                    var aNew = aClone.Transpose();
                     aClone.Dispose();
                     aClone = aNew;
                 }
                 else
                 {
-                    Tensor aNew = new Tensor(aClone.Allocator, aClone.ElementType, aClone.Sizes[1], aClone.Sizes[0]);
-                    Tensor aClone2 = aNew.Transpose();
+                    var aNew = new Tensor(aClone.Allocator, aClone.ElementType, aClone.Sizes[1], aClone.Sizes[0]);
+                    var aClone2 = aNew.Transpose();
                     Ops.Copy(aClone2, aClone);
                     aClone.Dispose();
                     aClone = aClone2;
@@ -95,14 +95,14 @@ namespace TensorSharp.CUDA.MatrixMul
                     bClone.Strides[0] != 0 && bClone.Strides[0] != 1)
                 {
                     bOp = BlasOp.Transpose;
-                    Tensor bNew = bClone.Transpose();
+                    var bNew = bClone.Transpose();
                     bClone.Dispose();
                     bClone = bNew;
                 }
                 else
                 {
-                    Tensor bNew = new Tensor(bClone.Allocator, bClone.ElementType, bClone.Sizes[1], bClone.Sizes[0]);
-                    Tensor bClone2 = bNew.Transpose();
+                    var bNew = new Tensor(bClone.Allocator, bClone.ElementType, bClone.Sizes[1], bClone.Sizes[0]);
+                    var bClone2 = bNew.Transpose();
                     Ops.Copy(bClone2, bClone);
                     bClone.Dispose();
                     bClone = bClone2;
@@ -136,9 +136,9 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new InvalidOperationException("Size mismatch");
             }
 
-            BlasOp aOp = default(BlasOp);
-            BlasOp bOp = default(BlasOp);
-            bool copyC = false;
+            var aOp = default(BlasOp);
+            var bOp = default(BlasOp);
+            var copyC = false;
 
             Tensor aClone = null;
             Tensor bClone = null;
@@ -167,7 +167,7 @@ namespace TensorSharp.CUDA.MatrixMul
             }
             else
             {
-                Tensor cNew = new Tensor(c.Allocator, c.ElementType, c.Sizes[0], c.Sizes[2], c.Sizes[1]);
+                var cNew = new Tensor(c.Allocator, c.ElementType, c.Sizes[0], c.Sizes[2], c.Sizes[1]);
                 cClone = cNew.Transpose(1, 2);
                 Ops.Copy(cClone, c);
                 cNew.Dispose();
@@ -189,14 +189,14 @@ namespace TensorSharp.CUDA.MatrixMul
                     aClone.Strides[1] != 0 && aClone.Strides[1] != 1)
                 {
                     aOp = BlasOp.Transpose;
-                    Tensor aNew = aClone.Transpose(1, 2);
+                    var aNew = aClone.Transpose(1, 2);
                     aClone.Dispose();
                     aClone = aNew;
                 }
                 else
                 {
-                    Tensor aNew = new Tensor(aClone.Allocator, aClone.ElementType, aClone.Sizes[0], aClone.Sizes[2], aClone.Sizes[1]);
-                    Tensor aClone2 = aNew.Transpose(1, 2);
+                    var aNew = new Tensor(aClone.Allocator, aClone.ElementType, aClone.Sizes[0], aClone.Sizes[2], aClone.Sizes[1]);
+                    var aClone2 = aNew.Transpose(1, 2);
                     Ops.Copy(aClone2, aClone);
                     aClone.Dispose();
                     aClone = aClone2;
@@ -215,14 +215,14 @@ namespace TensorSharp.CUDA.MatrixMul
                     bClone.Strides[1] != 0 && bClone.Strides[1] != 1)
                 {
                     bOp = BlasOp.Transpose;
-                    Tensor bNew = bClone.Transpose(1, 2);
+                    var bNew = bClone.Transpose(1, 2);
                     bClone.Dispose();
                     bClone = bNew;
                 }
                 else
                 {
-                    Tensor bNew = new Tensor(bClone.Allocator, bClone.ElementType, bClone.Sizes[0], bClone.Sizes[2], bClone.Sizes[1]);
-                    Tensor bClone2 = bNew.Transpose(1, 2);
+                    var bNew = new Tensor(bClone.Allocator, bClone.ElementType, bClone.Sizes[0], bClone.Sizes[2], bClone.Sizes[1]);
+                    var bClone2 = bNew.Transpose(1, 2);
                     Ops.Copy(bClone2, bClone);
                     bClone.Dispose();
                     bClone = bClone2;
@@ -277,56 +277,54 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new ArgumentException("c must be contiguous in the first dimension (column major / fortran order)");
             }
 
-            using (Util.PooledObject<CudaBlas> blas = context.BlasForTensor(c))
+            using var blas = context.BlasForTensor(c);
+            var nta = transA == BlasOp.NonTranspose;
+            var ntb = transB == BlasOp.NonTranspose;
+            var transa = GetCudaBlasOp(transA);
+            var transb = GetCudaBlasOp(transB);
+            var m = (int)a.Sizes[nta ? 0 : 1];
+            var k = (int)b.Sizes[ntb ? 0 : 1];
+            var n = (int)b.Sizes[ntb ? 1 : 0];
+            var lda = (int)a.Strides[1];
+            var ldb = (int)b.Strides[1];
+            var ldc = (int)c.Strides[1];
+
+            var status = CudaBlasNativeMethods.cublasSetMathMode(blas.Value.CublasHandle, ManagedCuda.CudaBlas.Math.TensorOpMath);
+            if (status != CublasStatus.Success)
             {
-                bool nta = transA == BlasOp.NonTranspose;
-                bool ntb = transB == BlasOp.NonTranspose;
-                Operation transa = GetCudaBlasOp(transA);
-                Operation transb = GetCudaBlasOp(transB);
-                int m = (int)a.Sizes[nta ? 0 : 1];
-                int k = (int)b.Sizes[ntb ? 0 : 1];
-                int n = (int)b.Sizes[ntb ? 1 : 0];
-                int lda = (int)a.Strides[1];
-                int ldb = (int)b.Strides[1];
-                int ldc = (int)c.Strides[1];
+                throw new CudaBlasException($"Failed to set math mode to tensor ops.");
+            }
 
-                CublasStatus status = CudaBlasNativeMethods.cublasSetMathMode(blas.Value.CublasHandle, ManagedCuda.CudaBlas.Math.TensorOpMath);
-                if (status != CublasStatus.Success)
-                {
-                    throw new CudaBlasException($"Failed to set math mode to tensor ops.");
-                }
+            if (c.ElementType == DType.Float32)
+            {
+                var aPtrSingle = CudaHelpers.GetBufferStart(a);
+                var bPtrSingle = CudaHelpers.GetBufferStart(b);
+                var cPtrSingle = CudaHelpers.GetBufferStart(c);
 
-                if (c.ElementType == DType.Float32)
+                var _statusF32 = CudaBlasNativeMethods.cublasSgemm_v2(blas.Value.CublasHandle,
+                                                                      transa, transb, m, n, k, ref alpha, aPtrSingle, lda, bPtrSingle, ldb, ref beta, cPtrSingle, ldc);
+                if (_statusF32 != CublasStatus.Success)
                 {
-                    CUdeviceptr aPtrSingle = CudaHelpers.GetBufferStart(a);
-                    CUdeviceptr bPtrSingle = CudaHelpers.GetBufferStart(b);
-                    CUdeviceptr cPtrSingle = CudaHelpers.GetBufferStart(c);
-
-                    CublasStatus _statusF32 = CudaBlasNativeMethods.cublasSgemm_v2(blas.Value.CublasHandle,
-                        transa, transb, m, n, k, ref alpha, aPtrSingle, lda, bPtrSingle, ldb, ref beta, cPtrSingle, ldc);
-                    if (_statusF32 != CublasStatus.Success)
-                    {
-                        throw new CudaBlasException(_statusF32);
-                    }
+                    throw new CudaBlasException(_statusF32);
                 }
-                else if (c.ElementType == DType.Float64)
+            }
+            else if (c.ElementType == DType.Float64)
+            {
+                var aPtrDouble = CudaHelpers.GetBufferStart(a);
+                var bPtrDouble = CudaHelpers.GetBufferStart(b);
+                var cPtrDouble = CudaHelpers.GetBufferStart(c);
+                double alphaDouble = alpha;
+                double betaDouble = beta;
+                var _statusF64 = CudaBlasNativeMethods.cublasDgemm_v2(blas.Value.CublasHandle,
+                                                                      transa, transb, m, n, k, ref alphaDouble, aPtrDouble, lda, bPtrDouble, ldb, ref betaDouble, cPtrDouble, ldc);
+                if (_statusF64 != CublasStatus.Success)
                 {
-                    CUdeviceptr aPtrDouble = CudaHelpers.GetBufferStart(a);
-                    CUdeviceptr bPtrDouble = CudaHelpers.GetBufferStart(b);
-                    CUdeviceptr cPtrDouble = CudaHelpers.GetBufferStart(c);
-                    double alphaDouble = alpha;
-                    double betaDouble = beta;
-                    CublasStatus _statusF64 = CudaBlasNativeMethods.cublasDgemm_v2(blas.Value.CublasHandle,
-                        transa, transb, m, n, k, ref alphaDouble, aPtrDouble, lda, bPtrDouble, ldb, ref betaDouble, cPtrDouble, ldc);
-                    if (_statusF64 != CublasStatus.Success)
-                    {
-                        throw new CudaBlasException(_statusF64);
-                    }
+                    throw new CudaBlasException(_statusF64);
                 }
-                else
-                {
-                    throw new NotSupportedException("CUDA GEMM with element type " + c.ElementType + " not supported");
-                }
+            }
+            else
+            {
+                throw new NotSupportedException("CUDA GEMM with element type " + c.ElementType + " not supported");
             }
         }
 
@@ -352,66 +350,64 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new ArgumentException($"c must be contiguous in the first dimension (column major / fortran order) ({a.Strides[0]}, {a.Strides[1]}, {a.Strides[2]}) ({b.Strides[0]}, {b.Strides[1]}, {b.Strides[2]}) ({c.Strides[0]}, {c.Strides[1]}, {c.Strides[2]})");
             }
 
-            using (Util.PooledObject<CudaBlas> blas = context.BlasForTensor(c))
+            using var blas = context.BlasForTensor(c);
+            var nta = transA == BlasOp.NonTranspose;
+            var ntb = transB == BlasOp.NonTranspose;
+            var transa = GetCudaBlasOp(transA);
+            var transb = GetCudaBlasOp(transB);
+            var m = (int)a.Sizes[nta ? 1 : 2];
+            var k = (int)b.Sizes[ntb ? 1 : 2];
+            var n = (int)b.Sizes[ntb ? 2 : 1];
+            var lda = (int)a.Strides[2];
+            var ldb = (int)b.Strides[2];
+            var ldc = (int)c.Strides[2];
+
+            var stra = (int)a.Strides[0];
+            var strb = (int)b.Strides[0];
+            var strc = (int)c.Strides[0];
+            var batchSize = (int)c.Sizes[0];
+
+
+            //// Set the math mode to allow cuBLAS to use Tensor Cores:
+            //cublasStat = cublasSetMathMode(handle, CUBLAS_TENSOR_OP_MATH);
+
+            var status = CudaBlasNativeMethods.cublasSetMathMode(blas.Value.CublasHandle, ManagedCuda.CudaBlas.Math.TensorOpMath);
+            if (status != CublasStatus.Success)
             {
-                bool nta = transA == BlasOp.NonTranspose;
-                bool ntb = transB == BlasOp.NonTranspose;
-                Operation transa = GetCudaBlasOp(transA);
-                Operation transb = GetCudaBlasOp(transB);
-                int m = (int)a.Sizes[nta ? 1 : 2];
-                int k = (int)b.Sizes[ntb ? 1 : 2];
-                int n = (int)b.Sizes[ntb ? 2 : 1];
-                int lda = (int)a.Strides[2];
-                int ldb = (int)b.Strides[2];
-                int ldc = (int)c.Strides[2];
-
-                int stra = (int)a.Strides[0];
-                int strb = (int)b.Strides[0];
-                int strc = (int)c.Strides[0];
-                int batchSize = (int)c.Sizes[0];
+                throw new CudaBlasException($"Failed to set math mode to tensor ops.");
+            }
 
 
-                //// Set the math mode to allow cuBLAS to use Tensor Cores:
-                //cublasStat = cublasSetMathMode(handle, CUBLAS_TENSOR_OP_MATH);
+            if (c.ElementType == DType.Float32)
+            {
+                var aPtrSingle = CudaHelpers.GetBufferStart(a);
+                var bPtrSingle = CudaHelpers.GetBufferStart(b);
+                var cPtrSingle = CudaHelpers.GetBufferStart(c);
 
-                CublasStatus status = CudaBlasNativeMethods.cublasSetMathMode(blas.Value.CublasHandle, ManagedCuda.CudaBlas.Math.TensorOpMath);
-                if (status != CublasStatus.Success)
+                var _statusF32 = CudaBlasNativeMethods.cublasSgemmStridedBatched(blas.Value.CublasHandle,
+                                                                                 transa, transb, m, n, k, ref alpha, aPtrSingle, lda, stra, bPtrSingle, ldb, strb, ref beta, cPtrSingle, ldc, strc, batchSize);
+                if (_statusF32 != CublasStatus.Success)
                 {
-                    throw new CudaBlasException($"Failed to set math mode to tensor ops.");
+                    throw new CudaBlasException(_statusF32);
                 }
-
-
-                if (c.ElementType == DType.Float32)
+            }
+            else if (c.ElementType == DType.Float64)
+            {
+                var aPtrDouble = CudaHelpers.GetBufferStart(a);
+                var bPtrDouble = CudaHelpers.GetBufferStart(b);
+                var cPtrDouble = CudaHelpers.GetBufferStart(c);
+                double alphaDouble = alpha;
+                double betaDouble = beta;
+                var _statusF64 = CudaBlasNativeMethods.cublasDgemmStridedBatched(blas.Value.CublasHandle,
+                                                                                 transa, transb, m, n, k, ref alphaDouble, aPtrDouble, lda, stra, bPtrDouble, ldb, strb, ref betaDouble, cPtrDouble, ldc, strc, batchSize);
+                if (_statusF64 != CublasStatus.Success)
                 {
-                    CUdeviceptr aPtrSingle = CudaHelpers.GetBufferStart(a);
-                    CUdeviceptr bPtrSingle = CudaHelpers.GetBufferStart(b);
-                    CUdeviceptr cPtrSingle = CudaHelpers.GetBufferStart(c);
-
-                    CublasStatus _statusF32 = CudaBlasNativeMethods.cublasSgemmStridedBatched(blas.Value.CublasHandle,
-                        transa, transb, m, n, k, ref alpha, aPtrSingle, lda, stra, bPtrSingle, ldb, strb, ref beta, cPtrSingle, ldc, strc, batchSize);
-                    if (_statusF32 != CublasStatus.Success)
-                    {
-                        throw new CudaBlasException(_statusF32);
-                    }
+                    throw new CudaBlasException(_statusF64);
                 }
-                else if (c.ElementType == DType.Float64)
-                {
-                    CUdeviceptr aPtrDouble = CudaHelpers.GetBufferStart(a);
-                    CUdeviceptr bPtrDouble = CudaHelpers.GetBufferStart(b);
-                    CUdeviceptr cPtrDouble = CudaHelpers.GetBufferStart(c);
-                    double alphaDouble = alpha;
-                    double betaDouble = beta;
-                    CublasStatus _statusF64 = CudaBlasNativeMethods.cublasDgemmStridedBatched(blas.Value.CublasHandle,
-                        transa, transb, m, n, k, ref alphaDouble, aPtrDouble, lda, stra, bPtrDouble, ldb, strb, ref betaDouble, cPtrDouble, ldc, strc, batchSize);
-                    if (_statusF64 != CublasStatus.Success)
-                    {
-                        throw new CudaBlasException(_statusF64);
-                    }
-                }
-                else
-                {
-                    throw new NotSupportedException("CUDA GEMM with element type " + c.ElementType + " not supported");
-                }
+            }
+            else
+            {
+                throw new NotSupportedException("CUDA GEMM with element type " + c.ElementType + " not supported");
             }
         }
 
@@ -440,7 +436,7 @@ namespace TensorSharp.CUDA.MatrixMul
                 throw new ArgumentException("rhs must be a CUDA tensor", "rhs");
             }
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes[0], rhs.Sizes[1]);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes[0], rhs.Sizes[1]);
 
             Gemm(context, 1, lhs, rhs, 0, writeTarget);
 

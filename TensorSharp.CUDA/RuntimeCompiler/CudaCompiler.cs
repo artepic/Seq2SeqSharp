@@ -18,39 +18,40 @@ namespace TensorSharp.CUDA.RuntimeCompiler
         public CudaCompiler(KernelDiskCache diskCache, string[] options = null)
         {
             this.diskCache = diskCache;
-            m_options = options;
-            RegisterAttributeHeaders(Assembly.GetExecutingAssembly());
+            this.m_options = options;
+            this.RegisterAttributeHeaders(Assembly.GetExecutingAssembly());
         }
 
         public byte[] CompileToPtx(string code, params string[] prependIncludes)
         {
             // We manually prepend include files here, so that the header content forms part of the hash of the source
             // code. This means that changes to headers will correctly trigger a recompile.
-            StringBuilder finalCode = new StringBuilder();
-            foreach (string includeName in prependIncludes)
+            var finalCode = new StringBuilder();
+            foreach (var includeName in prependIncludes)
             {
-                finalCode.Append(includes[includeName]).Append('\n');
+                finalCode.Append(this.includes[includeName]).Append('\n');
             }
             finalCode.Append(code);
-            string finalCodeString = finalCode.ToString();
+            var finalCodeString = finalCode.ToString();
 
-            return diskCache.Get(finalCodeString, DoCompile);
+            return this.diskCache.Get(finalCodeString, this.DoCompile);
         }
 
         private byte[] DoCompile(string fullSource)
         {
-            ManagedCuda.NVRTC.CudaRuntimeCompiler rtc = new ManagedCuda.NVRTC.CudaRuntimeCompiler(fullSource, null);
+            var rtc = new ManagedCuda.NVRTC.CudaRuntimeCompiler(fullSource, null);
 
             try
             {
-                if (m_options == null || m_options.Length == 0)
+                if (this.m_options == null ||
+                    this.m_options.Length == 0)
                 {
                     rtc.Compile(new string[] { });
                 }
                 else
                 {
-                    Logger.WriteLine($"Compiler Options: {String.Join(" ", m_options)}");
-                    rtc.Compile(m_options);
+                    Logger.WriteLine($"Compiler Options: {string.Join(" ", this.m_options)}");
+                    rtc.Compile(this.m_options);
                     //rtc.Compile(new string[] { "--use_fast_math", "--gpu-architecture=compute_60" });
                 }
             }
@@ -64,26 +65,26 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         public void RegisterHeader(string name, string content)
         {
-            includes.Add(name, content);
+            this.includes.Add(name, content);
         }
 
 
         private void RegisterAttributeHeaders(Assembly assembly)
         {
-            foreach (Tuple<Type, IEnumerable<CudaIncludeAttribute>> applyType in assembly.TypesWithAttribute<CudaIncludeAttribute>(false))
+            foreach (var applyType in assembly.TypesWithAttribute<CudaIncludeAttribute>(false))
             {
-                foreach (CudaIncludeAttribute attribute in applyType.Item2)
+                foreach (var attribute in applyType.Item2)
                 {
-                    Tuple<string, string> info = HeaderInfoFromAttribute(applyType.Item1, attribute);
-                    RegisterHeader(info.Item1, info.Item2);
+                    var info = this.HeaderInfoFromAttribute(applyType.Item1, attribute);
+                    this.RegisterHeader(info.Item1, info.Item2);
                 }
             }
         }
 
         private Tuple<string, string> HeaderInfoFromAttribute(Type containingType, CudaIncludeAttribute attribute)
         {
-            FieldInfo field = containingType.GetField(attribute.FieldName, BindingFlags.Public | BindingFlags.Static);
-            string content = (string)field.GetValue(null);
+            var field = containingType.GetField(attribute.FieldName, BindingFlags.Public | BindingFlags.Static);
+            var content = (string)field.GetValue(null);
             return Tuple.Create(attribute.IncludeName, content);
         }
     }

@@ -9,7 +9,7 @@ namespace TensorSharp
         Float16 = 1,
         Float64 = 2,
         Int32 = 3,
-        UInt8 = 4,
+        UInt8 = 4
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -58,26 +58,24 @@ namespace TensorSharp
             {
                 return DType.Float16;
             }
-            else if (type == typeof(float))
+
+            if (type == typeof(float))
             {
                 return DType.Float32;
             }
-            else if (type == typeof(double))
+            if (type == typeof(double))
             {
                 return DType.Float64;
             }
-            else if (type == typeof(int))
+            if (type == typeof(int))
             {
                 return DType.Int32;
             }
-            else if (type == typeof(byte))
+            if (type == typeof(byte))
             {
                 return DType.UInt8;
             }
-            else
-            {
-                throw new NotSupportedException("No corresponding DType value for CLR type " + type);
-            }
+            throw new NotSupportedException("No corresponding DType value for CLR type " + type);
         }
     }
 }

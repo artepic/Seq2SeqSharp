@@ -55,11 +55,11 @@ namespace Seq2SeqSharp
                 var hhSum = computeGraph.Affine(hxhc, this.m_Wxhc, this.m_b);
                 var hhSum2 = this.m_layerNorm1.Norm(hhSum, computeGraph);
 
-                (var gates_raw, var cell_write_raw) = computeGraph.SplitColumns(hhSum2, this.m_hiddenDim * 3, this.m_hiddenDim);
+                var (gates_raw, cell_write_raw) = computeGraph.SplitColumns(hhSum2, this.m_hiddenDim * 3, this.m_hiddenDim);
                 var gates = computeGraph.Sigmoid(gates_raw);
                 var cell_write = computeGraph.Tanh(cell_write_raw);
 
-                (var input_gate, var forget_gate, var output_gate) = computeGraph.SplitColumns(gates, this.m_hiddenDim, this.m_hiddenDim, this.m_hiddenDim);
+                var (input_gate, forget_gate, output_gate) = computeGraph.SplitColumns(gates, this.m_hiddenDim, this.m_hiddenDim, this.m_hiddenDim);
 
                 // compute new cell activation: ct = forget_gate * cell_prev + input_gate * cell_write
                 this.Cell = g.EltMulMulAdd(forget_gate, cell_prev, input_gate, cell_write);

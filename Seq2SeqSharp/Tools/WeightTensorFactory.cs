@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using TensorSharp;
+﻿using System.Collections.Generic;
 
 namespace Seq2SeqSharp.Tools
 {

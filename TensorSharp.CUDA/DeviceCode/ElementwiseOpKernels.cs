@@ -10,7 +10,7 @@
 
         private static string GetFullCode()
         {
-            PermutationGenerator result = new PermutationGenerator();
+            var result = new PermutationGenerator();
        
             AppendTTSFunc(result, "add", "add_op");
             AppendTTSFunc(result, "sub", "sub_op");

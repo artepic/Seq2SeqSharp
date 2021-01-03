@@ -7,11 +7,6 @@ namespace TensorSharp.Cpu
     [OpsClass]
     public class CpuBasicOps
     {
-        public CpuBasicOps()
-        {
-        }
-
-
         [RegisterOpStorageType("dot", typeof(CpuStorage))]
         public Tensor Dot(Tensor result, Tensor lhs, Tensor rhs)
         {
@@ -19,18 +14,16 @@ namespace TensorSharp.Cpu
             {
                 return MatrixMultiplication.Dot(result, lhs, rhs);
             }
-            else if (lhs.DimensionCount == 2 && rhs.DimensionCount == 1)
+
+            if (lhs.DimensionCount == 2 && rhs.DimensionCount == 1)
             {
                 return MatrixMultiplication.Mul_M_V(result, lhs, rhs);
             }
-            else if (lhs.DimensionCount == 2 && rhs.DimensionCount == 2)
+            if (lhs.DimensionCount == 2 && rhs.DimensionCount == 2)
             {
                 return MatrixMultiplication.Mul_M_M(result, lhs, rhs);
             }
-            else
-            {
-                throw new NotSupportedException(string.Format("Multiplication of {0}D with {1}D tensor is not supported"));
-            }
+            throw new NotSupportedException(string.Format("Multiplication of {0}D with {1}D tensor is not supported"));
         }
 
         [RegisterOpStorageType("addmm", typeof(CpuStorage))]

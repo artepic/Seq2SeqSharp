@@ -25,25 +25,25 @@ namespace TensorSharp.CUDA.Util
         {
             get
             {
-                if (disposed)
+                if (this.disposed)
                 {
-                    throw new ObjectDisposedException(ToString());
+                    throw new ObjectDisposedException(this.ToString());
                 }
 
-                return value;
+                return this.value;
             }
         }
 
         public void Dispose()
         {
-            if (!disposed)
+            if (!this.disposed)
             {
-                onDispose(this);
-                disposed = true;
+                this.onDispose(this);
+                this.disposed = true;
             }
             else
             {
-                throw new ObjectDisposedException(ToString());
+                throw new ObjectDisposedException(this.ToString());
             }
         }
     }
@@ -71,34 +71,35 @@ namespace TensorSharp.CUDA.Util
             this.constructor = constructor;
             this.destructor = destructor;
 
-            for (int i = 0; i < initialSize; ++i)
+            for (var i = 0; i < initialSize; ++i)
             {
-                freeList.Push(constructor());
+                this.freeList.Push(constructor());
             }
         }
 
         public void Dispose()
         {
-            if (!disposed)
+            if (!this.disposed)
             {
-                disposed = true;
-                foreach (T item in freeList)
+                this.disposed = true;
+                foreach (var item in this.freeList)
                 {
-                    destructor(item);
+                    this.destructor(item);
                 }
-                freeList.Clear();
+
+                this.freeList.Clear();
             }
         }
 
         public PooledObject<T> Get()
         {
-            T value = freeList.Count > 0 ? freeList.Pop() : constructor();
-            return new PooledObject<T>(value, Release);
+            var value = this.freeList.Count > 0 ? this.freeList.Pop() : this.constructor();
+            return new PooledObject<T>(value, this.Release);
         }
 
         private void Release(PooledObject<T> handle)
         {
-            freeList.Push(handle.Value);
+            this.freeList.Push(handle.Value);
         }
     }
 }

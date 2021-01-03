@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace Seq2SeqSharp
@@ -152,11 +151,7 @@ namespace Seq2SeqSharp
         /// <returns></returns>
         public T GetNetworkOnDevice(int deviceIdIdx)
         {
-            if (deviceIdIdx == -1)
-            {
-                return this.m_networkOnDefaultDevice;
-            }
-            return this.m_networks[deviceIdIdx];
+            return deviceIdIdx == -1 ? this.m_networkOnDefaultDevice : this.m_networks[deviceIdIdx];
         }
     }
 }

@@ -23,7 +23,7 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         public static void Convert(CudaContext context, bool index32, object[] args)
         {
-            for (int i = 0; i < args.Length; ++i)
+            for (var i = 0; i < args.Length; ++i)
             {
                 if (args[i] is Tensor)
                 {
@@ -38,12 +38,12 @@ namespace TensorSharp.CUDA.RuntimeCompiler
         {
             if (index32)
             {
-                TensorInfoIndex32 ti = new TensorInfoIndex32
+                var ti = new TensorInfoIndex32
                 {
                     data = CudaHelpers.GetBufferStart(tensor),
                     dims = tensor.DimensionCount
                 };
-                for (int i = 0; i < tensor.DimensionCount; ++i)
+                for (var i = 0; i < tensor.DimensionCount; ++i)
                 {
                     ti.sizes[i] = (uint)tensor.Sizes[i];
                     ti.strides[i] = (uint)tensor.Strides[i];
@@ -58,12 +58,12 @@ namespace TensorSharp.CUDA.RuntimeCompiler
             }
             else
             {
-                TensorInfoIndex64 ti = new TensorInfoIndex64
+                var ti = new TensorInfoIndex64
                 {
                     data = CudaHelpers.GetBufferStart(tensor),
                     dims = tensor.DimensionCount
                 };
-                for (int i = 0; i < tensor.DimensionCount; ++i)
+                for (var i = 0; i < tensor.DimensionCount; ++i)
                 {
                     ti.sizes[i] = (ulong)tensor.Sizes[i];
                     ti.strides[i] = (ulong)tensor.Strides[i];

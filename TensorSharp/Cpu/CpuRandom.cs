@@ -9,18 +9,10 @@ namespace TensorSharp.Cpu
         private static readonly Random seedGen = new Random();
 
 
-        public CpuRandom()
-        {
-        }
-
-
         // allArgs should start with a null placeholder for the RNG object
         private static void InvokeWithRng(int? seed, MethodInfo method, params object[] allArgs)
         {
-            if (!seed.HasValue)
-            {
-                seed = seedGen.Next();
-            }
+            seed ??= seedGen.Next();
 
             NativeWrapper.CheckResult(CpuOpsNative.TS_NewRNG(out var rng));
             NativeWrapper.CheckResult(CpuOpsNative.TS_SetRNGSeed(rng, seed.Value));

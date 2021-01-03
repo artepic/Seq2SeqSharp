@@ -18,12 +18,12 @@ namespace TensorSharp.CUDA.ContextState
 
         public void Dispose()
         {
-            lock (locker)
+            lock (this.locker)
             {
-                foreach (KeyValuePair<Tuple<CudaContext, byte[], string>, CudaKernel> kvp in activeKernels)
+                foreach (var kvp in this.activeKernels)
                 {
-                    CudaContext ctx = kvp.Key.Item1;
-                    CudaKernel kernel = kvp.Value;
+                    var ctx = kvp.Key.Item1;
+                    var kernel = kvp.Value;
 
                     ctx.UnloadKernel(kernel);
                 }
@@ -34,18 +34,18 @@ namespace TensorSharp.CUDA.ContextState
 
         public CudaKernel Get(CudaContext context, byte[] ptx, string kernelName)
         {
-            lock (locker)
+            lock (this.locker)
             {
                 try
                 {
-                    if (activeKernels.TryGetValue(Tuple.Create(context, ptx, kernelName), out CudaKernel value))
+                    if (this.activeKernels.TryGetValue(Tuple.Create(context, ptx, kernelName), out var value))
                     {
                         return value;
                     }
                     else
                     {
                         value = context.LoadKernelPTX(ptx, kernelName);
-                        activeKernels.Add(Tuple.Create(context, ptx, kernelName), value);
+                        this.activeKernels.Add(Tuple.Create(context, ptx, kernelName), value);
                         return value;
                     }
                 }

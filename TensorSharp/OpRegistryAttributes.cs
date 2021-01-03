@@ -14,7 +14,7 @@ namespace TensorSharp
     {
         public string OpName { get; private set; }
 
-        public RegisterOp(string opName)
+        protected RegisterOp(string opName)
         {
             this.OpName = opName;
         }
@@ -78,10 +78,6 @@ namespace TensorSharp
     [AttributeUsage(AttributeTargets.Parameter)]
     public abstract class ArgConstraintAttribute : Attribute
     {
-        public ArgConstraintAttribute()
-        {
-        }
-
         public abstract IEnumerable<OpConstraint> GetConstraints(ParameterInfo parameter, object instance);
     }
 

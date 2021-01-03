@@ -14,7 +14,7 @@ namespace TensorSharp.CUDA.ContextState
 
         public BasicDeviceAllocator(CudaContext cudaContext)
         {
-            context = cudaContext;
+            this.context = cudaContext;
         }
 
         public void Dispose()
@@ -24,8 +24,8 @@ namespace TensorSharp.CUDA.ContextState
 
         public IDeviceMemory Allocate(long byteCount)
         {
-            CUdeviceptr buffer = context.AllocateMemory(byteCount);
-            return new BasicDeviceMemory(buffer, () => context.FreeMemory(buffer));
+            var buffer = this.context.AllocateMemory(byteCount);
+            return new BasicDeviceMemory(buffer, () => this.context.FreeMemory(buffer));
         }
 
         public float GetAllocatedMemoryRatio()
@@ -39,7 +39,7 @@ namespace TensorSharp.CUDA.ContextState
         private readonly CUdeviceptr pointer;
         private readonly Action freeHandler;
 
-        public CUdeviceptr Pointer => pointer;
+        public CUdeviceptr Pointer => this.pointer;
 
 
         public BasicDeviceMemory(CUdeviceptr pointer, Action freeHandler)
@@ -50,7 +50,7 @@ namespace TensorSharp.CUDA.ContextState
 
         public void Free()
         {
-            freeHandler();
+            this.freeHandler();
         }
     }
 }

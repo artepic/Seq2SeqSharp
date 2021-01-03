@@ -8,25 +8,24 @@ namespace TensorSharp
     {
         public static void Serialize(Tensor tensor, Stream stream)
         {
-            using (var src = Ops.AsContiguous(tensor))
+            using var src = Ops.AsContiguous(tensor);
+
+            // Note: don't dispose writer - it does not own the stream's lifetime
+            var writer = new BinaryWriter(stream);
+
+            // Can infer strides - src is contiguous
+            writer.Write(tensor.DimensionCount); // int32
+            writer.Write((int)tensor.ElementType);
+            for (var i = 0; i < tensor.DimensionCount; ++i)
             {
-                // Note: don't dispose writer - it does not own the stream's lifetime
-                var writer = new BinaryWriter(stream);
-
-                // Can infer strides - src is contiguous
-                writer.Write(tensor.DimensionCount); // int32
-                writer.Write((int)tensor.ElementType);
-                for (var i = 0; i < tensor.DimensionCount; ++i)
-                {
-                    writer.Write(tensor.Sizes[i]);
-                }
-
-                var byteCount = src.ElementType.Size() * tensor.ElementCount();
-                writer.Write(byteCount);
-                WriteBytes(writer, src.Storage, src.StorageOffset, byteCount);
-
-                writer.Flush();
+                writer.Write(tensor.Sizes[i]);
             }
+
+            var byteCount = src.ElementType.Size() * tensor.ElementCount();
+            writer.Write(byteCount);
+            WriteBytes(writer, src.Storage, src.StorageOffset, byteCount);
+
+            writer.Flush();
         }
 
         public static Tensor Deserialize(IAllocator allocator, Stream stream)

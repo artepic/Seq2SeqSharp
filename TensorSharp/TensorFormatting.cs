@@ -94,7 +94,7 @@ namespace TensorSharp
         {
             Int,
             Scientific,
-            Float,
+            Float
         }
         private static Tuple<FormatType, double, int> GetFormatSize(Tuple<double, double> minMax, bool intMode)
         {
@@ -107,48 +107,35 @@ namespace TensorSharp
 
             if (intMode)
             {
-                if (expMax > 9)
-                {
-                    return Tuple.Create(FormatType.Scientific, 1.0, 11);
-                }
-                else
-                {
-                    return Tuple.Create(FormatType.Int, 1.0, expMax + 1);
-                }
+                return expMax > 9 ? Tuple.Create(FormatType.Scientific, 1.0, 11) : Tuple.Create(FormatType.Int, 1.0, expMax + 1);
             }
-            else
+
+            if (expMax - expMin > 4)
             {
-                if (expMax - expMin > 4)
-                {
-                    var sz = Math.Abs(expMax) > 99 || Math.Abs(expMin) > 99 ?
-                                 12 : 11;
-                    return Tuple.Create(FormatType.Scientific, 1.0, sz);
-                }
-                else
-                {
-                    if (expMax > 5 || expMax < 0)
-                    {
-                        return Tuple.Create(FormatType.Float,
-                            Math.Pow(10, expMax - 1), 7);
-                    }
-                    else
-                    {
-                        return Tuple.Create(FormatType.Float, 1.0,
-                            expMax == 0 ? 7 : expMax + 6);
-                    }
-                }
+                var sz = Math.Abs(expMax) > 99 || Math.Abs(expMin) > 99 ?
+                             12 : 11;
+                return Tuple.Create(FormatType.Scientific, 1.0, sz);
             }
+
+            if (expMax > 5 || expMax < 0)
+            {
+                return Tuple.Create(FormatType.Float,
+                                    Math.Pow(10, expMax - 1), 7);
+            }
+
+            return Tuple.Create(FormatType.Float, 1.0,
+                                expMax == 0 ? 7 : expMax + 6);
         }
 
         private static string BuildFormatString(FormatType type, int size)
         {
-            switch (type)
+            return type switch
             {
-                case FormatType.Int: return GetIntFormat(size);
-                case FormatType.Float: return GetFloatFormat(size);
-                case FormatType.Scientific: return GetScientificFormat(size);
-                default: throw new InvalidOperationException("Invalid format type " + type);
-            }
+                FormatType.Int => GetIntFormat(size),
+                FormatType.Float => GetFloatFormat(size),
+                FormatType.Scientific => GetScientificFormat(size),
+                _ => throw new InvalidOperationException("Invalid format type " + type)
+            };
         }
 
         private static Tuple<string, double, int> GetStorageFormat(Storage storage, Tensor tensor)
@@ -260,24 +247,23 @@ namespace TensorSharp
 
                 for (long l = 0; l < tensor.Sizes[0]; ++l)
                 {
-                    using (var row = tensor.Select(0, l))
+                    using var row = tensor.Select(0, l);
+
+                    for (var c = firstColumn; c <= lastColumn; ++c)
                     {
-                        for (var c = firstColumn; c <= lastColumn; ++c)
+                        var value = Convert.ToDouble((object)row.GetElementAsFloat(c)) / scale;
+                        builder.Append(string.Format(format, value));
+                        if (c == lastColumn)
                         {
-                            var value = Convert.ToDouble((object)row.GetElementAsFloat(c)) / scale;
-                            builder.Append(string.Format(format, value));
-                            if (c == lastColumn)
+                            builder.AppendLine();
+                            if (l != tensor.Sizes[0])
                             {
-                                builder.AppendLine();
-                                if (l != tensor.Sizes[0])
-                                {
-                                    builder.Append(scale != 1 ? indent + " " : indent);
-                                }
+                                builder.Append(scale != 1 ? indent + " " : indent);
                             }
-                            else
-                            {
-                                builder.Append(' ');
-                            }
+                        }
+                        else
+                        {
+                            builder.Append(' ');
                         }
                     }
                 }

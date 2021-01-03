@@ -2,11 +2,9 @@
 using Seq2SeqSharp.Metrics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
@@ -26,9 +24,9 @@ namespace Seq2SeqSharp.Tools
 
         private readonly string m_modelFilePath;
         private readonly float m_regc = 1e-10f; // L2 regularization strength
-        private int m_weightsUpdateCount = 0;
+        private int m_weightsUpdateCount;
         private double m_avgCostPerWordInTotalInLastEpoch = 10000.0;
-        private double m_bestPrimaryScore = 0.0f;
+        private double m_bestPrimaryScore;
         private readonly object locker = new object();
         private SortedList<string, IMultiProcessorNetworkWrapper> m_name2network;
         DateTime m_lastCheckPointDateTime = DateTime.Now;
@@ -133,7 +131,7 @@ namespace Seq2SeqSharp.Tools
                     {
                         try
                         {
-                            (var cost, var sWordCnt, var tWordCnt, var processedLine) = this.RunNetwork(ForwardOnSingleDevice, sntPairBatchs, batchSplitFactor);
+                            var (cost, sWordCnt, tWordCnt, processedLine) = this.RunNetwork(ForwardOnSingleDevice, sntPairBatchs, batchSplitFactor);
                             processedLineInTotal += processedLine;
                             srcWordCntsInTotal += sWordCnt;
                             tgtWordCntsInTotal += tWordCnt;
@@ -153,7 +151,7 @@ namespace Seq2SeqSharp.Tools
                             if (this.IterationDone != null &&
                                 this.m_weightsUpdateCount % 100 == 0)
                             {
-                                this.IterationDone(this, new CostEventArg()
+                                this.IterationDone(this, new CostEventArg
                                 {
                                     LearningRate = lr,
                                     CostPerWord = cost / tWordCnt,
@@ -172,7 +170,7 @@ namespace Seq2SeqSharp.Tools
                         {
                             if (err.InnerExceptions != null)
                             {
-                                var oomMessage = String.Empty;
+                                var oomMessage = string.Empty;
                                 var isOutOfMemException = false;
                                 var isArithmeticException = false;
                                 foreach (var excep in err.InnerExceptions)
@@ -411,7 +409,7 @@ namespace Seq2SeqSharp.Tools
                         {
                             srcTkns.Add(sntPairBatch.SntPairs[j].SrcSnt.ToList());
                             refTkns.Add(sntPairBatch.SntPairs[j].TgtSnt.ToList());
-                            hypTkns.Add(new List<string>() { ParallelCorpus.BOS });
+                            hypTkns.Add(new List<string> { ParallelCorpus.BOS });
                         }
 
                         // Create a new computing graph instance
@@ -438,7 +436,7 @@ namespace Seq2SeqSharp.Tools
                                         throw new InvalidDataException($"Hyp token only has '{hypTkns.Count}' batch, however, it try to access batch '{j}'. Ref token has '{refTkns.Count}' tokens, Batch Size = '{sntPairBatch.BatchSize}'");
                                     }
 
-                                    metric.Evaluate(new List<List<string>>() { refTkns[j] }, hypTkns[j]);
+                                    metric.Evaluate(new List<List<string>> { refTkns[j] }, hypTkns[j]);
                                 }
                             }
 

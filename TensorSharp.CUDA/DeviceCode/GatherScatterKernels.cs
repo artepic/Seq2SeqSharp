@@ -214,7 +214,7 @@ __global__ void scatterFill_kernel(
 
         private static string GetCode()
         {
-            StringBuilder sb = new StringBuilder(Code);
+            var sb = new StringBuilder(Code);
             sb.AppendLine(GetMacroInvocations(true, 1));
             sb.AppendLine(GetMacroInvocations(true, 2));
             sb.AppendLine(GetMacroInvocations(true, 3));
@@ -225,7 +225,7 @@ __global__ void scatterFill_kernel(
 
         private static string GetMacroInvocations(bool is32, int dims)
         {
-            string indexType = is32 ? ApplySpecialization.IndexType32 : ApplySpecialization.IndexType64;
+            var indexType = is32 ? ApplySpecialization.IndexType32 : ApplySpecialization.IndexType64;
 
             return
                 string.Format("DECLARE_GATHER({0}, {1}, {2})\n", MakeKernelName(GatherBaseName, is32, dims), indexType, dims) +
@@ -247,8 +247,8 @@ __global__ void scatterFill_kernel(
 
         public Tensor Gather(Tensor result, Tensor src, int dim, Tensor indices)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             if (result != null && result.DimensionCount != src.DimensionCount)
             {
@@ -275,26 +275,26 @@ __global__ void scatterFill_kernel(
                 throw new InvalidOperationException("result and src must be the same size except in dimension dim");
             }
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, indices.Allocator, src.ElementType, false, indices.Sizes);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, indices.Allocator, src.ElementType, false, indices.Sizes);
 
-            long nElement = indices.ElementCount();
-            dim3 block = ApplyUtils.GetApplyBlock();
-            dim3 grid = ApplyUtils.GetApplyGrid(context.DeviceInfoForContext(cudaContext), nElement);
+            var nElement = indices.ElementCount();
+            var block = ApplyUtils.GetApplyBlock();
+            var grid = ApplyUtils.GetApplyGrid(context.DeviceInfoForContext(cudaContext), nElement);
 
             if (ApplyUtils.CanUse32BitIndexMath(writeTarget) &&
                 ApplyUtils.CanUse32BitIndexMath(src) &&
                 ApplyUtils.CanUse32BitIndexMath(indices))
             {
-                int dims = indices.DimensionCount <= 3 ? indices.DimensionCount : -1;
-                string kernelName = MakeKernelName(GatherBaseName, true, dims);
-                Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, true,
-                    writeTarget, src, indices, dim, (int)nElement);
+                var dims = indices.DimensionCount <= 3 ? indices.DimensionCount : -1;
+                var kernelName = MakeKernelName(GatherBaseName, true, dims);
+                this.Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, true,
+                            writeTarget, src, indices, dim, (int)nElement);
             }
             else
             {
-                string kernelName = MakeKernelName(GatherBaseName, false, -1);
-                Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, false,
-                   writeTarget, src, indices, dim, nElement);
+                var kernelName = MakeKernelName(GatherBaseName, false, -1);
+                this.Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, false,
+                            writeTarget, src, indices, dim, nElement);
             }
 
             return writeTarget;
@@ -302,8 +302,8 @@ __global__ void scatterFill_kernel(
 
         public Tensor Scatter(Tensor result, Tensor src, int dim, Tensor indices)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForTensor(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForTensor(src);
 
             if (result == null)
             {
@@ -335,26 +335,26 @@ __global__ void scatterFill_kernel(
                 throw new InvalidOperationException("result and src must be the same size except in dimension dim");
             }
 
-            Tensor writeTarget = result;
+            var writeTarget = result;
 
-            long nElement = indices.ElementCount();
-            dim3 block = ApplyUtils.GetApplyBlock();
-            dim3 grid = ApplyUtils.GetApplyGrid(context.DeviceInfoForContext(cudaContext), nElement);
+            var nElement = indices.ElementCount();
+            var block = ApplyUtils.GetApplyBlock();
+            var grid = ApplyUtils.GetApplyGrid(context.DeviceInfoForContext(cudaContext), nElement);
 
             if (ApplyUtils.CanUse32BitIndexMath(writeTarget) &&
                 ApplyUtils.CanUse32BitIndexMath(src) &&
                 ApplyUtils.CanUse32BitIndexMath(indices))
             {
-                int dims = indices.DimensionCount <= 3 ? indices.DimensionCount : -1;
-                string kernelName = MakeKernelName(ScatterBaseName, true, dims);
-                Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, true,
-                    writeTarget, src, indices, dim, (int)nElement);
+                var dims = indices.DimensionCount <= 3 ? indices.DimensionCount : -1;
+                var kernelName = MakeKernelName(ScatterBaseName, true, dims);
+                this.Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, true,
+                            writeTarget, src, indices, dim, (int)nElement);
             }
             else
             {
-                string kernelName = MakeKernelName(ScatterBaseName, false, -1);
-                Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, false,
-                   writeTarget, src, indices, dim, nElement);
+                var kernelName = MakeKernelName(ScatterBaseName, false, -1);
+                this.Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, false,
+                            writeTarget, src, indices, dim, nElement);
             }
 
             return writeTarget;
@@ -362,8 +362,8 @@ __global__ void scatterFill_kernel(
 
         public Tensor ScatterFill(Tensor result, float value, int dim, Tensor indices)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(indices);
-            CudaContext cudaContext = context.CudaContextForTensor(indices);
+            var context = CudaHelpers.TSContextForTensor(indices);
+            var cudaContext = context.CudaContextForTensor(indices);
 
             if (result == null)
             {
@@ -385,25 +385,25 @@ __global__ void scatterFill_kernel(
                 throw new InvalidOperationException("result and indices must be the same size except in dimension dim");
             }
 
-            Tensor writeTarget = result;
+            var writeTarget = result;
 
-            long nElement = indices.ElementCount();
-            dim3 block = ApplyUtils.GetApplyBlock();
-            dim3 grid = ApplyUtils.GetApplyGrid(context.DeviceInfoForContext(cudaContext), nElement);
+            var nElement = indices.ElementCount();
+            var block = ApplyUtils.GetApplyBlock();
+            var grid = ApplyUtils.GetApplyGrid(context.DeviceInfoForContext(cudaContext), nElement);
 
             if (ApplyUtils.CanUse32BitIndexMath(writeTarget) &&
                 ApplyUtils.CanUse32BitIndexMath(indices))
             {
-                int dims = indices.DimensionCount <= 3 ? indices.DimensionCount : -1;
-                string kernelName = MakeKernelName(ScatterFillBaseName, true, dims);
-                Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, true,
-                    writeTarget, indices, value, dim, (int)nElement);
+                var dims = indices.DimensionCount <= 3 ? indices.DimensionCount : -1;
+                var kernelName = MakeKernelName(ScatterFillBaseName, true, dims);
+                this.Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, true,
+                            writeTarget, indices, value, dim, (int)nElement);
             }
             else
             {
-                string kernelName = MakeKernelName(ScatterFillBaseName, false, -1);
-                Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, false,
-                   writeTarget, indices, value, dim, nElement);
+                var kernelName = MakeKernelName(ScatterFillBaseName, false, -1);
+                this.Invoke(context, cudaContext, kernelName, grid, block, 0, CUstream.NullStream, false,
+                            writeTarget, indices, value, dim, nElement);
             }
 
             return writeTarget;
@@ -414,8 +414,8 @@ __global__ void scatterFill_kernel(
         {
             ConvertTensorArgs.Convert(cudaContext, index32, args);
 
-            byte[] ptx = GetPtx(context.Compiler);
-            CudaKernel kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
+            var ptx = this.GetPtx(context.Compiler);
+            var kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
             kernel.GridDimensions = grid;
             kernel.BlockDimensions = block;
             kernel.DynamicSharedMemory = smemSize;

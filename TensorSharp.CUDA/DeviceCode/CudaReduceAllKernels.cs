@@ -10,9 +10,9 @@
 
         private static string GetFullCode()
         {
-            string identity = "return a;";
+            var identity = "return a;";
 
-            PermutationGenerator result = new PermutationGenerator();
+            var result = new PermutationGenerator();
             result.AddReduceAll("sumAll", identity, "return a + b;");
             result.AddReduceAll("prodAll", identity, "return a * b;");
             result.AddReduceAll("minAll", identity, "return min(a, b);");

@@ -9,7 +9,7 @@ namespace TensorSharp.Cpu
         Float16 = 1,
         Float64 = 2,
         Int32 = 3,
-        UInt8 = 4,
+        UInt8 = 4
     }
 
     [StructLayout(LayoutKind.Sequential)]

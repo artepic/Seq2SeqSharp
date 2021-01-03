@@ -16,16 +16,16 @@ namespace TensorSharp.CUDA.DeviceCode
 
         public byte[] GetPtx(CudaCompiler compiler)
         {
-            if (ptx == null)
+            if (this.ptx == null)
             {
-                Precompile(compiler);
+                this.Precompile(compiler);
             }
-            return ptx;
+            return this.ptx;
         }
 
         public void Precompile(CudaCompiler compiler)
         {
-            ptx = compiler.CompileToPtx(code, requiredHeaders);
+            this.ptx = compiler.CompileToPtx(this.code, this.requiredHeaders);
         }
     }
 

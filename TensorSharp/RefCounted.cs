@@ -13,13 +13,6 @@ namespace TensorSharp
     {
         private int refCount = 1;
 
-        /// <summary>
-        /// Construct a new reference counted object. The reference count automatically starts at 1.
-        /// </summary>
-        public RefCounted()
-        {
-        }
-
         ~RefCounted()
         {
             if (this.refCount > 0)
@@ -64,19 +57,17 @@ namespace TensorSharp
         /// </summary>
         public void AddRef()
         {
-            int curRefCount;
-            int original;
             var spin = new SpinWait();
             while (true)
             {
-                curRefCount = this.refCount;
+                var curRefCount = this.refCount;
                 if (curRefCount == 0)
                 {
                     throw new InvalidOperationException("Cannot AddRef - object has already been destroyed");
                 }
 
                 var desiredRefCount = curRefCount + 1;
-                original = Interlocked.CompareExchange(ref this.refCount, desiredRefCount, curRefCount);
+                var original = Interlocked.CompareExchange(ref this.refCount, desiredRefCount, curRefCount);
                 if (original == curRefCount)
                 {
                     break;
@@ -92,19 +83,17 @@ namespace TensorSharp
         /// </summary>
         public void Release()
         {
-            int original;
-            int curRefCount;
             var spin = new SpinWait();
             while (true)
             {
-                curRefCount = this.refCount;
+                var curRefCount = this.refCount;
                 if (curRefCount == 0)
                 {
                     throw new InvalidOperationException("Cannot release object - object has already been destroyed");
                 }
 
                 var desiredRefCount = this.refCount - 1;
-                original = Interlocked.CompareExchange(ref this.refCount, desiredRefCount, curRefCount);
+                var original = Interlocked.CompareExchange(ref this.refCount, desiredRefCount, curRefCount);
                 if (original == curRefCount)
                 {
                     break;

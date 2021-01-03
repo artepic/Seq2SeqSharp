@@ -1,7 +1,7 @@
 ﻿using AdvUtils;
 using Seq2SeqSharp.Metrics;
 using Seq2SeqSharp.Tools;
-using Seq2SeqSharp.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,7 +144,7 @@ namespace Seq2SeqSharp
         private float RunForwardOnSingleDevice(IComputeGraph g, List<List<string>> srcSnts, List<List<string>> tgtSnts, int deviceIdIdx, bool isTraining)
         {
 
-            (var encoder, var srcEmbedding, var posEmbedding, var decoderFFLayer) = this.GetNetworksOnDeviceAt(deviceIdIdx);
+            var (encoder, srcEmbedding, posEmbedding, decoderFFLayer) = this.GetNetworksOnDeviceAt(deviceIdIdx);
 
             // Reset networks
             encoder.Reset(g.GetWeightFactory(), srcSnts.Count);

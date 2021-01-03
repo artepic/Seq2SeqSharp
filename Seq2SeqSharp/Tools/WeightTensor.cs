@@ -37,12 +37,12 @@ namespace Seq2SeqSharp.Tools
 
         private IAllocator m_allocator;
 
-        private Tensor m_TWeight = null;
-        private Tensor m_TGradient = null;
+        private Tensor m_TWeight;
+        private Tensor m_TGradient;
         private static readonly object locker = new object();
 
-        private bool releasedWeight = false;
-        private bool releasedGradient = false;
+        private bool releasedWeight;
+        private bool releasedGradient;
         private IComputeGraph m_computeGraphToBind;
 
         private string m_GradientSetName = "None";
@@ -442,14 +442,7 @@ namespace Seq2SeqSharp.Tools
 
         public List<IWeightTensor> GetParams()
         {
-            if (this.IsTrainable)
-            {
-                return new List<IWeightTensor>() { this };
-            }
-            else
-            {
-                return new List<IWeightTensor>();
-            }
+            return this.IsTrainable ? new List<IWeightTensor> { this } : new List<IWeightTensor>();
         }
     }
 }

@@ -78,14 +78,8 @@ namespace TensorSharp.Expression
             {
                 return min;
             }
-            else if (value > max)
-            {
-                return max;
-            }
-            else
-            {
-                return value;
-            }
+
+            return value > max ? max : value;
         }
     }
 }

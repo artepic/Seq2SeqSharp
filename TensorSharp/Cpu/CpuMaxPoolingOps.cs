@@ -82,27 +82,26 @@ namespace TensorSharp.Cpu
                 }
             }
 
-            using (var inputContig = Ops.AsContiguous(input))
+            using var inputContig = Ops.AsContiguous(input);
+            for (var i = 0; i < nbatch; ++i)
             {
-                for (var i = 0; i < nbatch; ++i)
+                using var input_i = inputContig.Select(0, i);
+                using var output_i = output.Select(0, i);
+                using var indices_i = indices.Select(0, i);
+                using (NativeWrapper.BuildTensorRefPtr(input_i, out var input_iPtr))
                 {
-                    using (var input_i = inputContig.Select(0, i))
-                    using (var output_i = output.Select(0, i))
-                    using (var indices_i = indices.Select(0, i))
+                    using (NativeWrapper.BuildTensorRefPtr(output_i, out var output_iPtr))
                     {
-                        using (NativeWrapper.BuildTensorRefPtr(input_i, out var input_iPtr))
-                        using (NativeWrapper.BuildTensorRefPtr(output_i, out var output_iPtr))
                         using (NativeWrapper.BuildTensorRefPtr(indices_i, out var indices_iPtr))
                         {
                             CpuOpsNative.TS_SpatialMaxPooling_updateOutput_frame(input_iPtr, output_iPtr, indices_iPtr,
-                                nslices, iwidth, iheight,
-                                owidth, oheight,
-                                cd.kW, cd.kH, cd.dW, cd.dH, cd.padW, cd.padH);
+                                                                                 nslices, iwidth, iheight,
+                                                                                 owidth, oheight,
+                                                                                 cd.kW, cd.kH, cd.dW, cd.dH, cd.padW, cd.padH);
                         }
                     }
                 }
             }
-
         }
 
 
@@ -121,23 +120,22 @@ namespace TensorSharp.Cpu
 
             Ops.Fill(gradInput, 0);
 
-
-            using (var gradOutputContig = Ops.AsContiguous(gradOutput))
+            using var gradOutputContig = Ops.AsContiguous(gradOutput);
+            for (var i = 0; i < nbatch; ++i)
             {
-                for (var i = 0; i < nbatch; ++i)
+                using var gradInput_i = gradInput.Select(0, i);
+                using var gradOutput_i = gradOutputContig.Select(0, i);
+                using var indices_i = indices.Select(0, i);
+                using (NativeWrapper.BuildTensorRefPtr(gradInput_i, out var gradInput_iPtr))
                 {
-                    using (var gradInput_i = gradInput.Select(0, i))
-                    using (var gradOutput_i = gradOutputContig.Select(0, i))
-                    using (var indices_i = indices.Select(0, i))
+                    using (NativeWrapper.BuildTensorRefPtr(gradOutput_i, out var gradOutput_iPtr))
                     {
-                        using (NativeWrapper.BuildTensorRefPtr(gradInput_i, out var gradInput_iPtr))
-                        using (NativeWrapper.BuildTensorRefPtr(gradOutput_i, out var gradOutput_iPtr))
                         using (NativeWrapper.BuildTensorRefPtr(indices_i, out var indices_iPtr))
                         {
                             CpuOpsNative.TS_SpatialMaxPooling_updateGradInput_frame(gradInput_iPtr, gradOutput_iPtr, indices_iPtr,
-                                nslices, iwidth, iheight,
-                                owidth, oheight,
-                                cd.dW, cd.dH);
+                                                                                    nslices, iwidth, iheight,
+                                                                                    owidth, oheight,
+                                                                                    cd.dW, cd.dH);
                         }
                     }
                 }

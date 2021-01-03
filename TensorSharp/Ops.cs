@@ -14,14 +14,7 @@ namespace TensorSharp
 
         public static Tensor AsContiguous(Tensor src)
         {
-            if (src.IsContiguous())
-            {
-                return src.CopyRef();
-            }
-            else
-            {
-                return NewContiguous(src);
-            }
+            return src.IsContiguous() ? src.CopyRef() : NewContiguous(src);
         }
 
         public static Tensor Concat(Tensor result, int dimension, params Tensor[] inputs)
@@ -40,11 +33,11 @@ namespace TensorSharp
                 //If the result is not on the CPU, it is much faster to build the tensor on the CPU and then copy
                 //An alternative to this would be building a specific GPU kernel for this operation
                 var cpuAlloc = new Cpu.CpuAllocator();
-                using (var cpuResult = new Tensor(cpuAlloc, result.ElementType, result.Sizes))
-                {
-                    DoFillOneHot(cpuResult, labelCount, labels);
-                    Copy(result, cpuResult);
-                }
+
+                using var cpuResult = new Tensor(cpuAlloc, result.ElementType, result.Sizes);
+
+                DoFillOneHot(cpuResult, labelCount, labels);
+                Copy(result, cpuResult);
             }
         }
 
@@ -246,15 +239,47 @@ namespace TensorSharp
         public static Tensor VarAll(Tensor result, Tensor src) { return (Tensor)OpRegistry.Invoke("varall", result, src); }
 
 
-        public static float SumAll(Tensor src) { using (var resultTensor = SumAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
-        public static float ProdAll(Tensor src) { using (var resultTensor = ProdAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
-        public static float MinAll(Tensor src) { using (var resultTensor = MinAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
-        public static float MaxAll(Tensor src) { using (var resultTensor = MaxAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
+        public static float SumAll(Tensor src)
+        {
+            using var resultTensor = SumAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
+        public static float ProdAll(Tensor src)
+        {
+            using var resultTensor = ProdAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
+        public static float MinAll(Tensor src)
+        {
+            using var resultTensor = MinAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
+        public static float MaxAll(Tensor src)
+        {
+            using var resultTensor = MaxAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
 
-        public static float MeanAll(Tensor src) { using (var resultTensor = MeanAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
-        public static float VarAll(Tensor src) { using (var resultTensor = VarAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
-        public static float StdAll(Tensor src) { using (var resultTensor = StdAll(null, src)) { return resultTensor.GetElementAsFloat(0); } }
-        public static float NormAll(Tensor src, float value) { using (var resultTensor = NormAll(null, src, value)) { return resultTensor.GetElementAsFloat(0); } }
+        public static float MeanAll(Tensor src)
+        {
+            using var resultTensor = MeanAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
+        public static float VarAll(Tensor src)
+        {
+            using var resultTensor = VarAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
+        public static float StdAll(Tensor src)
+        {
+            using var resultTensor = StdAll(null, src);
+            return resultTensor.GetElementAsFloat(0);
+        }
+        public static float NormAll(Tensor src, float value)
+        {
+            using var resultTensor = NormAll(null, src, value);
+            return resultTensor.GetElementAsFloat(0);
+        }
 
 
         public static Tensor IndexSelect(Tensor result, Tensor src, int dim, Tensor indices) { return (Tensor)OpRegistry.Invoke("index_select", result, src, dim, indices); }
@@ -265,7 +290,7 @@ namespace TensorSharp
 
         private static int? GetSeed(RandomGenerator src)
         {
-            return src == null ? (int?)null : src.NextSeed();
+            return src?.NextSeed();
         }
 
         public static void RandomUniform(Tensor result, RandomGenerator seedSource, float min, float max) { OpRegistry.Invoke("random_uniform", result, GetSeed(seedSource), min, max); }

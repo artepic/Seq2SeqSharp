@@ -120,13 +120,13 @@ __global__ void MaxPoolBackward(const int nthreads, const float* top_diff,
 
         public void SpatialMaxPoolingForward(Tensor input, Tensor output, Tensor indices, ConvolutionDesc2d cd, bool ceilMode)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(input);
-            CudaContext cudaContext = context.CudaContextForTensor(input);
+            var context = CudaHelpers.TSContextForTensor(input);
+            var cudaContext = context.CudaContextForTensor(input);
 
-            long iwidth = input.Sizes[3];
-            long iheight = input.Sizes[2];
-            long nInputPlane = input.Sizes[1];
-            long batchSize = input.Sizes[0];
+            var iwidth = input.Sizes[3];
+            var iheight = input.Sizes[2];
+            var nInputPlane = input.Sizes[1];
+            var batchSize = input.Sizes[0];
 
             long owidth;
             long oheight;
@@ -156,58 +156,51 @@ __global__ void MaxPoolBackward(const int nthreads, const float* top_diff,
                 }
             }
 
-            using (Tensor inputContig = Ops.AsContiguous(input))
-            {
-                CUdeviceptr inputPtr = CudaHelpers.GetBufferStart(inputContig);
-                CUdeviceptr outputPtr = CudaHelpers.GetBufferStart(output);
-                CUdeviceptr indicesPtr = CudaHelpers.GetBufferStart(indices);
+            using var inputContig = Ops.AsContiguous(input);
+            var inputPtr = CudaHelpers.GetBufferStart(inputContig);
+            var outputPtr = CudaHelpers.GetBufferStart(output);
+            var indicesPtr = CudaHelpers.GetBufferStart(indices);
 
-                int count = (int)output.ElementCount();
+            var count = (int)output.ElementCount();
 
-                Invoke(context, cudaContext, "MaxPoolForward", new dim3(NNThreads.NumBlocks(count)), new dim3(NNThreads.NumThreads), 0, CUstream.NullStream,
-                    count, inputPtr, batchSize, nInputPlane, iheight, iwidth, oheight, owidth,
-                    cd.kH, cd.kW, cd.dH, cd.dW, cd.padH, cd.padW, outputPtr, indicesPtr);
-            }
+            this.Invoke(context, cudaContext, "MaxPoolForward", new dim3(NNThreads.NumBlocks(count)), new dim3(NNThreads.NumThreads), 0, CUstream.NullStream,
+                        count, inputPtr, batchSize, nInputPlane, iheight, iwidth, oheight, owidth,
+                        cd.kH, cd.kW, cd.dH, cd.dW, cd.padH, cd.padW, outputPtr, indicesPtr);
         }
 
         public void SpatialMaxPoolingBackward(Tensor input, Tensor gradOutput, Tensor gradInput, Tensor indices, ConvolutionDesc2d cd, bool ceilMode)
         {
-            TSCudaContext context = CudaHelpers.TSContextForTensor(gradOutput);
-            CudaContext cudaContext = context.CudaContextForTensor(gradOutput);
+            var context = CudaHelpers.TSContextForTensor(gradOutput);
+            var cudaContext = context.CudaContextForTensor(gradOutput);
 
-            int dimw = 3;
-            int dimh = 2;
-            int dimc = 1;
+            var dimw = 3;
+            var dimh = 2;
+            var dimc = 1;
 
-            long nbatch = input.Sizes[0];
-            long nslices = input.Sizes[dimc];
-            long iheight = input.Sizes[dimh];
-            long iwidth = input.Sizes[dimw];
-            long owidth = gradOutput.Sizes[dimw];
-            long oheight = gradOutput.Sizes[dimh];
+            var nbatch = input.Sizes[0];
+            var nslices = input.Sizes[dimc];
+            var iheight = input.Sizes[dimh];
+            var iwidth = input.Sizes[dimw];
+            var owidth = gradOutput.Sizes[dimw];
+            var oheight = gradOutput.Sizes[dimh];
 
+            using var gradOutputContig = Ops.AsContiguous(gradOutput);
+            var gradOutputPtr = CudaHelpers.GetBufferStart(gradOutputContig);
+            var indicesPtr = CudaHelpers.GetBufferStart(indices);
+            var gradInputPtr = CudaHelpers.GetBufferStart(gradInput);
 
-            using (Tensor gradOutputContig = Ops.AsContiguous(gradOutput))
-            {
-                CUdeviceptr gradOutputPtr = CudaHelpers.GetBufferStart(gradOutputContig);
-                CUdeviceptr indicesPtr = CudaHelpers.GetBufferStart(indices);
-                CUdeviceptr gradInputPtr = CudaHelpers.GetBufferStart(gradInput);
+            var count = (int)input.ElementCount();
 
-                int count = (int)input.ElementCount();
-
-                Invoke(context, cudaContext, "MaxPoolBackward", new dim3(NNThreads.NumBlocks(count)), new dim3(NNThreads.NumThreads), 0, CUstream.NullStream,
-                    count, gradOutputPtr, indicesPtr, nbatch, nslices, iheight, iwidth, oheight, owidth,
-                    cd.kH, cd.kW, cd.dH, cd.dW, cd.padH, cd.padW, gradInputPtr);
-
-            }
-
+            this.Invoke(context, cudaContext, "MaxPoolBackward", new dim3(NNThreads.NumBlocks(count)), new dim3(NNThreads.NumThreads), 0, CUstream.NullStream,
+                        count, gradOutputPtr, indicesPtr, nbatch, nslices, iheight, iwidth, oheight, owidth,
+                        cd.kH, cd.kW, cd.dH, cd.dW, cd.padH, cd.padW, gradInputPtr);
         }
 
 
         private void Invoke(TSCudaContext context, CudaContext cudaContext, string kernelName, dim3 grid, dim3 block, uint smemSize, CUstream stream, params object[] args)
         {
-            byte[] ptx = GetPtx(context.Compiler);
-            CudaKernel kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
+            var ptx = this.GetPtx(context.Compiler);
+            var kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
             kernel.GridDimensions = grid;
             kernel.BlockDimensions = block;
             kernel.DynamicSharedMemory = smemSize;

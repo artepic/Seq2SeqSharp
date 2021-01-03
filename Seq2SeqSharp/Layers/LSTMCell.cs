@@ -47,11 +47,11 @@ namespace Seq2SeqSharp
                 var hhSum = innerGraph.Affine(inputs, this.m_Wxh, this.m_b);
                 var hhSum2 = this.m_layerNorm1.Norm(hhSum, innerGraph);
 
-                (var gates_raw, var cell_write_raw) = innerGraph.SplitColumns(hhSum2, this.m_hdim * 3, this.m_hdim);
+                var (gates_raw, cell_write_raw) = innerGraph.SplitColumns(hhSum2, this.m_hdim * 3, this.m_hdim);
                 var gates = innerGraph.Sigmoid(gates_raw);
                 var cell_write = innerGraph.Tanh(cell_write_raw);
 
-                (var input_gate, var forget_gate, var output_gate) = innerGraph.SplitColumns(gates, this.m_hdim, this.m_hdim, this.m_hdim);
+                var (input_gate, forget_gate, output_gate) = innerGraph.SplitColumns(gates, this.m_hdim, this.m_hdim, this.m_hdim);
 
                 // compute new cell activation: ct = forget_gate * cell_prev + input_gate * cell_write
                 this.m_cell = g.EltMulMulAdd(forget_gate, cell_prev, input_gate, cell_write);

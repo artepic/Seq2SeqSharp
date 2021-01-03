@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 
 namespace TensorSharp
 {
     public class RandomGenerator
     {
-        static Random rnd = new Random(DateTime.Now.Millisecond);
+        static readonly Random rnd = new Random(DateTime.Now.Millisecond);
 
         public int NextSeed()
         {
@@ -32,15 +33,10 @@ namespace TensorSharp
 
         public static float[] BuildRandomBernoulliWeight(long[] sizes, float p)
         {
-            long size = 1;
-            foreach (var s in sizes)
-            {
-                size *= s;
-            }
+            var size = sizes.Aggregate<long, long>(1, (current, s) => current * s);
 
             var w = new float[size];
             
-
             for (var i = 0; i < size; i++)
             {
                 w[i] = rnd.NextDouble() <= p ? 1.0f : 0.0f;

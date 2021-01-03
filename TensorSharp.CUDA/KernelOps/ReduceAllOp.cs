@@ -15,41 +15,41 @@ namespace TensorSharp.CUDA.KernelOps
 
         public static Tensor Invoke(CudaReduceAllKernels reduceAllKernels, float init, ReduceInitType initType, string kernelName, Tensor result, Tensor src, object extraArg = null)
         {
-            int deviceId = CudaHelpers.GetDeviceId(src);
-            TSCudaContext context = CudaHelpers.TSContextForTensor(src);
-            CudaContext cudaContext = context.CudaContextForDevice(deviceId);
+            var deviceId = CudaHelpers.GetDeviceId(src);
+            var context = CudaHelpers.TSContextForTensor(src);
+            var cudaContext = context.CudaContextForDevice(deviceId);
 
             if (src.DimensionCount > TSCudaContext.MaxDims)
             {
                 throw new InvalidOperationException("Tensors with dimension count > " + TSCudaContext.MaxDims + " are not supported");
             }
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, 1);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, src, false, 1);
 
             if (src.DimensionCount == 0)
             {
                 return result;
             }
 
-            long totalElements = src.ElementCount();
-            ApplySpecialization config = new ApplySpecialization(src);
+            var totalElements = src.ElementCount();
+            var config = new ApplySpecialization(src);
             object totalElementsTyped = config.Use32BitIndices ? (uint)totalElements : (ulong)totalElements;
-            object initValueTyped = ReduceInitConverter.GetInitValue(init, initType, src.ElementType);
+            var initValueTyped = ReduceInitConverter.GetInitValue(init, initType, src.ElementType);
 
             dim3 grid;
             dim3 block;
 
-            byte[] ptx = reduceAllKernels.GetPtx(context.Compiler);
-            string fullKernelName = PermutationGenerator.GetMangledName(kernelName, config);
+            var ptx = reduceAllKernels.GetPtx(context.Compiler);
+            var fullKernelName = PermutationGenerator.GetMangledName(kernelName, config);
 
-            ManagedCuda.BasicTypes.CUdeviceptr outputDevicePtr = CudaHelpers.GetBufferStart(writeTarget);
+            var outputDevicePtr = CudaHelpers.GetBufferStart(writeTarget);
 
             if (isTwoPassReductionSize(totalElements))
             {
                 getPass1ReduceBlockGrid(context, deviceId, totalElements, out grid, out block);
-                uint smemSize = block.x * sizeof(float);
+                var smemSize = block.x * sizeof(float);
 
-                ManagedCuda.BasicTypes.CUdeviceptr scratchSpace = context.ScratchSpaceForDevice(deviceId).buffer;
+                var scratchSpace = context.ScratchSpaceForDevice(deviceId).buffer;
 
                 if (extraArg == null)
                 {
@@ -60,7 +60,7 @@ namespace TensorSharp.CUDA.KernelOps
                     InvokeReduceAll(context, cudaContext, ptx, "twoPassA_" + fullKernelName, grid, block, smemSize, config, src, totalElementsTyped, initValueTyped, scratchSpace, extraArg);
                 }
 
-                uint numPass1Blocks = grid.x;
+                var numPass1Blocks = grid.x;
                 getPass2ReduceBlockGrid(context, deviceId, totalElements, out grid, out block);
                 smemSize = block.x * sizeof(float);
 
@@ -70,7 +70,7 @@ namespace TensorSharp.CUDA.KernelOps
             else
             {
                 getSinglePassReduceBlockGrid(totalElements, out grid, out block);
-                uint smemSize = block.x * sizeof(float);
+                var smemSize = block.x * sizeof(float);
 
                 if (extraArg == null)
                 {
@@ -87,10 +87,10 @@ namespace TensorSharp.CUDA.KernelOps
 
         public static void InvokeReduceAllPass2(TSCudaContext context, CudaContext cudaContext, byte[] ptx, string kernelName, dim3 grid, dim3 block, uint smemSize, bool index32, params object[] args)
         {
-            KernelConfig config = new ApplySpecialization(index32).GetConfig();
+            var config = new ApplySpecialization(index32).GetConfig();
 
 
-            CudaKernel kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
+            var kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
 
             kernel.GridDimensions = grid;
             kernel.BlockDimensions = block;
@@ -103,7 +103,7 @@ namespace TensorSharp.CUDA.KernelOps
         {
             ConvertTensorArgs.Convert(cudaContext, spec.Use32BitIndices, args);
 
-            CudaKernel kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
+            var kernel = context.KernelCache.Get(cudaContext, ptx, kernelName);
 
             kernel.GridDimensions = grid;
             kernel.BlockDimensions = block;
@@ -121,7 +121,7 @@ namespace TensorSharp.CUDA.KernelOps
 
         private static long getTwoPassBlocks(TSCudaContext context, int deviceId, long elements)
         {
-            long numBlocks = ApplyUtils.CeilDiv(elements, ReduceAllBlockSize);
+            var numBlocks = ApplyUtils.CeilDiv(elements, ReduceAllBlockSize);
 
             // We can only have as many blocks as there is scratch space
             long scratchSpace =

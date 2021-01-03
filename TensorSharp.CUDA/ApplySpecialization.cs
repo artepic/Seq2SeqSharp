@@ -24,34 +24,34 @@ namespace TensorSharp.CUDA
         {
             if (tensors.All(ApplyUtils.CanUse32BitIndexMath))
             {
-                Use32BitIndices = true;
+                this.Use32BitIndices = true;
 
                 // Specialize each tensor dimenionality independently
-                TensorDims = tensors.Select(tensor =>
-                {
-                    if (tensor.IsContiguous())
-                    {
-                        return -2;
-                    }
+                this.TensorDims = tensors.Select(tensor =>
+                                         {
+                                             if (tensor.IsContiguous())
+                                             {
+                                                 return -2;
+                                             }
 
-                    return -1; // tensor.DimensionCount > 3 ? -1 : tensor.DimensionCount;
-                })
-                .ToArray();
+                                             return -1; // tensor.DimensionCount > 3 ? -1 : tensor.DimensionCount;
+                                         })
+                                         .ToArray();
             }
             else
             {
-                Use32BitIndices = false;
+                this.Use32BitIndices = false;
                 // For 64-bit index case (ie. large tensors), only specalize on totally contiguous
                 // or totally generic
                 if (tensors.All(x => x.IsContiguous()))
                 {
                     // All tensors are contiguous
-                    TensorDims = Enumerable.Repeat(-2, tensors.Length).ToArray();
+                    this.TensorDims = Enumerable.Repeat(-2, tensors.Length).ToArray();
                 }
                 else
                 {
                     // Not all tensors are contiguous - just generate a completely generic kernel
-                    TensorDims = Enumerable.Repeat(-1, tensors.Length).ToArray();
+                    this.TensorDims = Enumerable.Repeat(-1, tensors.Length).ToArray();
                 }
             }
 
@@ -59,22 +59,22 @@ namespace TensorSharp.CUDA
 
         public ApplySpecialization(bool use32BitIndices, params int[] tensorDims)
         {
-            Use32BitIndices = use32BitIndices;
-            TensorDims = tensorDims;
+            this.Use32BitIndices = use32BitIndices;
+            this.TensorDims = tensorDims;
         }
 
 
 
         public KernelConfig GetConfig()
         {
-            KernelConfig result = new KernelConfig();
+            var result = new KernelConfig();
 
-            result.Set("INDEX_TYPE", Use32BitIndices ? IndexType32 : IndexType64);
+            result.Set("INDEX_TYPE", this.Use32BitIndices ? IndexType32 : IndexType64);
 
-            for (int i = 0; i < TensorDims.Length; ++i)
+            for (var i = 0; i < this.TensorDims.Length; ++i)
             {
-                char tensorName = (char)('A' + i);
-                result.Set("DIMS" + tensorName, TensorDims[i].ToString());
+                var tensorName = (char)('A' + i);
+                result.Set("DIMS" + tensorName, this.TensorDims[i].ToString());
             }
 
             return result;
@@ -85,7 +85,7 @@ namespace TensorSharp.CUDA
             yield return new ApplySpecialization(false, Enumerable.Repeat(-2, tensorCount).ToArray());
             yield return new ApplySpecialization(false, Enumerable.Repeat(-1, tensorCount).ToArray());
 
-            foreach (int[] combination in CombinationsOf(All32BitTensorDims, tensorCount))
+            foreach (var combination in CombinationsOf(All32BitTensorDims, tensorCount))
             {
                 yield return new ApplySpecialization(true, combination);
             }
@@ -102,19 +102,19 @@ namespace TensorSharp.CUDA
 
             if (count == 1)
             {
-                foreach (T item in possibleValues)
+                foreach (var item in possibleValues)
                 {
                     yield return new T[] { item };
                 }
             }
             else
             {
-                foreach (T item in possibleValues)
+                foreach (var item in possibleValues)
                 {
-                    IEnumerable<T[]> restCombinations = CombinationsOf(possibleValues, count - 1);
-                    foreach (T[] restItems in restCombinations)
+                    var restCombinations = CombinationsOf(possibleValues, count - 1);
+                    foreach (var restItems in restCombinations)
                     {
-                        List<T> result = new List<T>(count);
+                        var result = new List<T>(count);
                         result.AddRange(restItems);
                         result.Add(item);
                         yield return result.ToArray();

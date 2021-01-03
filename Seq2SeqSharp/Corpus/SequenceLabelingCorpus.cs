@@ -1,11 +1,10 @@
 ﻿using AdvUtils;
-using Seq2SeqSharp.Utils;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Seq2SeqSharp.Tools
@@ -20,7 +19,7 @@ namespace Seq2SeqSharp.Tools
         private readonly List<string> m_srcFileList;
         private readonly List<string> m_tgtFileList;
 
-        public int CorpusSize = 0;
+        public int CorpusSize;
 
         public int BatchSize => this.m_batchSize;
 
@@ -247,7 +246,7 @@ namespace Seq2SeqSharp.Tools
 
         public IEnumerator<SntPairBatch> GetEnumerator()
         {
-            (var srcShuffledFilePath, var tgtShuffledFilePath) = this.ShuffleAll();
+            var (srcShuffledFilePath, tgtShuffledFilePath) = this.ShuffleAll();
 
             using (var srSrc = new StreamReader(srcShuffledFilePath))
             {
@@ -406,12 +405,12 @@ namespace Seq2SeqSharp.Tools
             var currTgtLine = new List<string>();
             foreach (var line in File.ReadAllLines(filePath))
             {
-                if (String.IsNullOrEmpty(line) == true)
+                if (string.IsNullOrEmpty(line) == true)
                 {
                     //This is a new record
 
-                    srcLines.Add(String.Join(" ", currSrcLine));
-                    tgtLines.Add(String.Join(" ", currTgtLine));
+                    srcLines.Add(string.Join(" ", currSrcLine));
+                    tgtLines.Add(string.Join(" ", currTgtLine));
 
                     currSrcLine = new List<string>();
                     currTgtLine = new List<string>();
@@ -427,8 +426,8 @@ namespace Seq2SeqSharp.Tools
                 }
             }
 
-            srcLines.Add(String.Join(" ", currSrcLine));
-            tgtLines.Add(String.Join(" ", currTgtLine));
+            srcLines.Add(string.Join(" ", currSrcLine));
+            tgtLines.Add(string.Join(" ", currTgtLine));
 
             var srcFilePath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName() + "_src.tmp");
             var tgtFilePath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName() + "_tgt.tmp");
@@ -453,7 +452,7 @@ namespace Seq2SeqSharp.Tools
             this.m_tgtFileList = new List<string>();
 
 
-            (var srcFilePath, var tgtFilePath) = this.ConvertSequenceLabelingFormatToParallel(corpusFilePath);
+            var (srcFilePath, tgtFilePath) = this.ConvertSequenceLabelingFormatToParallel(corpusFilePath);
 
             this.m_srcFileList.Add(srcFilePath);
             this.m_tgtFileList.Add(tgtFilePath);

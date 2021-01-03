@@ -8,8 +8,8 @@ namespace Seq2SeqSharp
 {
     public static class TensorAllocator
     {
-        private static IAllocator[] m_allocator = null;
-        private static TSCudaContext m_cudaContext = null;
+        private static IAllocator[] m_allocator;
+        private static TSCudaContext m_cudaContext;
         private static int[] m_deviceIds;
         private static ProcessorTypeEnums m_archType;
 
@@ -71,7 +71,7 @@ namespace Seq2SeqSharp
                 }
             }
 
-            var strIds = String.Empty;
+            var strIds = string.Empty;
             foreach (var item in m_deviceIds)
             {
                 strIds = strIds + " " + item.ToString();

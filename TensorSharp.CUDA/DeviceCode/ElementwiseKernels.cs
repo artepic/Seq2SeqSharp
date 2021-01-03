@@ -10,7 +10,7 @@
 
         private static string GetFullCode()
         {
-            PermutationGenerator result = new PermutationGenerator();
+            var result = new PermutationGenerator();
             AppendTTFunc(result, "abs", "fabs");
             AppendTTFunc(result, "neg", "-");
             AppendTTFunc(result, "sign", "sgn");

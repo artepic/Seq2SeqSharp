@@ -8,8 +8,8 @@ namespace TensorSharp.Cpu
         public IntPtr buffer;
 
 
-        public CpuStorage(IAllocator allocator, DType ElementType, long elementCount)
-            : base(allocator, ElementType, elementCount)
+        public CpuStorage(IAllocator allocator, DType elementType, long elementCount)
+            : base(allocator, elementType, elementCount)
         {
             this.buffer = Marshal.AllocHGlobal(new IntPtr(this.ByteLength));
         }
@@ -45,10 +45,8 @@ namespace TensorSharp.Cpu
                     }
                     return array;
                 }
-                else
-                {
-                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
-                }
+
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
@@ -60,22 +58,20 @@ namespace TensorSharp.Cpu
                 {
                     return ((float*)this.buffer.ToPointer())[index];
                 }
-                else if (this.ElementType == DType.Float64)
+
+                if (this.ElementType == DType.Float64)
                 {
                     return (float)((double*)this.buffer.ToPointer())[index];
                 }
-                else if (this.ElementType == DType.Int32)
+                if (this.ElementType == DType.Int32)
                 {
                     return ((int*)this.buffer.ToPointer())[index];
                 }
-                else if (this.ElementType == DType.UInt8)
+                if (this.ElementType == DType.UInt8)
                 {
                     return ((byte*)this.buffer.ToPointer())[index];
                 }
-                else
-                {
-                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
-                }
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 
@@ -94,10 +90,8 @@ namespace TensorSharp.Cpu
                     }
                     return array;
                 }
-                else
-                {
-                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
-                }
+
+                throw new NotSupportedException("Element type " + this.ElementType + " not supported");
             }
         }
 

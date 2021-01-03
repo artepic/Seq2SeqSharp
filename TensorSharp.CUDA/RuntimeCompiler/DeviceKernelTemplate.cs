@@ -20,44 +20,44 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         public void AddConfigArgs(params string[] args)
         {
-            foreach (string item in args)
+            foreach (var item in args)
             {
-                requiredConfigArgs.Add(item);
+                this.requiredConfigArgs.Add(item);
             }
         }
 
         public void AddHeaders(params string[] headers)
         {
-            requiredHeaders.AddRange(headers);
+            this.requiredHeaders.AddRange(headers);
         }
 
         public byte[] PtxForConfig(CudaCompiler compiler, KernelConfig config)
         {
-            if (ptxCache.TryGetValue(config, out byte[] cachedResult))
+            if (this.ptxCache.TryGetValue(config, out var cachedResult))
             {
                 return cachedResult;
             }
 
-            if (!requiredConfigArgs.All(config.ContainsKey))
+            if (!this.requiredConfigArgs.All(config.ContainsKey))
             {
-                string allRequired = string.Join(", ", requiredConfigArgs);
+                var allRequired = string.Join(", ", this.requiredConfigArgs);
                 throw new InvalidOperationException("All config arguments must be provided. Required: " + allRequired);
             }
 
             // Checking this ensures that there is only one config argument that can evaluate to the same code,
             // which ensures that the ptx cacheing does not generate unnecessary combinations. Also, a mismatch
             // occurring here probably indicates a bug somewhere else.
-            if (!config.Keys.All(requiredConfigArgs.Contains))
+            if (!config.Keys.All(this.requiredConfigArgs.Contains))
             {
-                string allRequired = string.Join(", ", requiredConfigArgs);
+                var allRequired = string.Join(", ", this.requiredConfigArgs);
                 throw new InvalidOperationException("Config provides some unnecessary arguments. Required: " + allRequired);
             }
 
             //return new DeviceKernelCode(config.ApplyToTemplate(templateCode), requiredHeaders.ToArray());
-            string finalCode = config.ApplyToTemplate(templateCode);
+            var finalCode = config.ApplyToTemplate(this.templateCode);
 
-            byte[] result = compiler.CompileToPtx(finalCode, requiredHeaders.ToArray());
-            ptxCache.Add(config, result);
+            var result = compiler.CompileToPtx(finalCode, this.requiredHeaders.ToArray());
+            this.ptxCache.Add(config, result);
             return result;
         }
     }

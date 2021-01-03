@@ -10,8 +10,8 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         public CudaIncludeAttribute(string fieldName, string includeName)
         {
-            FieldName = fieldName;
-            IncludeName = includeName;
+            this.FieldName = fieldName;
+            this.IncludeName = includeName;
         }
     }
 }

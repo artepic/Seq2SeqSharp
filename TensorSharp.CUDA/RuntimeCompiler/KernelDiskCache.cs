@@ -18,9 +18,9 @@ namespace TensorSharp.CUDA.RuntimeCompiler
         public KernelDiskCache(string cacheDir)
         {
             this.cacheDir = cacheDir;
-            if (!System.IO.Directory.Exists(cacheDir))
+            if (!Directory.Exists(cacheDir))
             {
-                System.IO.Directory.CreateDirectory(cacheDir);
+                Directory.CreateDirectory(cacheDir);
             }
         }
 
@@ -30,10 +30,10 @@ namespace TensorSharp.CUDA.RuntimeCompiler
         /// </summary>
         public void CleanUnused()
         {
-            foreach (string file in Directory.GetFiles(cacheDir))
+            foreach (var file in Directory.GetFiles(this.cacheDir))
             {
-                string key = KeyFromFilePath(file);
-                if (!memoryCachedKernels.ContainsKey(key))
+                var key = this.KeyFromFilePath(file);
+                if (!this.memoryCachedKernels.ContainsKey(key))
                 {
                     File.Delete(file);
                 }
@@ -42,23 +42,23 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         public byte[] Get(string fullSourceCode, Func<string, byte[]> compile)
         {
-            string key = KeyFromSource(fullSourceCode);
-            if (memoryCachedKernels.TryGetValue(key, out byte[] ptx))
+            var key = KeyFromSource(fullSourceCode);
+            if (this.memoryCachedKernels.TryGetValue(key, out var ptx))
             {
                 return ptx;
             }
-            else if (TryGetFromFile(key, out ptx))
+            else if (this.TryGetFromFile(key, out ptx))
             {
-                memoryCachedKernels.Add(key, ptx);
+                this.memoryCachedKernels.Add(key, ptx);
                 return ptx;
             }
             else
             {
-                WriteCudaCppToFile(key, fullSourceCode);
+                this.WriteCudaCppToFile(key, fullSourceCode);
 
                 ptx = compile(fullSourceCode);
-                memoryCachedKernels.Add(key, ptx);
-                WriteToFile(key, ptx);
+                this.memoryCachedKernels.Add(key, ptx);
+                this.WriteToFile(key, ptx);
 
                 return ptx;
             }
@@ -67,43 +67,43 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         private void WriteToFile(string key, byte[] ptx)
         {
-            string filePath = FilePathFromKey(key);
+            var filePath = this.FilePathFromKey(key);
 
             Logger.WriteLine($"Writing PTX code to '{filePath}'");
-            System.IO.File.WriteAllBytes(filePath, ptx);
+            File.WriteAllBytes(filePath, ptx);
         }
 
         private void WriteCudaCppToFile(string key, string sourceCode)
         {           
-            string filePath = FilePathFromKey(key) + ".cu";
+            var filePath = this.FilePathFromKey(key) + ".cu";
 
             Logger.WriteLine($"Writing cuda source code to '{filePath}'");
-            System.IO.File.WriteAllText(filePath, sourceCode);
+            File.WriteAllText(filePath, sourceCode);
         }
 
         private bool TryGetFromFile(string key, out byte[] ptx)
         {
-            string filePath = FilePathFromKey(key);
-            if (!System.IO.File.Exists(filePath))
+            var filePath = this.FilePathFromKey(key);
+            if (!File.Exists(filePath))
             {
                 ptx = null;
                 return false;
             }
 
-            ptx = System.IO.File.ReadAllBytes(filePath);
+            ptx = File.ReadAllBytes(filePath);
             return true;
         }
 
         private string FilePathFromKey(string key)
         {
-            return System.IO.Path.Combine(cacheDir, key + ".ptx");
+            return Path.Combine(this.cacheDir, key + ".ptx");
         }
 
         private string KeyFromFilePath(string filepath)
         {
-            string[] fileExts = new string[] { ".ptx", ".cu" };
+            var fileExts = new string[] { ".ptx", ".cu" };
 
-            foreach (string ext in fileExts)
+            foreach (var ext in fileExts)
             {
                 if (filepath.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -119,13 +119,11 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 
         private static string KeyFromSource(string fullSource)
         {
-            string fullKey = fullSource.Length.ToString() + fullSource;
+            var fullKey = fullSource.Length.ToString() + fullSource;
 
-            using (SHA1Managed sha1 = new SHA1Managed())
-            {
-                return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(fullKey)))
-                    .Replace("-", "");
-            }
+            using var sha1 = new SHA1Managed();
+            return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(fullKey)))
+                               .Replace("-", "");
         }
     }
 }

@@ -22,54 +22,54 @@ namespace TensorSharp.CUDA.ContextState
 
         public PoolingDeviceAllocator(CudaContext context, float memoryUsageRatio = 0.9f)
         {
-            m_context = context;
+            this.m_context = context;
             context.SetCurrent();
 
-            m_ulAvailMemByteInTotal = (ulong)((ulong)context.GetFreeDeviceMemorySize() * memoryUsageRatio);
+            this.m_ulAvailMemByteInTotal = (ulong)((ulong)context.GetFreeDeviceMemorySize() * memoryUsageRatio);
 
-            m_memPoolPtr = context.AllocateMemory(m_ulAvailMemByteInTotal);
+            this.m_memPoolPtr = context.AllocateMemory(this.m_ulAvailMemByteInTotal);
 
-            m_startMemAddr = m_memPoolPtr.Pointer;
-            m_endMemAddr = m_startMemAddr + m_ulAvailMemByteInTotal;
+            this.m_startMemAddr = this.m_memPoolPtr.Pointer;
+            this.m_endMemAddr = this.m_startMemAddr + this.m_ulAvailMemByteInTotal;
 
-            m_usedAddr2Size = new SortedDictionary<ulong, ulong>();
+            this.m_usedAddr2Size = new SortedDictionary<ulong, ulong>();
 
-            Logger.WriteLine($"Allocated Cuda memory: {m_ulAvailMemByteInTotal}, address from '{m_startMemAddr}' to '{m_endMemAddr}'");
+            Logger.WriteLine($"Allocated Cuda memory: {this.m_ulAvailMemByteInTotal}, address from '{this.m_startMemAddr}' to '{this.m_endMemAddr}'");
         }
 
         public float GetAllocatedMemoryRatio()
         {
-            lock (locker)
+            lock (this.locker)
             {
                 ulong allocatedMemByte = 0;
-                foreach (var pair in m_usedAddr2Size)
+                foreach (var pair in this.m_usedAddr2Size)
                 {
                     allocatedMemByte += pair.Value;
                 }
 
-                return (float)((float)allocatedMemByte / (float)m_ulAvailMemByteInTotal);
+                return (float)((float)allocatedMemByte / (float)this.m_ulAvailMemByteInTotal);
             }
         }
 
         private CUdeviceptr AllocateMemory(ulong size)
         {
-            lock (locker)
+            lock (this.locker)
             {
-                SizeT currMemAddr = m_startMemAddr;
+                var currMemAddr = this.m_startMemAddr;
                 SizeT currMemAddrEnd;
 
-                foreach (var kv in m_usedAddr2Size)
+                foreach (var kv in this.m_usedAddr2Size)
                 {
                     currMemAddrEnd = currMemAddr + size;
 
-                    if (currMemAddrEnd > m_endMemAddr)
+                    if (currMemAddrEnd > this.m_endMemAddr)
                     {
-                        throw new OutOfMemoryException($"Out of GPU memory. Current memory usage = '{(GetAllocatedMemoryRatio() * 100.0f).ToString("F")}%'");
+                        throw new OutOfMemoryException($"Out of GPU memory. Current memory usage = '{(this.GetAllocatedMemoryRatio() * 100.0f).ToString("F")}%'");
                     }
 
                     if (currMemAddrEnd < kv.Key)
                     {
-                        m_usedAddr2Size.Add(currMemAddr, size);
+                        this.m_usedAddr2Size.Add(currMemAddr, size);
                         return new CUdeviceptr(currMemAddr);
                     }
                     else
@@ -79,30 +79,30 @@ namespace TensorSharp.CUDA.ContextState
                 }
 
                 currMemAddrEnd = currMemAddr + size;
-                if (currMemAddrEnd > m_endMemAddr)
+                if (currMemAddrEnd > this.m_endMemAddr)
                 {
-                    throw new OutOfMemoryException($"Out of GPU memory. Current memory usage = '{(GetAllocatedMemoryRatio() * 100.0f).ToString("F")}%'");
+                    throw new OutOfMemoryException($"Out of GPU memory. Current memory usage = '{(this.GetAllocatedMemoryRatio() * 100.0f).ToString("F")}%'");
                 }
 
-                m_usedAddr2Size.Add(currMemAddr, size);
+                this.m_usedAddr2Size.Add(currMemAddr, size);
                 return new CUdeviceptr(currMemAddr);
             }
         }
 
         public IDeviceMemory Allocate(long byteCount)
         {
-            ulong size = PadToAlignment(byteCount, MemoryAlignment);
+            var size = PadToAlignment(byteCount, MemoryAlignment);
 
-            lock (locker)
+            lock (this.locker)
             {            
-                CUdeviceptr buffer = AllocateMemory(size);
+                var buffer = this.AllocateMemory(size);
 
                 BasicDeviceMemory devMemory = null;
                 devMemory = new BasicDeviceMemory(buffer, () =>
                 {
-                    lock (locker)
+                    lock (this.locker)
                     {
-                        m_usedAddr2Size.Remove(devMemory.Pointer.Pointer);
+                        this.m_usedAddr2Size.Remove(devMemory.Pointer.Pointer);
                     }
                 });
 
@@ -111,9 +111,9 @@ namespace TensorSharp.CUDA.ContextState
         }
 
         public void Dispose()
-        {           
-            m_context.SetCurrent();
-            m_context.FreeMemory(m_memPoolPtr);
+        {
+            this.m_context.SetCurrent();
+            this.m_context.FreeMemory(this.m_memPoolPtr);
         }
 
         private static ulong PadToAlignment(long size, long alignment)
