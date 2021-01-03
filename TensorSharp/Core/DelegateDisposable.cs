@@ -13,7 +13,7 @@ namespace TensorSharp.Core
 
         public virtual void Dispose()
         {
-            action();
+            this.action();
         }
     }
 }

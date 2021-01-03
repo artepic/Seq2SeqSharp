@@ -28,43 +28,43 @@ namespace Seq2SeqSharp
 
         public AttentionDecoder(string name, int hiddenDim, int embeddingDim, int contextDim, int outputDim, float dropoutRatio, int depth, int deviceId, bool enableCoverageModel, bool isTrainable)
         {
-            m_name = name;
-            m_hdim = hiddenDim;
-            m_embDim = embeddingDim;
-            m_context = contextDim;
-            m_depth = depth;
-            m_deviceId = deviceId;
-            m_outputDim = outputDim;
-            m_dropoutRatio = dropoutRatio;
-            m_enableCoverageModel = enableCoverageModel;
-            m_isTrainable = isTrainable;
+            this.m_name = name;
+            this.m_hdim = hiddenDim;
+            this.m_embDim = embeddingDim;
+            this.m_context = contextDim;
+            this.m_depth = depth;
+            this.m_deviceId = deviceId;
+            this.m_outputDim = outputDim;
+            this.m_dropoutRatio = dropoutRatio;
+            this.m_enableCoverageModel = enableCoverageModel;
+            this.m_isTrainable = isTrainable;
 
-            m_attentionLayer = new AttentionUnit($"{name}.AttnUnit", hiddenDim, contextDim, deviceId, enableCoverageModel, isTrainable: isTrainable);
+            this.m_attentionLayer = new AttentionUnit($"{name}.AttnUnit", hiddenDim, contextDim, deviceId, enableCoverageModel, isTrainable: isTrainable);
 
-            m_decoders.Add(new LSTMAttentionDecoderCell($"{name}.LSTMAttn_0", hiddenDim, embeddingDim, contextDim, deviceId, isTrainable));
-            for (int i = 1; i < depth; i++)
+            this.m_decoders.Add(new LSTMAttentionDecoderCell($"{name}.LSTMAttn_0", hiddenDim, embeddingDim, contextDim, deviceId, isTrainable));
+            for (var i = 1; i < depth; i++)
             {
-                m_decoders.Add(new LSTMAttentionDecoderCell($"{name}.LSTMAttn_{i}", hiddenDim, hiddenDim, contextDim, deviceId, isTrainable));
+                this.m_decoders.Add(new LSTMAttentionDecoderCell($"{name}.LSTMAttn_{i}", hiddenDim, hiddenDim, contextDim, deviceId, isTrainable));
             }
 
-            m_decoderFFLayer = new FeedForwardLayer($"{name}.FeedForward", hiddenDim, outputDim, 0.0f, deviceId: deviceId, isTrainable: isTrainable);
+            this.m_decoderFFLayer = new FeedForwardLayer($"{name}.FeedForward", hiddenDim, outputDim, 0.0f, deviceId: deviceId, isTrainable: isTrainable);
 
         }
 
         public int GetDeviceId()
         {
-            return m_deviceId;
+            return this.m_deviceId;
         }
 
         public INeuralUnit CloneToDeviceAt(int deviceId)
         {
-            return new AttentionDecoder(m_name, m_hdim, m_embDim, m_context, m_outputDim, m_dropoutRatio, m_depth, deviceId, m_enableCoverageModel, m_isTrainable);
+            return new AttentionDecoder(this.m_name, this.m_hdim, this.m_embDim, this.m_context, this.m_outputDim, this.m_dropoutRatio, this.m_depth, deviceId, this.m_enableCoverageModel, this.m_isTrainable);
         }
 
 
         public void Reset(IWeightFactory weightFactory, int batchSize)
         {
-            foreach (LSTMAttentionDecoderCell item in m_decoders)
+            foreach (var item in this.m_decoders)
             {
                 item.Reset(weightFactory, batchSize);
             }
@@ -72,24 +72,24 @@ namespace Seq2SeqSharp
 
         public AttentionPreProcessResult PreProcess(IWeightTensor encOutputs, int batchSize, IComputeGraph g)
         {
-            return m_attentionLayer.PreProcess(encOutputs, batchSize, g);
+            return this.m_attentionLayer.PreProcess(encOutputs, batchSize, g);
         }
 
 
         public IWeightTensor Decode(IWeightTensor input, AttentionPreProcessResult attenPreProcessResult, int batchSize, IComputeGraph g)
         {
-            IWeightTensor V = input;
-            IWeightTensor lastStatus = m_decoders.LastOrDefault().Cell;
-            IWeightTensor context = m_attentionLayer.Perform(lastStatus, attenPreProcessResult, batchSize, g);
+            var V = input;
+            var lastStatus = this.m_decoders.LastOrDefault().Cell;
+            var context = this.m_attentionLayer.Perform(lastStatus, attenPreProcessResult, batchSize, g);
 
-            foreach (LSTMAttentionDecoderCell decoder in m_decoders)
+            foreach (var decoder in this.m_decoders)
             {
-                IWeightTensor e = decoder.Step(context, V, g);
+                var e = decoder.Step(context, V, g);
                 V = e;
             }
 
-            IWeightTensor eOutput = g.Dropout(V, batchSize, m_dropoutRatio, false);
-            eOutput = m_decoderFFLayer.Process(eOutput, batchSize, g);
+            var eOutput = g.Dropout(V, batchSize, this.m_dropoutRatio, false);
+            eOutput = this.m_decoderFFLayer.Process(eOutput, batchSize, g);
 
             return eOutput;
         }
@@ -97,8 +97,8 @@ namespace Seq2SeqSharp
 
         public List<IWeightTensor> GetCTs()
         {
-            List<IWeightTensor> res = new List<IWeightTensor>();
-            foreach (LSTMAttentionDecoderCell decoder in m_decoders)
+            var res = new List<IWeightTensor>();
+            foreach (var decoder in this.m_decoders)
             {
                 res.Add(decoder.Cell);
             }
@@ -108,8 +108,8 @@ namespace Seq2SeqSharp
 
         public List<IWeightTensor> GetHTs()
         {
-            List<IWeightTensor> res = new List<IWeightTensor>();
-            foreach (LSTMAttentionDecoderCell decoder in m_decoders)
+            var res = new List<IWeightTensor>();
+            foreach (var decoder in this.m_decoders)
             {
                 res.Add(decoder.Hidden);
             }
@@ -119,54 +119,54 @@ namespace Seq2SeqSharp
 
         public void SetCTs(List<IWeightTensor> l)
         {
-            for (int i = 0; i < l.Count; i++)
+            for (var i = 0; i < l.Count; i++)
             {
-                m_decoders[i].Cell = l[i];
+                this.m_decoders[i].Cell = l[i];
             }
         }
 
         public void SetHTs(List<IWeightTensor> l)
         {
-            for (int i = 0; i < l.Count; i++)
+            for (var i = 0; i < l.Count; i++)
             {
-                m_decoders[i].Hidden = l[i];
+                this.m_decoders[i].Hidden = l[i];
             }
         }
 
         public List<IWeightTensor> GetParams()
         {
-            List<IWeightTensor> response = new List<IWeightTensor>();
+            var response = new List<IWeightTensor>();
 
-            foreach (LSTMAttentionDecoderCell item in m_decoders)
+            foreach (var item in this.m_decoders)
             {
                 response.AddRange(item.getParams());
             }
-            response.AddRange(m_attentionLayer.GetParams());
-            response.AddRange(m_decoderFFLayer.GetParams());
+            response.AddRange(this.m_attentionLayer.GetParams());
+            response.AddRange(this.m_decoderFFLayer.GetParams());
 
             return response;
         }
 
         public void Save(Stream stream)
         {
-            m_attentionLayer.Save(stream);
-            foreach (LSTMAttentionDecoderCell item in m_decoders)
+            this.m_attentionLayer.Save(stream);
+            foreach (var item in this.m_decoders)
             {
                 item.Save(stream);
             }
 
-            m_decoderFFLayer.Save(stream);
+            this.m_decoderFFLayer.Save(stream);
         }
 
         public void Load(Stream stream)
         {
-            m_attentionLayer.Load(stream);
-            foreach (LSTMAttentionDecoderCell item in m_decoders)
+            this.m_attentionLayer.Load(stream);
+            foreach (var item in this.m_decoders)
             {
                 item.Load(stream);
             }
 
-            m_decoderFFLayer.Load(stream);
+            this.m_decoderFFLayer.Load(stream);
         }
     }
 }

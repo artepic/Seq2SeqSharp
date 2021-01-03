@@ -19,13 +19,13 @@ namespace TensorSharp.Cpu
             Tensor resultTensor;
             if (args[0] == null)
             {
-                Tensor otherTensor = args.OfType<Tensor>().First();
+                var otherTensor = args.OfType<Tensor>().First();
                 resultTensor = TensorResultBuilder.GetWriteTarget(null, otherTensor, false, otherTensor.Sizes);
             }
             else
             {
-                Tensor resultSrc = (Tensor)args[0];
-                Tensor otherTensor = args.OfType<Tensor>().Skip(1).First();
+                var resultSrc = (Tensor)args[0];
+                var otherTensor = args.OfType<Tensor>().Skip(1).First();
                 resultTensor = TensorResultBuilder.GetWriteTarget(resultSrc, otherTensor, false, otherTensor.Sizes);
             }
 
@@ -41,11 +41,11 @@ namespace TensorSharp.Cpu
                 throw new ArgumentOutOfRangeException("dimension");
             }
 
-            long[] desiredSize = (long[])src.Sizes.Clone();
+            var desiredSize = (long[])src.Sizes.Clone();
             desiredSize[dimension] = 1;
-            Tensor resultTensor = TensorResultBuilder.GetWriteTarget(result, src, false, desiredSize);
+            var resultTensor = TensorResultBuilder.GetWriteTarget(result, src, false, desiredSize);
 
-            List<object> finalArgs = new List<object>(extraArgs.Length + 3)
+            var finalArgs = new List<object>(extraArgs.Length + 3)
             {
                 resultTensor,
                 src,
@@ -58,13 +58,13 @@ namespace TensorSharp.Cpu
 
         public static void InvokeTypeMatch(MethodInfo method, params object[] args)
         {
-            IEnumerable<Tensor> tensors = args.OfType<Tensor>();
+            var tensors = args.OfType<Tensor>();
             if (tensors.Any())
             {
-                DType elemType = tensors.First().ElementType;
+                var elemType = tensors.First().ElementType;
                 if (!tensors.All(x => x.ElementType == elemType))
                 {
-                    string allTypes = string.Join(", ", tensors.Select(x => x.ElementType));
+                    var allTypes = string.Join(", ", tensors.Select(x => x.ElementType));
                     throw new InvalidOperationException("All tensors must have the same argument types. Given: " + allTypes);
                 }
             }
@@ -75,8 +75,8 @@ namespace TensorSharp.Cpu
 
         public static IDisposable BuildTensorRefPtr(Tensor tensor, out IntPtr tensorRefPtr)
         {
-            TensorRef64 tensorRef = NativeWrapper.AllocTensorRef(tensor);
-            IntPtr tensorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(TensorRef64)));
+            var tensorRef = AllocTensorRef(tensor);
+            var tensorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(TensorRef64)));
             Marshal.StructureToPtr(tensorRef, tensorPtr, false);
 
             tensorRefPtr = tensorPtr;
@@ -84,29 +84,29 @@ namespace TensorSharp.Cpu
             return new DelegateDisposable(() =>
             {
                 Marshal.FreeHGlobal(tensorPtr);
-                NativeWrapper.FreeTensorRef(tensorRef);
+                FreeTensorRef(tensorRef);
             });
         }
 
         public static void Invoke(MethodInfo method, params object[] args)
         {
-            List<TensorRef64> freeListTensor = new List<TensorRef64>();
-            List<IntPtr> freeListPtr = new List<IntPtr>();
+            var freeListTensor = new List<TensorRef64>();
+            var freeListPtr = new List<IntPtr>();
 
             try
             {
-                for (int i = 0; i < args.Length; ++i)
+                for (var i = 0; i < args.Length; ++i)
                 {
                     if (args[i] is Tensor)
                     {
-                        Tensor tensor = (Tensor)args[i];
+                        var tensor = (Tensor)args[i];
                         if (!(tensor.Storage is CpuStorage))
                         {
                             throw new InvalidOperationException("Argument " + i + " is not a Cpu tensor");
                         }
 
-                        TensorRef64 tensorRef = AllocTensorRef(tensor);
-                        IntPtr tensorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(TensorRef64)));
+                        var tensorRef = AllocTensorRef(tensor);
+                        var tensorPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(TensorRef64)));
                         Marshal.StructureToPtr(tensorRef, tensorPtr, false);
 
                         args[i] = tensorPtr;
@@ -117,7 +117,7 @@ namespace TensorSharp.Cpu
                 }
 
                 //return method.Invoke(null, args);
-                int result = (int)method.Invoke(null, args);
+                var result = (int)method.Invoke(null, args);
                 if (result != 0)
                 {
                     throw new ApplicationException(GetLastError());
@@ -125,12 +125,12 @@ namespace TensorSharp.Cpu
             }
             finally
             {
-                foreach (TensorRef64 tensorRef in freeListTensor)
+                foreach (var tensorRef in freeListTensor)
                 {
                     FreeTensorRef(tensorRef);
                 }
 
-                foreach (IntPtr tensorPtr in freeListPtr)
+                foreach (var tensorPtr in freeListPtr)
                 {
                     Marshal.FreeHGlobal(tensorPtr);
                 }
@@ -147,14 +147,14 @@ namespace TensorSharp.Cpu
 
         private static string GetLastError()
         {
-            IntPtr strPtr = CpuOpsNative.TS_GetLastError();
+            var strPtr = CpuOpsNative.TS_GetLastError();
             return Marshal.PtrToStringAnsi(strPtr);
         }
 
 
         public static TensorRef64 AllocTensorRef(Tensor tensor)
         {
-            TensorRef64 tensorRef = new TensorRef64
+            var tensorRef = new TensorRef64
             {
                 buffer = CpuNativeHelpers.GetBufferStart(tensor),
                 dimCount = tensor.Sizes.Length,
@@ -167,7 +167,7 @@ namespace TensorSharp.Cpu
 
         private static IntPtr AllocArray(long[] data)
         {
-            IntPtr result = Marshal.AllocHGlobal(sizeof(long) * data.Length);
+            var result = Marshal.AllocHGlobal(sizeof(long) * data.Length);
             Marshal.Copy(data, 0, result, data.Length);
             return result;
         }

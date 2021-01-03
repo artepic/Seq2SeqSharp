@@ -16,9 +16,9 @@ namespace TensorSharp.Core
             {
                 if (!MatchesRequirements(maybeResult, requireContiguous, requiredSizes))
                 {
-                    string message = string.Format("output tensor does not match requirements. Tensor must have sizes {0}{1}",
-                        string.Join(", ", requiredSizes),
-                        requireContiguous ? "; and must be contiguous" : "");
+                    var message = string.Format("output tensor does not match requirements. Tensor must have sizes {0}{1}",
+                                                string.Join(", ", requiredSizes),
+                                                requireContiguous ? "; and must be contiguous" : "");
 
                     throw new InvalidOperationException(message);
                 }
@@ -47,7 +47,7 @@ namespace TensorSharp.Core
                 return false;
             }
 
-            for (int i = 0; i < a.Length; ++i)
+            for (var i = 0; i < a.Length; ++i)
             {
                 if (!a[i].Equals(b[i]))
                 {
@@ -65,7 +65,7 @@ namespace TensorSharp.Core
                 return false;
             }
 
-            for (int i = 0; i < a.Length; ++i)
+            for (var i = 0; i < a.Length; ++i)
             {
                 if (i == ignoreIndex)
                 {

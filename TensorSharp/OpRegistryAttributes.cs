@@ -16,7 +16,7 @@ namespace TensorSharp
 
         public RegisterOp(string opName)
         {
-            OpName = opName;
+            this.OpName = opName;
         }
 
         public abstract void DoRegister(object instance, MethodInfo method, IEnumerable<OpConstraint> paramConstraints);
@@ -34,11 +34,11 @@ namespace TensorSharp
 
         public override void DoRegister(object instance, MethodInfo method, IEnumerable<OpConstraint> paramConstraints)
         {
-            List<OpConstraint> constraints = new List<OpConstraint>();
+            var constraints = new List<OpConstraint>();
             constraints.AddRange(paramConstraints);
             constraints.Add(new ArgCountConstraint(method.GetParameters().Length));
 
-            OpRegistry.Register(OpName, args => method.Invoke(instance, args), constraints);
+            OpRegistry.Register(this.OpName, args => method.Invoke(instance, args), constraints);
         }
     }
 
@@ -55,20 +55,20 @@ namespace TensorSharp
 
         public override void DoRegister(object instance, MethodInfo method, IEnumerable<OpConstraint> paramConstraints)
         {
-            List<OpConstraint> constraints = new List<OpConstraint>();
+            var constraints = new List<OpConstraint>();
             constraints.AddRange(paramConstraints);
             constraints.Add(new ArgCountConstraint(method.GetParameters().Length));
 
-            ParameterInfo[] methodParams = method.GetParameters();
-            for (int i = 0; i < methodParams.Length; ++i)
+            var methodParams = method.GetParameters();
+            for (var i = 0; i < methodParams.Length; ++i)
             {
                 if (methodParams[i].ParameterType == typeof(Tensor))
                 {
-                    constraints.Add(new ArgStorageTypeConstraint(i, storageType));
+                    constraints.Add(new ArgStorageTypeConstraint(i, this.storageType));
                 }
             }
 
-            OpRegistry.Register(OpName, args => method.Invoke(instance, args), constraints);
+            OpRegistry.Register(this.OpName, args => method.Invoke(instance, args), constraints);
         }
     }
 
@@ -97,7 +97,7 @@ namespace TensorSharp
 
         public override IEnumerable<OpConstraint> GetConstraints(ParameterInfo parameter, object instance)
         {
-            yield return new ArgStorageTypeConstraint(parameter.Position, storageType);
+            yield return new ArgStorageTypeConstraint(parameter.Position, this.storageType);
         }
     }
 }

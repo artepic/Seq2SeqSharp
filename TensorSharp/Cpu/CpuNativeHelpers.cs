@@ -6,7 +6,7 @@ namespace TensorSharp.Cpu
     {
         public static IntPtr GetBufferStart(Tensor tensor)
         {
-            IntPtr buffer = ((CpuStorage)tensor.Storage).buffer;
+            var buffer = ((CpuStorage)tensor.Storage).buffer;
             return PtrAdd(buffer, tensor.StorageOffset * tensor.ElementType.Size());
         }
 

@@ -8,8 +8,8 @@ namespace TensorSharp
     {
         private static string RepeatChar(char c, int count)
         {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < count; ++i)
+            var builder = new StringBuilder();
+            for (var i = 0; i < count; ++i)
             {
                 builder.Append(c);
             }
@@ -18,20 +18,20 @@ namespace TensorSharp
 
         private static string GetIntFormat(int length)
         {
-            string padding = RepeatChar('#', length - 1);
+            var padding = RepeatChar('#', length - 1);
             return string.Format(" {0}0;-{0}0", padding);
         }
 
         private static string GetFloatFormat(int length)
         {
-            string padding = RepeatChar('#', length - 1);
+            var padding = RepeatChar('#', length - 1);
             return string.Format(" {0}0.0000;-{0}0.0000", padding);
         }
 
         private static string GetScientificFormat(int length)
         {
-            int padCount = length - 6;
-            string padding = RepeatChar('0', padCount);
+            var padCount = length - 6;
+            var padding = RepeatChar('0', padCount);
             return string.Format(" {0}.0000e+00;-0.{0}e+00", padding);
         }
 
@@ -43,11 +43,11 @@ namespace TensorSharp
             // HACK this is a hacky way of iterating over the elements of the tensor.
             // if the tensor has holes, this will incorrectly include those elements
             // in the iteration.
-            long minOffset = tensor.StorageOffset;
-            long maxOffset = minOffset + TensorDimensionHelpers.GetStorageSize(tensor.Sizes, tensor.Strides) - 1;
-            for (long i = minOffset; i <= maxOffset; ++i)
+            var minOffset = tensor.StorageOffset;
+            var maxOffset = minOffset + TensorDimensionHelpers.GetStorageSize(tensor.Sizes, tensor.Strides) - 1;
+            for (var i = minOffset; i <= maxOffset; ++i)
             {
-                double value = Convert.ToDouble((object)storage.GetElementAsFloat(i));
+                var value = Convert.ToDouble((object)storage.GetElementAsFloat(i));
                 if (value != Math.Ceiling(value))
                 {
                     return false;
@@ -70,12 +70,12 @@ namespace TensorSharp
             // HACK this is a hacky way of iterating over the elements of the tensor.
             // if the tensor has holes, this will incorrectly include those elements
             // in the iteration.
-            long minOffset = tensor.StorageOffset;
-            long maxOffset = minOffset + TensorDimensionHelpers.GetStorageSize(tensor.Sizes, tensor.Strides) - 1;
+            var minOffset = tensor.StorageOffset;
+            var maxOffset = minOffset + TensorDimensionHelpers.GetStorageSize(tensor.Sizes, tensor.Strides) - 1;
 
-            for (long i = minOffset; i <= maxOffset; ++i)
+            for (var i = minOffset; i <= maxOffset; ++i)
             {
-                float item = storage.GetElementAsFloat(i);
+                var item = storage.GetElementAsFloat(i);
                 if (item < min)
                 {
                     min = item;
@@ -98,12 +98,12 @@ namespace TensorSharp
         }
         private static Tuple<FormatType, double, int> GetFormatSize(Tuple<double, double> minMax, bool intMode)
         {
-            int expMin = minMax.Item1 != 0 ?
-                    (int)Math.Floor(Math.Log10(minMax.Item1)) + 1 :
-                    1;
-            int expMax = minMax.Item2 != 0 ?
-                    (int)Math.Floor(Math.Log10(minMax.Item2)) + 1 :
-                    1;
+            var expMin = minMax.Item1 != 0 ?
+                             (int)Math.Floor(Math.Log10(minMax.Item1)) + 1 :
+                             1;
+            var expMax = minMax.Item2 != 0 ?
+                             (int)Math.Floor(Math.Log10(minMax.Item2)) + 1 :
+                             1;
 
             if (intMode)
             {
@@ -120,8 +120,8 @@ namespace TensorSharp
             {
                 if (expMax - expMin > 4)
                 {
-                    int sz = Math.Abs(expMax) > 99 || Math.Abs(expMin) > 99 ?
-                        12 : 11;
+                    var sz = Math.Abs(expMax) > 99 || Math.Abs(expMin) > 99 ?
+                                 12 : 11;
                     return Tuple.Create(FormatType.Scientific, 1.0, sz);
                 }
                 else
@@ -158,18 +158,18 @@ namespace TensorSharp
                 return Tuple.Create("", 1.0, 0);
             }
 
-            bool intMode = IsIntOnly(storage, tensor);
-            Tuple<double, double> minMax = AbsMinMax(storage, tensor);
+            var intMode = IsIntOnly(storage, tensor);
+            var minMax = AbsMinMax(storage, tensor);
 
-            Tuple<FormatType, double, int> formatSize = GetFormatSize(minMax, intMode);
-            string formatString = BuildFormatString(formatSize.Item1, formatSize.Item3);
+            var formatSize = GetFormatSize(minMax, intMode);
+            var formatString = BuildFormatString(formatSize.Item1, formatSize.Item3);
 
             return Tuple.Create("{0:" + formatString + "}", formatSize.Item2, formatSize.Item3);
         }
 
         public static string FormatTensorTypeAndSize(Tensor tensor)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result
                 .Append("[")
                 .Append(tensor.ElementType)
@@ -185,7 +185,7 @@ namespace TensorSharp
                 .Append(" of size ")
                 .Append(tensor.Sizes[0]);
 
-                for (int i = 1; i < tensor.DimensionCount; ++i)
+                for (var i = 1; i < tensor.DimensionCount; ++i)
                 {
                     result.Append("x").Append(tensor.Sizes[i]);
                 }
@@ -198,24 +198,24 @@ namespace TensorSharp
 
         private static void FormatVector(StringBuilder builder, Tensor tensor)
         {
-            Tuple<string, double, int> storageFormat = GetStorageFormat(tensor.Storage, tensor);
-            string format = storageFormat.Item1;
-            double scale = storageFormat.Item2;
+            var storageFormat = GetStorageFormat(tensor.Storage, tensor);
+            var format = storageFormat.Item1;
+            var scale = storageFormat.Item2;
 
             if (scale != 1)
             {
                 builder.AppendLine(scale + " *");
-                for (int i = 0; i < tensor.Sizes[0]; ++i)
+                for (var i = 0; i < tensor.Sizes[0]; ++i)
                 {
-                    double value = Convert.ToDouble((object)tensor.GetElementAsFloat(i)) / scale;
+                    var value = Convert.ToDouble((object)tensor.GetElementAsFloat(i)) / scale;
                     builder.AppendLine(string.Format(format, value));
                 }
             }
             else
             {
-                for (int i = 0; i < tensor.Sizes[0]; ++i)
+                for (var i = 0; i < tensor.Sizes[0]; ++i)
                 {
-                    double value = Convert.ToDouble((object)tensor.GetElementAsFloat(i));
+                    var value = Convert.ToDouble((object)tensor.GetElementAsFloat(i));
                     builder.AppendLine(string.Format(format, value));
                 }
             }
@@ -223,14 +223,14 @@ namespace TensorSharp
 
         private static void FormatMatrix(StringBuilder builder, Tensor tensor, string indent)
         {
-            Tuple<string, double, int> storageFormat = GetStorageFormat(tensor.Storage, tensor);
-            string format = storageFormat.Item1;
-            double scale = storageFormat.Item2;
-            int sz = storageFormat.Item3;
+            var storageFormat = GetStorageFormat(tensor.Storage, tensor);
+            var format = storageFormat.Item1;
+            var scale = storageFormat.Item2;
+            var sz = storageFormat.Item3;
 
             builder.Append(indent);
 
-            int nColumnPerLine = (int)Math.Floor((80 - indent.Length) / (double)(sz + 1));
+            var nColumnPerLine = (int)Math.Floor((80 - indent.Length) / (double)(sz + 1));
             long firstColumn = 0;
             long lastColumn = -1;
             while (firstColumn < tensor.Sizes[1])
@@ -260,11 +260,11 @@ namespace TensorSharp
 
                 for (long l = 0; l < tensor.Sizes[0]; ++l)
                 {
-                    using (Tensor row = tensor.Select(0, l))
+                    using (var row = tensor.Select(0, l))
                     {
-                        for (long c = firstColumn; c <= lastColumn; ++c)
+                        for (var c = firstColumn; c <= lastColumn; ++c)
                         {
-                            double value = Convert.ToDouble((object)row.GetElementAsFloat(c)) / scale;
+                            var value = Convert.ToDouble((object)row.GetElementAsFloat(c)) / scale;
                             builder.Append(string.Format(format, value));
                             if (c == lastColumn)
                             {
@@ -287,18 +287,18 @@ namespace TensorSharp
 
         private static void FormatTensor(StringBuilder builder, Tensor tensor)
         {
-            Tuple<string, double, int> storageFormat = GetStorageFormat(tensor.Storage, tensor);
-            string format = storageFormat.Item1;
-            double scale = storageFormat.Item2;
-            int sz = storageFormat.Item3;
+            var storageFormat = GetStorageFormat(tensor.Storage, tensor);
+            var format = storageFormat.Item1;
+            var scale = storageFormat.Item2;
+            var sz = storageFormat.Item3;
 
-            int startingLength = builder.Length;
-            long[] counter = Enumerable.Repeat((long)0, tensor.DimensionCount - 2).ToArray();
-            bool finished = false;
+            var startingLength = builder.Length;
+            var counter = Enumerable.Repeat((long)0, tensor.DimensionCount - 2).ToArray();
+            var finished = false;
             counter[0] = -1;
             while (true)
             {
-                for (int i = 0; i < tensor.DimensionCount - 2; ++i)
+                for (var i = 0; i < tensor.DimensionCount - 2; ++i)
                 {
                     counter[i]++;
                     if (counter[i] >= tensor.Sizes[i])
@@ -327,10 +327,10 @@ namespace TensorSharp
                 }
 
                 builder.Append('(');
-                Tensor tensorCopy = tensor.CopyRef();
-                for (int i = 0; i < tensor.DimensionCount - 2; ++i)
+                var tensorCopy = tensor.CopyRef();
+                for (var i = 0; i < tensor.DimensionCount - 2; ++i)
                 {
-                    Tensor newCopy = tensorCopy.Select(0, counter[i]);
+                    var newCopy = tensorCopy.Select(0, counter[i]);
                     tensorCopy.Dispose();
                     tensorCopy = newCopy;
                     builder.Append(counter[i]).Append(',');
@@ -345,7 +345,7 @@ namespace TensorSharp
 
         public static string Format(Tensor tensor)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             if (tensor.DimensionCount == 0)
             {
             }

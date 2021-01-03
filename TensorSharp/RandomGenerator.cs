@@ -19,9 +19,9 @@ namespace TensorSharp
                 size *= s;
             }
 
-            float[] w = new float[size];
+            var w = new float[size];
 
-            for (int i = 0; i < size; i++)
+            for (var i = 0; i < size; i++)
             {
                 w[i] = (float)rnd.NextDouble() * (max - min) + min;
             }
@@ -38,10 +38,10 @@ namespace TensorSharp
                 size *= s;
             }
 
-            float[] w = new float[size];
+            var w = new float[size];
             
 
-            for (int i = 0; i < size; i++)
+            for (var i = 0; i < size; i++)
             {
                 w[i] = rnd.NextDouble() <= p ? 1.0f : 0.0f;
             }

@@ -9,28 +9,28 @@ namespace Seq2SeqSharp.Metrics
 
         public LengthRatioMetric()
         {
-            ClearStatus();
+            this.ClearStatus();
         }
 
         public void ClearStatus()
         {
-            m_counts = new double[2];
+            this.m_counts = new double[2];
         }
 
         public void Evaluate(List<List<string>> refTokens, List<string> hypTokens)
         {
-            m_counts[0] += hypTokens.Count;
-            m_counts[1] += BleuMetric.GetClosestRefLength(refTokens, hypTokens);
+            this.m_counts[0] += hypTokens.Count;
+            this.m_counts[1] += BleuMetric.GetClosestRefLength(refTokens, hypTokens);
         }
 
         public string GetScoreStr()
         {
-            return GetPrimaryScore().ToString("F");
+            return this.GetPrimaryScore().ToString("F");
         }
 
         public double GetPrimaryScore()
         {
-            double lr = m_counts[0] / m_counts[1];
+            var lr = this.m_counts[0] / this.m_counts[1];
             return 100.0 * lr;
         }
     }

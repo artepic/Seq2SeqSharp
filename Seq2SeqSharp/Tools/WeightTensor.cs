@@ -21,13 +21,13 @@ namespace Seq2SeqSharp.Tools
 
         public int Rows
         {
-            get => (int)Sizes[0];
-            set => Sizes[0] = value;
+            get => (int)this.Sizes[0];
+            set => this.Sizes[0] = value;
         }
         public int Columns
         {
-            get => (int)Sizes[1];
-            set => Sizes[1] = value;
+            get => (int)this.Sizes[1];
+            set => this.Sizes[1] = value;
         }
 
         public string Name { get; set; }
@@ -51,27 +51,27 @@ namespace Seq2SeqSharp.Tools
         {
             get
             {
-                if (releasedWeight)
+                if (this.releasedWeight)
                 {
-                    throw new Exception($"The weight '{Name}' has been released, you cannot access it.");
+                    throw new Exception($"The weight '{this.Name}' has been released, you cannot access it.");
                 }
 
-                if (m_TWeight == null)
+                if (this.m_TWeight == null)
                 {
-                    m_TWeight = new Tensor(m_allocator, DType.Float32, Sizes);
+                    this.m_TWeight = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
                 }
 
-                return m_TWeight;
+                return this.m_TWeight;
             }
             set
             {
-                if (m_TWeight != null)
+                if (this.m_TWeight != null)
                 {
-                    throw new Exception($"Please call ReleaseWeight function before assign a new value to weight '{Name}'.");
+                    throw new Exception($"Please call ReleaseWeight function before assign a new value to weight '{this.Name}'.");
                 }
 
-                m_TWeight = value;
-                releasedWeight = false;
+                this.m_TWeight = value;
+                this.releasedWeight = false;
             }
         }
 
@@ -79,164 +79,164 @@ namespace Seq2SeqSharp.Tools
         {
             get
             {
-                if (releasedGradient)
+                if (this.releasedGradient)
                 {
-                    throw new Exception($"The gradient '{Name}' has been released, you cannot access it.");
+                    throw new Exception($"The gradient '{this.Name}' has been released, you cannot access it.");
                 }
 
-                if (m_TGradient == null)
+                if (this.m_TGradient == null)
                 {
-                    m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
-                    Ops.Fill(m_TGradient, 0.0f);
+                    this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+                    Ops.Fill(this.m_TGradient, 0.0f);
 
-                    m_GradientSetName = "Get";
+                    this.m_GradientSetName = "Get";
                 }
 
-                return m_TGradient;
+                return this.m_TGradient;
             }
 
             set
             {
-                if (m_TGradient != null)
+                if (this.m_TGradient != null)
                 {                   
-                    throw new Exception($"Please call ReleaseGradient function before assign a new value to gradient '{Name}'. This gradient was set by '{m_GradientSetName}'");
+                    throw new Exception($"Please call ReleaseGradient function before assign a new value to gradient '{this.Name}'. This gradient was set by '{this.m_GradientSetName}'");
                 }
 
-                m_TGradient = value;
-                releasedGradient = false;
+                this.m_TGradient = value;
+                this.releasedGradient = false;
             }
         }
 
 
         public WeightTensor(long[] sizes, int deviceId, string name = "", bool isTrainable = false, NormType normal = NormType.None, bool fanIn = false, bool fanOut = false, IComputeGraph graphToBind = null)
         {
-            Name = name;
-            DeviceId = deviceId;
-            IsTrainable = isTrainable;
-            m_allocator = TensorAllocator.Allocator(DeviceId);
-            Sizes = sizes;
+            this.Name = name;
+            this.DeviceId = deviceId;
+            this.IsTrainable = isTrainable;
+            this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+            this.Sizes = sizes;
 
             if (graphToBind != null)
             {
-                m_computeGraphToBind = graphToBind;
-                m_computeGraphToBind.Bind(this);
+                this.m_computeGraphToBind = graphToBind;
+                this.m_computeGraphToBind.Bind(this);
             }
 
             if (normal == NormType.Uniform)
             {
-                var scale = (float)Math.Sqrt(6.0 / (double)(Rows + Columns));
+                var scale = (float)Math.Sqrt(6.0 / (double)(this.Rows + this.Columns));
 
                 if (fanIn && !fanOut)
                 {
-                    scale = (float)Math.Sqrt(3.0 / (double)Rows);
+                    scale = (float)Math.Sqrt(3.0 / (double)this.Rows);
                 }
                 else if (!fanIn && fanOut)
                 {
-                    scale = (float)Math.Sqrt(3.0 / (double)Columns);
+                    scale = (float)Math.Sqrt(3.0 / (double)this.Columns);
                 }
 
-                float[] w = TensorSharp.RandomGenerator.BuildRandomUniformWeight(Sizes, -scale, scale);
-                SetWeightArray(w);               
+                var w = TensorSharp.RandomGenerator.BuildRandomUniformWeight(this.Sizes, -scale, scale);
+                this.SetWeightArray(w);               
             }
             else if (normal == NormType.Normal)
             {
-                float[] w = TensorSharp.RandomGenerator.BuildRandomUniformWeight(Sizes, -1.0f, 1.0f);
-                SetWeightArray(w);
+                var w = TensorSharp.RandomGenerator.BuildRandomUniformWeight(this.Sizes, -1.0f, 1.0f);
+                this.SetWeightArray(w);
             }
         }
 
         public WeightTensor(long[] sizes, float c, int deviceId, string name = "", bool isTrainable = false)
         {
-            Name = name;
-            DeviceId = deviceId;
-            IsTrainable = isTrainable;
-            Sizes = sizes;
-            m_allocator = TensorAllocator.Allocator(DeviceId);
+            this.Name = name;
+            this.DeviceId = deviceId;
+            this.IsTrainable = isTrainable;
+            this.Sizes = sizes;
+            this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
 
-            TWeight = new Tensor(m_allocator, DType.Float32, Sizes);
-            Ops.Fill(TWeight, c);
+            this.TWeight = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+            Ops.Fill(this.TWeight, c);
         }
 
 
         public void UnbindFromComputeGraph()
         {
-            if (m_computeGraphToBind != null)
+            if (this.m_computeGraphToBind != null)
             {
-                m_computeGraphToBind.Unbind(this);
+                this.m_computeGraphToBind.Unbind(this);
             }
         }
 
         public int GetDeviceId()
         {
-            return DeviceId;
+            return this.DeviceId;
         }
 
         public INeuralUnit CloneToDeviceAt(int deviceId)
         {
-            return new WeightTensor(Sizes, deviceId, Name, IsTrainable);
+            return new WeightTensor(this.Sizes, deviceId, this.Name, this.IsTrainable);
         }
 
         public void ZeroGradient()
         {
-            Ops.Fill(TGradient, 0.0f);
+            Ops.Fill(this.TGradient, 0.0f);
         }
 
         public void CleanWeight()
         {
-            Ops.Fill(TWeight, 0.0f);
+            Ops.Fill(this.TWeight, 0.0f);
         }
 
         public float GetWeightAt(int offset)
         {
-            return TWeight.GetElementAsFloat(0, offset);
+            return this.TWeight.GetElementAsFloat(0, offset);
         }
 
         public void SetWeightAt(float val, int offset)
         {
-            TWeight.SetElementAsFloat(val, 0, offset);
+            this.TWeight.SetElementAsFloat(val, 0, offset);
         }
 
 
         public void SetGradientAt(float val, int offset)
         {
-            TGradient.SetElementAsFloat(val, 0, offset);
+            this.TGradient.SetElementAsFloat(val, 0, offset);
         }
 
         public void SetWeightAtRow(int row, float[] val)
         {
-            TWeight.SetElementsAsFloat(val, row, 0);
+            this.TWeight.SetElementsAsFloat(val, row, 0);
         }
 
         public void CopyWeightsToGradients(IWeightTensor src)
         {
-            WeightTensor m = src as WeightTensor;
+            var m = src as WeightTensor;
 
-            if (m_TGradient != null)
+            if (this.m_TGradient != null)
             {
-                m_TGradient.Dispose();
+                this.m_TGradient.Dispose();
             }
 
-            m_TGradient = m.TWeight.CopyRef();
+            this.m_TGradient = m.TWeight.CopyRef();
 
-            m_GradientSetName = "CopyWeightsToGradients";
+            this.m_GradientSetName = "CopyWeightsToGradients";
         }
 
         public void CopyWeightsFrom(IWeightTensor src)
         {
-            WeightTensor m = src as WeightTensor;
+            var m = src as WeightTensor;
 
-            Ops.Copy(TWeight, m.TWeight);
+            Ops.Copy(this.TWeight, m.TWeight);
         }
 
         public void AddGradientFrom(IWeightTensor src)
         {
-            WeightTensor m = src as WeightTensor;
+            var m = src as WeightTensor;
 
             lock (locker)
             {
-                Tensor t = new Tensor(TGradient.Allocator, DType.Float32, Sizes);
+                var t = new Tensor(this.TGradient.Allocator, DType.Float32, this.Sizes);
                 Ops.Copy(t, m.TGradient);
-                Ops.Add(TGradient, TGradient, t);
+                Ops.Add(this.TGradient, this.TGradient, t);
 
                 t.Dispose();
             }
@@ -244,126 +244,126 @@ namespace Seq2SeqSharp.Tools
 
         public float[] ToWeightArray()
         {
-            return TWeight.GetElementsAsFloat(Rows * Columns);
+            return this.TWeight.GetElementsAsFloat(this.Rows * this.Columns);
         }
 
         public float[] ToGradientArray()
         {
-            return TGradient.GetElementsAsFloat(Rows * Columns);
+            return this.TGradient.GetElementsAsFloat(this.Rows * this.Columns);
         }
 
 
         public void AddSoftmaxGradient(WeightTensor src, bool inPlace = false)
         {
-            if (m_TGradient == null)
+            if (this.m_TGradient == null)
             {
-                m_allocator = TensorAllocator.Allocator(DeviceId);
-                m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
-                Ops.SoftmaxGrad(m_TGradient, src.TGradient, src.TWeight, false);
+                this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+                this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+                Ops.SoftmaxGrad(this.m_TGradient, src.TGradient, src.TWeight, false);
 
-                m_GradientSetName = "AddSoftmaxGradient";
+                this.m_GradientSetName = "AddSoftmaxGradient";
             }
             else
             {
-                Ops.SoftmaxGrad(m_TGradient, src.TGradient, src.TWeight, !inPlace);
+                Ops.SoftmaxGrad(this.m_TGradient, src.TGradient, src.TWeight, !inPlace);
             }
         }
 
         public void CopyOrAddGradient(WeightTensor src)
         {
-            if (m_TGradient == null)
+            if (this.m_TGradient == null)
             {
-                m_allocator = TensorAllocator.Allocator(DeviceId);
-                m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
-                Ops.Copy(m_TGradient, src.TGradient);
+                this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+                this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+                Ops.Copy(this.m_TGradient, src.TGradient);
 
-                m_GradientSetName = "CopyOrAddGradient_WeightTensor";
+                this.m_GradientSetName = "CopyOrAddGradient_WeightTensor";
             }
             else
             {
-                Ops.Add(m_TGradient, m_TGradient, src.TGradient);
+                Ops.Add(this.m_TGradient, this.m_TGradient, src.TGradient);
             }
         }
 
         public void CopyOrAddGradient(Tensor src, string callerName = "")
         {
-            if (m_TGradient == null)
+            if (this.m_TGradient == null)
             {
-                m_allocator = TensorAllocator.Allocator(DeviceId);
-                m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
-                Ops.Copy(m_TGradient, src);
+                this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+                this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+                Ops.Copy(this.m_TGradient, src);
 
-                m_GradientSetName = $"CopyOrAddGradient_Tensor_CalledBy_{callerName}";
+                this.m_GradientSetName = $"CopyOrAddGradient_Tensor_CalledBy_{callerName}";
             }
             else
             {
-                Ops.Add(m_TGradient, m_TGradient, src);
+                Ops.Add(this.m_TGradient, this.m_TGradient, src);
             }
         }
 
         public void AddMulGradient(Tensor w, Tensor g, bool inPlace = false)
         {
-            if (m_TGradient == null)
+            if (this.m_TGradient == null)
             {
-                m_allocator = TensorAllocator.Allocator(DeviceId);
-                m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
-                Ops.Mul(m_TGradient, w, g);
+                this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+                this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+                Ops.Mul(this.m_TGradient, w, g);
 
-                m_GradientSetName = "AddMulGrdient";
+                this.m_GradientSetName = "AddMulGrdient";
             }
             else
             {
                 if (inPlace)
                 {
-                    Ops.Mul(m_TGradient, w, g);
+                    Ops.Mul(this.m_TGradient, w, g);
                 }
                 else
                 {
-                    Ops.AddMul(m_TGradient, m_TGradient, w, g);
+                    Ops.AddMul(this.m_TGradient, this.m_TGradient, w, g);
                 }
             }
         }
 
         public void AddSigmoidGradient(WeightTensor src)
         {
-            if (m_TGradient == null)
+            if (this.m_TGradient == null)
             {
-                m_allocator = TensorAllocator.Allocator(DeviceId);
-                m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
-                Ops.SigmoidD(m_TGradient, src.TWeight, src.TGradient);
+                this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+                this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
+                Ops.SigmoidD(this.m_TGradient, src.TWeight, src.TGradient);
 
-                m_GradientSetName = "AddSigmoidGradient";
+                this.m_GradientSetName = "AddSigmoidGradient";
             }
             else
             {
-                Ops.AddSigmoidD(m_TGradient, m_TGradient, src.TWeight, src.TGradient);
+                Ops.AddSigmoidD(this.m_TGradient, this.m_TGradient, src.TWeight, src.TGradient);
             }
         }
 
 
         public void AddTanhGradient(WeightTensor src)
         {
-            if (m_TGradient == null)
+            if (this.m_TGradient == null)
             {
-                m_allocator = TensorAllocator.Allocator(DeviceId);
-                m_TGradient = new Tensor(m_allocator, DType.Float32, Sizes);
+                this.m_allocator = TensorAllocator.Allocator(this.DeviceId);
+                this.m_TGradient = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
 
-                Ops.TanhD(m_TGradient, src.TWeight, src.TGradient);
+                Ops.TanhD(this.m_TGradient, src.TWeight, src.TGradient);
 
-                m_GradientSetName = "AddTanhGradient";
+                this.m_GradientSetName = "AddTanhGradient";
             }
             else
             {
-                Ops.AddTanhD(m_TGradient, m_TGradient, src.TWeight, src.TGradient);
+                Ops.AddTanhD(this.m_TGradient, this.m_TGradient, src.TWeight, src.TGradient);
             }
         }
 
         public List<int> GetTopNMaxWeightIdx(int topN)
         {
-            float[] weights = ToWeightArray();
-            FixedSizePriorityQueue<ComparableItem<int>> q = new FixedSizePriorityQueue<ComparableItem<int>>(topN, new ComparableItemComparer<int>(true));
+            var weights = this.ToWeightArray();
+            var q = new FixedSizePriorityQueue<ComparableItem<int>>(topN, new ComparableItemComparer<int>(true));
 
-            for (int i = 0; i < weights.Length; i++)
+            for (var i = 0; i < weights.Length; i++)
             {
                 q.Enqueue(new ComparableItem<int>(weights[i], i));
             }
@@ -373,19 +373,19 @@ namespace Seq2SeqSharp.Tools
 
         public void SetWeightArray(float[] v)
         {
-            TWeight.SetElementsAsFloat(v);
+            this.TWeight.SetElementsAsFloat(v);
         }
 
         public void SetGradientArray(float[] v)
         {
-            TGradient.SetElementsAsFloat(v);
+            this.TGradient.SetElementsAsFloat(v);
         }
 
         public WeightTensor CopyWeightsRef(string name)
         {
-            WeightTensor result = new WeightTensor(Sizes, DeviceId, name)
+            var result = new WeightTensor(this.Sizes, this.DeviceId, name)
             {
-                m_TWeight = m_TWeight.CopyRef()
+                m_TWeight = this.m_TWeight.CopyRef()
             };
 
             return result;
@@ -393,36 +393,36 @@ namespace Seq2SeqSharp.Tools
 
         public void Dispose()
         {
-            ReleaseWeight();
-            ReleaseGradient();
+            this.ReleaseWeight();
+            this.ReleaseGradient();
         }
 
         public void ReleaseWeight()
         {
-            if (m_TWeight != null)
+            if (this.m_TWeight != null)
             {
-                m_TWeight.Dispose();
-                m_TWeight = null;
-                releasedWeight = true;
+                this.m_TWeight.Dispose();
+                this.m_TWeight = null;
+                this.releasedWeight = true;
             }
         }
 
         public void ReleaseGradient()
         {
-            if (m_TGradient != null)
+            if (this.m_TGradient != null)
             {
-                m_TGradient.Dispose();
-                m_TGradient = null;
-                releasedGradient = true;
+                this.m_TGradient.Dispose();
+                this.m_TGradient = null;
+                this.releasedGradient = true;
             }
         }
 
         public void Save(Stream stream)
         {
-            float[] floatArray1 = ToWeightArray();
+            var floatArray1 = this.ToWeightArray();
 
             // create a byte array and copy the floats into it...
-            byte[] byteArray = new byte[floatArray1.Length * 4];
+            var byteArray = new byte[floatArray1.Length * 4];
             Buffer.BlockCopy(floatArray1, 0, byteArray, 0, byteArray.Length);
 
             stream.Write(byteArray, 0, byteArray.Length);
@@ -430,19 +430,19 @@ namespace Seq2SeqSharp.Tools
 
         public void Load(Stream stream)
         {
-            int size = Rows * Columns;
-            byte[] byteArray = new byte[size * 4];
+            var size = this.Rows * this.Columns;
+            var byteArray = new byte[size * 4];
             stream.Read(byteArray, 0, byteArray.Length);
 
-            float[] floatArray2 = new float[byteArray.Length / 4];
+            var floatArray2 = new float[byteArray.Length / 4];
             Buffer.BlockCopy(byteArray, 0, floatArray2, 0, byteArray.Length);
 
-            SetWeightArray(floatArray2);
+            this.SetWeightArray(floatArray2);
         }
 
         public List<IWeightTensor> GetParams()
         {
-            if (IsTrainable)
+            if (this.IsTrainable)
             {
                 return new List<IWeightTensor>() { this };
             }

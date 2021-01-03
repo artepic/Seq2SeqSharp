@@ -27,53 +27,53 @@ namespace Seq2SeqSharp
         private List<string> m_tgtVocab = new List<string>();
 
 
-        public int SourceWordSize => m_srcIndexToWord.Count;
-        public int TargetWordSize => m_tgtIndexToWord.Count;
+        public int SourceWordSize => this.m_srcIndexToWord.Count;
+        public int TargetWordSize => this.m_tgtIndexToWord.Count;
 
-        public List<string> SrcVocab => m_srcVocab.GetRange(3, m_srcVocab.Count - 3);
+        public List<string> SrcVocab => this.m_srcVocab.GetRange(3, this.m_srcVocab.Count - 3);
 
-        public List<string> TgtVocab => m_tgtVocab.GetRange(3, m_tgtVocab.Count - 3);
+        public List<string> TgtVocab => this.m_tgtVocab.GetRange(3, this.m_tgtVocab.Count - 3);
 
         private object locker = new object();
 
         public Vocab()
         {
-            CreateIndex();
+            this.CreateIndex();
         }
 
         private void CreateIndex()
         {
-            SrcWordToIndex = new Dictionary<string, int>();
-            m_srcIndexToWord = new Dictionary<int, string>();
-            m_srcVocab = new List<string>();
+            this.SrcWordToIndex = new Dictionary<string, int>();
+            this.m_srcIndexToWord = new Dictionary<int, string>();
+            this.m_srcVocab = new List<string>();
 
-            TgtWordToIndex = new Dictionary<string, int>();
-            m_tgtIndexToWord = new Dictionary<int, string>();
-            m_tgtVocab = new List<string>();
+            this.TgtWordToIndex = new Dictionary<string, int>();
+            this.m_tgtIndexToWord = new Dictionary<int, string>();
+            this.m_tgtVocab = new List<string>();
 
-            m_srcVocab.Add(ParallelCorpus.EOS);
-            m_srcVocab.Add(ParallelCorpus.BOS);
-            m_srcVocab.Add(ParallelCorpus.UNK);
+            this.m_srcVocab.Add(ParallelCorpus.EOS);
+            this.m_srcVocab.Add(ParallelCorpus.BOS);
+            this.m_srcVocab.Add(ParallelCorpus.UNK);
 
-            SrcWordToIndex[ParallelCorpus.EOS] = (int)SENTTAGS.END;
-            SrcWordToIndex[ParallelCorpus.BOS] = (int)SENTTAGS.START;
-            SrcWordToIndex[ParallelCorpus.UNK] = (int)SENTTAGS.UNK;
+            this.SrcWordToIndex[ParallelCorpus.EOS] = (int)SENTTAGS.END;
+            this.SrcWordToIndex[ParallelCorpus.BOS] = (int)SENTTAGS.START;
+            this.SrcWordToIndex[ParallelCorpus.UNK] = (int)SENTTAGS.UNK;
 
-            m_srcIndexToWord[(int)SENTTAGS.END] = ParallelCorpus.EOS;
-            m_srcIndexToWord[(int)SENTTAGS.START] = ParallelCorpus.BOS;
-            m_srcIndexToWord[(int)SENTTAGS.UNK] = ParallelCorpus.UNK;
+            this.m_srcIndexToWord[(int)SENTTAGS.END] = ParallelCorpus.EOS;
+            this.m_srcIndexToWord[(int)SENTTAGS.START] = ParallelCorpus.BOS;
+            this.m_srcIndexToWord[(int)SENTTAGS.UNK] = ParallelCorpus.UNK;
 
-            m_tgtVocab.Add(ParallelCorpus.EOS);
-            m_tgtVocab.Add(ParallelCorpus.BOS);
-            m_tgtVocab.Add(ParallelCorpus.UNK);
+            this.m_tgtVocab.Add(ParallelCorpus.EOS);
+            this.m_tgtVocab.Add(ParallelCorpus.BOS);
+            this.m_tgtVocab.Add(ParallelCorpus.UNK);
 
-            TgtWordToIndex[ParallelCorpus.EOS] = (int)SENTTAGS.END;
-            TgtWordToIndex[ParallelCorpus.BOS] = (int)SENTTAGS.START;
-            TgtWordToIndex[ParallelCorpus.UNK] = (int)SENTTAGS.UNK;
+            this.TgtWordToIndex[ParallelCorpus.EOS] = (int)SENTTAGS.END;
+            this.TgtWordToIndex[ParallelCorpus.BOS] = (int)SENTTAGS.START;
+            this.TgtWordToIndex[ParallelCorpus.UNK] = (int)SENTTAGS.UNK;
 
-            m_tgtIndexToWord[(int)SENTTAGS.END] = ParallelCorpus.EOS;
-            m_tgtIndexToWord[(int)SENTTAGS.START] = ParallelCorpus.BOS;
-            m_tgtIndexToWord[(int)SENTTAGS.UNK] = ParallelCorpus.UNK;
+            this.m_tgtIndexToWord[(int)SENTTAGS.END] = ParallelCorpus.EOS;
+            this.m_tgtIndexToWord[(int)SENTTAGS.START] = ParallelCorpus.BOS;
+            this.m_tgtIndexToWord[(int)SENTTAGS.UNK] = ParallelCorpus.UNK;
         }
 
         /// <summary>
@@ -84,38 +84,38 @@ namespace Seq2SeqSharp
         public Vocab(string srcVocabFilePath, string tgtVocabFilePath)
         {
             Logger.WriteLine("Loading vocabulary files...");
-            string[] srcVocab = File.ReadAllLines(srcVocabFilePath);
-            string[] tgtVocab = File.ReadAllLines(tgtVocabFilePath);
+            var srcVocab = File.ReadAllLines(srcVocabFilePath);
+            var tgtVocab = File.ReadAllLines(tgtVocabFilePath);
 
-            CreateIndex();
+            this.CreateIndex();
 
             //Build word index for both source and target sides
-            int q = 3;
-            foreach (string line in srcVocab)
+            var q = 3;
+            foreach (var line in srcVocab)
             {
-                string[] items = line.Split('\t');
-                string word = items[0];
+                var items = line.Split('\t');
+                var word = items[0];
 
                 if (ParallelCorpus.IsPreDefinedToken(word) == false)
                 {
-                    m_srcVocab.Add(word);
-                    SrcWordToIndex[word] = q;
-                    m_srcIndexToWord[q] = word;
+                    this.m_srcVocab.Add(word);
+                    this.SrcWordToIndex[word] = q;
+                    this.m_srcIndexToWord[q] = word;
                     q++;
                 }
             }
 
             q = 3;
-            foreach (string line in tgtVocab)
+            foreach (var line in tgtVocab)
             {
-                string[] items = line.Split('\t');
-                string word = items[0];
+                var items = line.Split('\t');
+                var word = items[0];
 
                 if (ParallelCorpus.IsPreDefinedToken(word) == false)
                 {
-                    m_tgtVocab.Add(word);
-                    TgtWordToIndex[word] = q;
-                    m_tgtIndexToWord[q] = word;
+                    this.m_tgtVocab.Add(word);
+                    this.TgtWordToIndex[word] = q;
+                    this.m_tgtIndexToWord[q] = word;
                     q++;
                 }
             }
@@ -131,27 +131,27 @@ namespace Seq2SeqSharp
         {
             Logger.WriteLine($"Building vocabulary from given training corpus.");
             // count up all words
-            Dictionary<string, int> s_d = new Dictionary<string, int>();
-            Dictionary<string, int> t_d = new Dictionary<string, int>();
+            var s_d = new Dictionary<string, int>();
+            var t_d = new Dictionary<string, int>();
 
-            CreateIndex();
+            this.CreateIndex();
 
-            foreach (SntPairBatch sntPairBatch in trainCorpus)
+            foreach (var sntPairBatch in trainCorpus)
             {
-                foreach (SntPair sntPair in sntPairBatch.SntPairs)
+                foreach (var sntPair in sntPairBatch.SntPairs)
                 {
-                    string[] item = sntPair.SrcSnt;
+                    var item = sntPair.SrcSnt;
                     for (int i = 0, n = item.Length; i < n; i++)
                     {
-                        string txti = item[i];
+                        var txti = item[i];
                         if (s_d.Keys.Contains(txti)) { s_d[txti] += 1; }
                         else { s_d.Add(txti, 1); }
                     }
 
-                    string[] item2 = sntPair.TgtSnt;
+                    var item2 = sntPair.TgtSnt;
                     for (int i = 0, n = item2.Length; i < n; i++)
                     {
-                        string txti = item2[i];
+                        var txti = item2[i];
                         if (t_d.Keys.Contains(txti)) { t_d[txti] += 1; }
                         else { t_d.Add(txti, 1); }
                     }
@@ -159,15 +159,15 @@ namespace Seq2SeqSharp
             }
 
 
-            int q = 3;
-            foreach (KeyValuePair<string, int> ch in s_d)
+            var q = 3;
+            foreach (var ch in s_d)
             {
                 if (ch.Value >= minFreq && ParallelCorpus.IsPreDefinedToken(ch.Key) == false)
                 {
                     // add word to vocab
-                    SrcWordToIndex[ch.Key] = q;
-                    m_srcIndexToWord[q] = ch.Key;
-                    m_srcVocab.Add(ch.Key);
+                    this.SrcWordToIndex[ch.Key] = q;
+                    this.m_srcIndexToWord[q] = ch.Key;
+                    this.m_srcVocab.Add(ch.Key);
                     q++;
                 }
 
@@ -176,14 +176,14 @@ namespace Seq2SeqSharp
 
 
             q = 3;
-            foreach (KeyValuePair<string, int> ch in t_d)
+            foreach (var ch in t_d)
             {
                 if (ch.Value >= minFreq && ParallelCorpus.IsPreDefinedToken(ch.Key) == false)
                 {
                     // add word to vocab
-                    TgtWordToIndex[ch.Key] = q;
-                    m_tgtIndexToWord[q] = ch.Key;
-                    m_tgtVocab.Add(ch.Key);
+                    this.TgtWordToIndex[ch.Key] = q;
+                    this.m_tgtIndexToWord[q] = ch.Key;
+                    this.m_tgtVocab.Add(ch.Key);
                     q++;
                 }
 
@@ -195,8 +195,8 @@ namespace Seq2SeqSharp
 
         public void DumpTargetVocab(string fileName)
         {
-            List<string> lines = new List<string>();
-            foreach (KeyValuePair<int, string> pair in m_tgtIndexToWord)
+            var lines = new List<string>();
+            foreach (var pair in this.m_tgtIndexToWord)
             {
                 lines.Add($"{pair.Value}\t{pair.Key}");
             }
@@ -207,8 +207,8 @@ namespace Seq2SeqSharp
 
         public void DumpSourceVocab(string fileName)
         {
-            List<string> lines = new List<string>();
-            foreach (KeyValuePair<int, string> pair in m_srcIndexToWord)
+            var lines = new List<string>();
+            foreach (var pair in this.m_srcIndexToWord)
             {
                 lines.Add($"{pair.Value}\t{pair.Key}");
             }
@@ -219,15 +219,15 @@ namespace Seq2SeqSharp
 
         public List<string> ConvertTargetIdsToString(List<int> idxs)
         {
-            lock (locker)
+            lock (this.locker)
             {
-                List<string> result = new List<string>();
-                foreach (int idx in idxs)
+                var result = new List<string>();
+                foreach (var idx in idxs)
                 {
-                    string letter = ParallelCorpus.UNK;
-                    if (m_tgtIndexToWord.ContainsKey(idx))
+                    var letter = ParallelCorpus.UNK;
+                    if (this.m_tgtIndexToWord.ContainsKey(idx))
                     {
-                        letter = m_tgtIndexToWord[idx];
+                        letter = this.m_tgtIndexToWord[idx];
                     }
                     result.Add(letter);
                 }
@@ -238,9 +238,9 @@ namespace Seq2SeqSharp
 
         public int GetSourceWordIndex(string word, bool logUnk = false)
         {
-            lock (locker)
+            lock (this.locker)
             {
-                if (!SrcWordToIndex.TryGetValue(word, out int id))
+                if (!this.SrcWordToIndex.TryGetValue(word, out var id))
                 {
                     id = (int)SENTTAGS.UNK;
                     if (logUnk)
@@ -254,9 +254,9 @@ namespace Seq2SeqSharp
 
         public int GetTargetWordIndex(string word, bool logUnk = false)
         {
-            lock (locker)
+            lock (this.locker)
             {
-                if (!TgtWordToIndex.TryGetValue(word, out int id))
+                if (!this.TgtWordToIndex.TryGetValue(word, out var id))
                 {
                     id = (int)SENTTAGS.UNK;
 

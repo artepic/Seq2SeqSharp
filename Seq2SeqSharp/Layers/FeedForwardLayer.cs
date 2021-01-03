@@ -20,34 +20,33 @@ namespace Seq2SeqSharp
         {
             Logger.WriteLine($"Create feed forward layer '{name}' InputDim = '{inputDim}', OutputDim = '{outputDim}', DropoutRatio = '{dropoutRatio}', DeviceId = '{deviceId}'");
 
-            m_name = name;
-            m_inputDim = inputDim;
-            m_outputDim = outputDim;
-            m_dropoutRatio = dropoutRatio;
-            m_deviceId = deviceId;
-            m_isTrainable = isTrainable;
+            this.m_name = name;
+            this.m_inputDim = inputDim;
+            this.m_outputDim = outputDim;
+            this.m_dropoutRatio = dropoutRatio;
+            this.m_deviceId = deviceId;
+            this.m_isTrainable = isTrainable;
 
-            m_Whd = new WeightTensor(new long[2] { inputDim, outputDim }, deviceId, name: $"{name}.{nameof(m_Whd)}", normal: NormType.Uniform, isTrainable: isTrainable);
-            m_Bd = new WeightTensor(new long[2] { 1, outputDim }, 0, deviceId, name: $"{name}.{nameof(m_Bd)}", isTrainable: isTrainable);
+            this.m_Whd = new WeightTensor(new long[2] { inputDim, outputDim }, deviceId, name: $"{name}.{nameof(this.m_Whd)}", normal: NormType.Uniform, isTrainable: isTrainable);
+            this.m_Bd = new WeightTensor(new long[2] { 1, outputDim }, 0, deviceId, name: $"{name}.{nameof(this.m_Bd)}", isTrainable: isTrainable);
         }
 
         public int GetDeviceId()
         {
-            return m_deviceId;
+            return this.m_deviceId;
         }
 
         public IWeightTensor Process(IWeightTensor inputT, int batchSize, IComputeGraph g)
         {            
-            IWeightTensor res = g.Affine(inputT, m_Whd, m_Bd);
-            return g.Dropout(res, batchSize, m_dropoutRatio, inPlace: true);
+            var res = g.Affine(inputT, this.m_Whd, this.m_Bd);
+            return g.Dropout(res, batchSize, this.m_dropoutRatio, inPlace: true);
         }
 
         public virtual List<IWeightTensor> GetParams()
         {
-            List<IWeightTensor> response = new List<IWeightTensor>
+            var response = new List<IWeightTensor>
             {
-                m_Whd,
-                m_Bd
+                this.m_Whd, this.m_Bd
             };
 
             return response;
@@ -55,20 +54,20 @@ namespace Seq2SeqSharp
 
         public void Save(Stream stream)
         {
-            m_Whd.Save(stream);
-            m_Bd.Save(stream);
+            this.m_Whd.Save(stream);
+            this.m_Bd.Save(stream);
         }
 
 
         public void Load(Stream stream)
         {
-            m_Whd.Load(stream);
-            m_Bd.Load(stream);
+            this.m_Whd.Load(stream);
+            this.m_Bd.Load(stream);
         }
 
         public INeuralUnit CloneToDeviceAt(int deviceId)
         {
-            return new FeedForwardLayer(m_name, m_inputDim, m_outputDim, m_dropoutRatio, deviceId, m_isTrainable);
+            return new FeedForwardLayer(this.m_name, this.m_inputDim, this.m_outputDim, this.m_dropoutRatio, deviceId, this.m_isTrainable);
         }
     }
 }

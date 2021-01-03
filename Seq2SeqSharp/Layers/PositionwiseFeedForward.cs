@@ -17,28 +17,28 @@ namespace Seq2SeqSharp
 
         public PositionwiseFeedForward(string name, int hiddenDim, float dropoutRatio, int deviceId, bool isTrainable)
         {
-            m_name = name;
-            m_hiddenDim = hiddenDim;
-            m_dropoutRatio = dropoutRatio;
+            this.m_name = name;
+            this.m_hiddenDim = hiddenDim;
+            this.m_dropoutRatio = dropoutRatio;
 
-            layerNorm2 = new LayerNormalization($"{name}.{nameof(layerNorm2)}", hiddenDim, deviceId, isTrainable);
-            feedForwardLayer1 = new FeedForwardLayer($"{name}.{nameof(feedForwardLayer1)}", hiddenDim, hiddenDim * 4, m_dropoutRatio, deviceId, isTrainable);
-            feedForwardLayer2 = new FeedForwardLayer($"{name}.{nameof(feedForwardLayer2)}", hiddenDim * 4, hiddenDim, m_dropoutRatio, deviceId, isTrainable);
+            this.layerNorm2 = new LayerNormalization($"{name}.{nameof(this.layerNorm2)}", hiddenDim, deviceId, isTrainable);
+            this.feedForwardLayer1 = new FeedForwardLayer($"{name}.{nameof(this.feedForwardLayer1)}", hiddenDim, hiddenDim * 4, this.m_dropoutRatio, deviceId, isTrainable);
+            this.feedForwardLayer2 = new FeedForwardLayer($"{name}.{nameof(this.feedForwardLayer2)}", hiddenDim * 4, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable);
         }
       
         public IWeightTensor Perform(IWeightTensor input, int batchSize, IComputeGraph graph)
         {
-            using (IComputeGraph g = graph.CreateSubGraph($"{m_name}_PositionwiseFeedForward"))
+            using (var g = graph.CreateSubGraph($"{this.m_name}_PositionwiseFeedForward"))
             {
-                var inputNorm = layerNorm2.Norm(input, g);
+                var inputNorm = this.layerNorm2.Norm(input, g);
 
                 //Feed forward
-                IWeightTensor ffnResult = feedForwardLayer1.Process(inputNorm, batchSize, g);
-                IWeightTensor reluFFNResult = g.Relu(ffnResult, inPlace: true);
-                IWeightTensor ffn2Result = feedForwardLayer2.Process(reluFFNResult, batchSize, g);
+                var ffnResult = this.feedForwardLayer1.Process(inputNorm, batchSize, g);
+                var reluFFNResult = g.Relu(ffnResult, inPlace: true);
+                var ffn2Result = this.feedForwardLayer2.Process(reluFFNResult, batchSize, g);
 
                 //Skip connection and layer normaliztion
-                IWeightTensor addFFNResult = graph.Add(ffn2Result, input);
+                var addFFNResult = graph.Add(ffn2Result, input);
 
                 return addFFNResult;
             }
@@ -47,11 +47,11 @@ namespace Seq2SeqSharp
 
         public virtual List<IWeightTensor> getParams()
         {
-            List<IWeightTensor> response = new List<IWeightTensor>();
+            var response = new List<IWeightTensor>();
 
-            response.AddRange(layerNorm2.getParams());
-            response.AddRange(feedForwardLayer1.GetParams());
-            response.AddRange(feedForwardLayer2.GetParams());
+            response.AddRange(this.layerNorm2.getParams());
+            response.AddRange(this.feedForwardLayer1.GetParams());
+            response.AddRange(this.feedForwardLayer2.GetParams());
 
             return response;
         }
@@ -59,17 +59,17 @@ namespace Seq2SeqSharp
 
         public void Save(Stream stream)
         {
-            layerNorm2.Save(stream);
-            feedForwardLayer1.Save(stream);
-            feedForwardLayer2.Save(stream);
+            this.layerNorm2.Save(stream);
+            this.feedForwardLayer1.Save(stream);
+            this.feedForwardLayer2.Save(stream);
         }
 
 
         public void Load(Stream stream)
         {
-            layerNorm2.Load(stream);
-            feedForwardLayer1.Load(stream);
-            feedForwardLayer2.Load(stream);
+            this.layerNorm2.Load(stream);
+            this.feedForwardLayer1.Load(stream);
+            this.feedForwardLayer2.Load(stream);
         }
     }
 }

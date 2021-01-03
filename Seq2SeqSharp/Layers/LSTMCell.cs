@@ -19,101 +19,100 @@ namespace Seq2SeqSharp
         private readonly LayerNormalization m_layerNorm1;
         private readonly LayerNormalization m_layerNorm2;
 
-        public IWeightTensor Hidden => m_hidden;
+        public IWeightTensor Hidden => this.m_hidden;
 
         public LSTMCell(string name, int hdim, int dim, int deviceId, bool isTrainable)
         {
-            m_name = name;
+            this.m_name = name;
 
-            m_Wxh = new WeightTensor(new long[2] { dim + hdim, hdim * 4 }, deviceId, normal: NormType.Uniform, name: $"{name}.{nameof(m_Wxh)}", isTrainable: isTrainable);
-            m_b = new WeightTensor(new long[2] { 1, hdim * 4 }, 0, deviceId, name: $"{name}.{nameof(m_b)}", isTrainable: isTrainable);
+            this.m_Wxh = new WeightTensor(new long[2] { dim + hdim, hdim * 4 }, deviceId, normal: NormType.Uniform, name: $"{name}.{nameof(this.m_Wxh)}", isTrainable: isTrainable);
+            this.m_b = new WeightTensor(new long[2] { 1, hdim * 4 }, 0, deviceId, name: $"{name}.{nameof(this.m_b)}", isTrainable: isTrainable);
 
-            m_hdim = hdim;
-            m_dim = dim;
-            m_deviceId = deviceId;
+            this.m_hdim = hdim;
+            this.m_dim = dim;
+            this.m_deviceId = deviceId;
 
-            m_layerNorm1 = new LayerNormalization($"{name}.{nameof(m_layerNorm1)}", hdim * 4, deviceId, isTrainable: isTrainable);
-            m_layerNorm2 = new LayerNormalization($"{name}.{nameof(m_layerNorm2)}", hdim, deviceId, isTrainable: isTrainable);
+            this.m_layerNorm1 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm1)}", hdim * 4, deviceId, isTrainable: isTrainable);
+            this.m_layerNorm2 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm2)}", hdim, deviceId, isTrainable: isTrainable);
         }
 
         public IWeightTensor Step(IWeightTensor input, IComputeGraph g)
         {
-            using (IComputeGraph innerGraph = g.CreateSubGraph(m_name))
+            using (var innerGraph = g.CreateSubGraph(this.m_name))
             {
-                IWeightTensor hidden_prev = m_hidden;
-                IWeightTensor cell_prev = m_cell;
+                var hidden_prev = this.m_hidden;
+                var cell_prev = this.m_cell;
 
-                IWeightTensor inputs = innerGraph.ConcatColumns(input, hidden_prev);
-                IWeightTensor hhSum = innerGraph.Affine(inputs, m_Wxh, m_b);
-                IWeightTensor hhSum2 = m_layerNorm1.Norm(hhSum, innerGraph);
+                var inputs = innerGraph.ConcatColumns(input, hidden_prev);
+                var hhSum = innerGraph.Affine(inputs, this.m_Wxh, this.m_b);
+                var hhSum2 = this.m_layerNorm1.Norm(hhSum, innerGraph);
 
-                (IWeightTensor gates_raw, IWeightTensor cell_write_raw) = innerGraph.SplitColumns(hhSum2, m_hdim * 3, m_hdim);
-                IWeightTensor gates = innerGraph.Sigmoid(gates_raw);
-                IWeightTensor cell_write = innerGraph.Tanh(cell_write_raw);
+                (var gates_raw, var cell_write_raw) = innerGraph.SplitColumns(hhSum2, this.m_hdim * 3, this.m_hdim);
+                var gates = innerGraph.Sigmoid(gates_raw);
+                var cell_write = innerGraph.Tanh(cell_write_raw);
 
-                (IWeightTensor input_gate, IWeightTensor forget_gate, IWeightTensor output_gate) = innerGraph.SplitColumns(gates, m_hdim, m_hdim, m_hdim);
+                (var input_gate, var forget_gate, var output_gate) = innerGraph.SplitColumns(gates, this.m_hdim, this.m_hdim, this.m_hdim);
 
                 // compute new cell activation: ct = forget_gate * cell_prev + input_gate * cell_write
-                m_cell = g.EltMulMulAdd(forget_gate, cell_prev, input_gate, cell_write);
-                IWeightTensor ct2 = m_layerNorm2.Norm(m_cell, innerGraph);
+                this.m_cell = g.EltMulMulAdd(forget_gate, cell_prev, input_gate, cell_write);
+                var ct2 = this.m_layerNorm2.Norm(this.m_cell, innerGraph);
 
                 // compute hidden state as gated, saturated cell activations
-                m_hidden = g.EltMul(output_gate, innerGraph.Tanh(ct2));
+                this.m_hidden = g.EltMul(output_gate, innerGraph.Tanh(ct2));
 
-                return m_hidden;
+                return this.m_hidden;
             }
         }
 
         public virtual List<IWeightTensor> getParams()
         {
-            List<IWeightTensor> response = new List<IWeightTensor>
+            var response = new List<IWeightTensor>
             {
-                m_Wxh,
-                m_b
+                this.m_Wxh, this.m_b
             };
 
-            response.AddRange(m_layerNorm1.getParams());
-            response.AddRange(m_layerNorm2.getParams());
+            response.AddRange(this.m_layerNorm1.getParams());
+            response.AddRange(this.m_layerNorm2.getParams());
 
             return response;
         }
 
         public void Reset(IWeightFactory weightFactory, int batchSize)
         {
-            if (m_hidden != null)
+            if (this.m_hidden != null)
             {
-                m_hidden.Dispose();
-                m_hidden = null;
+                this.m_hidden.Dispose();
+                this.m_hidden = null;
             }
 
-            if (m_cell != null)
+            if (this.m_cell != null)
             {
-                m_cell.Dispose();
-                m_cell = null;
+                this.m_cell.Dispose();
+                this.m_cell = null;
             }
 
-            m_hidden = weightFactory.CreateWeightTensor(batchSize, m_hdim, m_deviceId, true, name: $"{m_name}.{nameof(m_hidden)}", isTrainable: true);
-            m_cell = weightFactory.CreateWeightTensor(batchSize, m_hdim, m_deviceId, true, name: $"{m_name}.{nameof(m_cell)}", isTrainable: true);
+            this.m_hidden = weightFactory.CreateWeightTensor(batchSize, this.m_hdim, this.m_deviceId, true, name: $"{this.m_name}.{nameof(this.m_hidden)}", isTrainable: true);
+            this.m_cell = weightFactory.CreateWeightTensor(batchSize, this.m_hdim, this.m_deviceId, true, name: $"{this.m_name}.{nameof(this.m_cell)}", isTrainable: true);
         }
 
         public void Save(Stream stream)
         {
-            m_Wxh.Save(stream);
-            m_b.Save(stream);
+            this.m_Wxh.Save(stream);
+            this.m_b.Save(stream);
 
-            m_layerNorm1.Save(stream);
-            m_layerNorm2.Save(stream);
+            this.m_layerNorm1.Save(stream);
+            this.m_layerNorm2.Save(stream);
 
         }
 
 
         public void Load(Stream stream)
         {
-            m_Wxh.Load(stream);
-            m_b.Load(stream);
+            this.m_Wxh.Load(stream);
+            this.m_b.Load(stream);
 
-            m_layerNorm1.Load(stream);
-            m_layerNorm2.Load(stream);
+            this.m_layerNorm1.Load(stream);
+            this.m_layerNorm2.Load(stream);
         }
     }
 

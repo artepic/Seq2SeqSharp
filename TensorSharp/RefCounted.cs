@@ -22,10 +22,10 @@ namespace TensorSharp
 
         ~RefCounted()
         {
-            if (refCount > 0)
+            if (this.refCount > 0)
             {
-                Destroy();
-                refCount = 0;
+                this.Destroy();
+                this.refCount = 0;
             }
         }
 
@@ -40,7 +40,7 @@ namespace TensorSharp
         /// <returns>true if the object is destroyed; false otherwise.</returns>
         protected bool IsDestroyed()
         {
-            return refCount == 0;
+            return this.refCount == 0;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace TensorSharp
         /// </summary>
         protected void ThrowIfDestroyed()
         {
-            if (IsDestroyed())
+            if (this.IsDestroyed())
             {
                 throw new InvalidOperationException("Reference counted object has been destroyed");
             }
@@ -56,7 +56,7 @@ namespace TensorSharp
 
         protected int GetCurrentRefCount()
         {
-            return refCount;
+            return this.refCount;
         }
 
         /// <summary>
@@ -66,17 +66,17 @@ namespace TensorSharp
         {
             int curRefCount;
             int original;
-            SpinWait spin = new SpinWait();
+            var spin = new SpinWait();
             while (true)
             {
-                curRefCount = refCount;
+                curRefCount = this.refCount;
                 if (curRefCount == 0)
                 {
                     throw new InvalidOperationException("Cannot AddRef - object has already been destroyed");
                 }
 
-                int desiredRefCount = curRefCount + 1;
-                original = Interlocked.CompareExchange(ref refCount, desiredRefCount, curRefCount);
+                var desiredRefCount = curRefCount + 1;
+                original = Interlocked.CompareExchange(ref this.refCount, desiredRefCount, curRefCount);
                 if (original == curRefCount)
                 {
                     break;
@@ -94,17 +94,17 @@ namespace TensorSharp
         {
             int original;
             int curRefCount;
-            SpinWait spin = new SpinWait();
+            var spin = new SpinWait();
             while (true)
             {
-                curRefCount = refCount;
+                curRefCount = this.refCount;
                 if (curRefCount == 0)
                 {
                     throw new InvalidOperationException("Cannot release object - object has already been destroyed");
                 }
 
-                int desiredRefCount = refCount - 1;
-                original = Interlocked.CompareExchange(ref refCount, desiredRefCount, curRefCount);
+                var desiredRefCount = this.refCount - 1;
+                original = Interlocked.CompareExchange(ref this.refCount, desiredRefCount, curRefCount);
                 if (original == curRefCount)
                 {
                     break;
@@ -113,9 +113,9 @@ namespace TensorSharp
                 spin.SpinOnce();
             }
 
-            if (refCount <= 0)
+            if (this.refCount <= 0)
             {
-                Destroy();
+                this.Destroy();
             }
         }
     }

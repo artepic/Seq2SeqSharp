@@ -7,9 +7,9 @@ namespace TensorSharp
     {
         public Storage(IAllocator allocator, DType elementType, long elementCount)
         {
-            Allocator = allocator;
-            ElementType = elementType;
-            ElementCount = elementCount;
+            this.Allocator = allocator;
+            this.ElementType = elementType;
+            this.ElementCount = elementCount;
         }
 
         /// <summary>
@@ -20,11 +20,11 @@ namespace TensorSharp
         public DType ElementType { get; private set; }
         public long ElementCount { get; private set; }
 
-        public long ByteLength => ElementCount * ElementType.Size();
+        public long ByteLength => this.ElementCount * this.ElementType.Size();
 
         public bool IsOwnerExclusive()
         {
-            return GetCurrentRefCount() == 1;
+            return this.GetCurrentRefCount() == 1;
         }
 
 

@@ -9,8 +9,8 @@
                 return 0;
             }
 
-            long total = 1L;
-            for (int i = 0; i < sizes.Length; ++i)
+            var total = 1L;
+            for (var i = 0; i < sizes.Length; ++i)
             {
                 total *= sizes[i];
             }
@@ -21,7 +21,7 @@
         public static long GetStorageSize(long[] sizes, long[] strides)
         {
             long offset = 0;
-            for (int i = 0; i < sizes.Length; ++i)
+            for (var i = 0; i < sizes.Length; ++i)
             {
                 offset += (sizes[i] - 1) * strides[i];
             }
@@ -34,9 +34,9 @@
         public static long[] GetContiguousStride(long[] dims)
         {
             long acc = 1;
-            long[] stride = new long[dims.Length];
+            var stride = new long[dims.Length];
 
-            for (int i = dims.Length - 1; i >= 0; --i)
+            for (var i = dims.Length - 1; i >= 0; --i)
             {
                 stride[i] = acc;
                 acc *= dims[i];

@@ -11,13 +11,13 @@ namespace TensorSharp.Cpu
         public CpuStorage(IAllocator allocator, DType ElementType, long elementCount)
             : base(allocator, ElementType, elementCount)
         {
-            buffer = Marshal.AllocHGlobal(new IntPtr(ByteLength));
+            this.buffer = Marshal.AllocHGlobal(new IntPtr(this.ByteLength));
         }
 
         protected override void Destroy()
         {
-            Marshal.FreeHGlobal(buffer);
-            buffer = IntPtr.Zero;
+            Marshal.FreeHGlobal(this.buffer);
+            this.buffer = IntPtr.Zero;
         }
 
         public override string LocationDescription()
@@ -27,19 +27,19 @@ namespace TensorSharp.Cpu
 
         public IntPtr PtrAtElement(long index)
         {
-            return new IntPtr(buffer.ToInt64() + (index * ElementType.Size()));
+            return new IntPtr(this.buffer.ToInt64() + (index * this.ElementType.Size()));
         }
 
         public override int[] GetElementsAsInt(long index, int length)
         {
             unsafe
             {
-                if (ElementType == DType.Int32)
+                if (this.ElementType == DType.Int32)
                 {
-                    int* p = ((int*)buffer.ToPointer());
-                    int[] array = new int[length];
+                    var p = ((int*)this.buffer.ToPointer());
+                    var array = new int[length];
 
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         array[i] = *(p + i);
                     }
@@ -47,7 +47,7 @@ namespace TensorSharp.Cpu
                 }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
         }
@@ -56,25 +56,25 @@ namespace TensorSharp.Cpu
         {
             unsafe
             {
-                if (ElementType == DType.Float32)
+                if (this.ElementType == DType.Float32)
                 {
-                    return ((float*)buffer.ToPointer())[index];
+                    return ((float*)this.buffer.ToPointer())[index];
                 }
-                else if (ElementType == DType.Float64)
+                else if (this.ElementType == DType.Float64)
                 {
-                    return (float)((double*)buffer.ToPointer())[index];
+                    return (float)((double*)this.buffer.ToPointer())[index];
                 }
-                else if (ElementType == DType.Int32)
+                else if (this.ElementType == DType.Int32)
                 {
-                    return ((int*)buffer.ToPointer())[index];
+                    return ((int*)this.buffer.ToPointer())[index];
                 }
-                else if (ElementType == DType.UInt8)
+                else if (this.ElementType == DType.UInt8)
                 {
-                    return ((byte*)buffer.ToPointer())[index];
+                    return ((byte*)this.buffer.ToPointer())[index];
                 }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
         }
@@ -83,12 +83,12 @@ namespace TensorSharp.Cpu
         {
             unsafe
             {
-                if (ElementType == DType.Float32)
+                if (this.ElementType == DType.Float32)
                 {
-                    float* p = ((float*)buffer.ToPointer());
-                    float[] array = new float[length];
+                    var p = ((float*)this.buffer.ToPointer());
+                    var array = new float[length];
 
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         array[i] = *(p + i);
                     }
@@ -96,7 +96,7 @@ namespace TensorSharp.Cpu
                 }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
         }
@@ -105,25 +105,25 @@ namespace TensorSharp.Cpu
         {
             unsafe
             {
-                if (ElementType == DType.Float32)
+                if (this.ElementType == DType.Float32)
                 {
-                    ((float*)buffer.ToPointer())[index] = value;
+                    ((float*)this.buffer.ToPointer())[index] = value;
                 }
-                else if (ElementType == DType.Float64)
+                else if (this.ElementType == DType.Float64)
                 {
-                    ((double*)buffer.ToPointer())[index] = value;
+                    ((double*)this.buffer.ToPointer())[index] = value;
                 }
-                else if (ElementType == DType.Int32)
+                else if (this.ElementType == DType.Int32)
                 {
-                    ((int*)buffer.ToPointer())[index] = (int)value;
+                    ((int*)this.buffer.ToPointer())[index] = (int)value;
                 }
-                else if (ElementType == DType.UInt8)
+                else if (this.ElementType == DType.UInt8)
                 {
-                    ((byte*)buffer.ToPointer())[index] = (byte)value;
+                    ((byte*)this.buffer.ToPointer())[index] = (byte)value;
                 }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
         }
@@ -132,16 +132,16 @@ namespace TensorSharp.Cpu
         {
             unsafe
             {
-                if (ElementType == DType.Int32)
+                if (this.ElementType == DType.Int32)
                 {
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                     {
-                        ((int*)buffer.ToPointer())[index + i] = value[i];
+                        ((int*)this.buffer.ToPointer())[index + i] = value[i];
                     }
                 }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
         }
@@ -150,23 +150,23 @@ namespace TensorSharp.Cpu
         {
             unsafe
             {
-                if (ElementType == DType.Float32)
+                if (this.ElementType == DType.Float32)
                 {
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                     {
-                        ((float*)buffer.ToPointer())[index + i] = value[i];
+                        ((float*)this.buffer.ToPointer())[index + i] = value[i];
                     }
                 }
                 else
                 {
-                    throw new NotSupportedException("Element type " + ElementType + " not supported");
+                    throw new NotSupportedException("Element type " + this.ElementType + " not supported");
                 }
             }
         }
 
         public override void CopyToStorage(long storageIndex, IntPtr src, long byteCount)
         {
-            IntPtr dstPtr = PtrAtElement(storageIndex);
+            var dstPtr = this.PtrAtElement(storageIndex);
             unsafe
             {
                 Buffer.MemoryCopy(src.ToPointer(), dstPtr.ToPointer(), byteCount, byteCount);
@@ -175,7 +175,7 @@ namespace TensorSharp.Cpu
 
         public override void CopyFromStorage(IntPtr dst, long storageIndex, long byteCount)
         {
-            IntPtr srcPtr = PtrAtElement(storageIndex);
+            var srcPtr = this.PtrAtElement(storageIndex);
             unsafe
             {
                 Buffer.MemoryCopy(srcPtr.ToPointer(), dst.ToPointer(), byteCount, byteCount);

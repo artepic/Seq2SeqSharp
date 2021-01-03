@@ -23,12 +23,12 @@ namespace Seq2SeqSharp
 
         public SeqLabelModelMetaData(int hiddenDim, int embeddingDim, int encoderLayerDepth, int multiHeadNum, EncoderTypeEnums encoderType, Vocab vocab)
         {
-            HiddenDim = hiddenDim;
-            EmbeddingDim = embeddingDim;
-            EncoderLayerDepth = encoderLayerDepth;
-            MultiHeadNum = multiHeadNum;
-            EncoderType = encoderType;
-            Vocab = vocab;
+            this.HiddenDim = hiddenDim;
+            this.EmbeddingDim = embeddingDim;
+            this.EncoderLayerDepth = encoderLayerDepth;
+            this.MultiHeadNum = multiHeadNum;
+            this.EncoderType = encoderType;
+            this.Vocab = vocab;
         }
     }
 }

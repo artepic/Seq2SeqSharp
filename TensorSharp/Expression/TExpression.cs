@@ -8,7 +8,7 @@ namespace TensorSharp.Expression
 
         public TExpression(bool isValidLvalue = false)
         {
-            IsValidLvalue = isValidLvalue;
+            this.IsValidLvalue = isValidLvalue;
         }
 
         public abstract Tensor Evaluate(Tensor writeTarget);
@@ -33,9 +33,9 @@ namespace TensorSharp.Expression
                 throw new InvalidOperationException("Cannot Select directly into another tensor");
             }
 
-            using (Tensor s = src.Evaluate(null))
+            using (var s = this.src.Evaluate(null))
             {
-                return evaluate(s);
+                return this.evaluate(s);
             }
         }
     }
@@ -56,12 +56,12 @@ namespace TensorSharp.Expression
         {
             if (writeTarget != null)
             {
-                writeTarget.CopyFrom(array);
+                writeTarget.CopyFrom(this.array);
                 return writeTarget;
             }
             else
             {
-                return Tensor.FromArray(allocator, array);
+                return Tensor.FromArray(this.allocator, this.array);
             }
         }
     }
@@ -79,11 +79,11 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor srcVal = src.Evaluate(null))
+            using (var srcVal = this.src.Evaluate(null))
             {
                 if (writeTarget == null)
                 {
-                    writeTarget = new Tensor(srcVal.Allocator, type, srcVal.Sizes);
+                    writeTarget = new Tensor(srcVal.Allocator, this.type, srcVal.Sizes);
                 }
 
                 Ops.Copy(writeTarget, srcVal);
@@ -105,11 +105,11 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor srcVal = src.Evaluate(null))
+            using (var srcVal = this.src.Evaluate(null))
             {
                 if (writeTarget == null)
                 {
-                    writeTarget = new Tensor(allocator, srcVal.ElementType, srcVal.Sizes);
+                    writeTarget = new Tensor(this.allocator, srcVal.ElementType, srcVal.Sizes);
                 }
 
                 Ops.Copy(writeTarget, srcVal);
@@ -136,14 +136,14 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor s = src.Evaluate(null))
-            using (Tensor i = indices.Evaluate(null))
+            using (var s = this.src.Evaluate(null))
+            using (var i = this.indices.Evaluate(null))
             {
                 if (!writeTarget.Equals(s))
                 {
                     Ops.Copy(writeTarget, s);
                 }
-                Ops.ScatterFill(writeTarget, value.Evaluate(), dimension, i);
+                Ops.ScatterFill(writeTarget, this.value.Evaluate(), this.dimension, i);
             }
 
             return writeTarget;
@@ -170,10 +170,10 @@ namespace TensorSharp.Expression
         {
             if (writeTarget == null)
             {
-                writeTarget = new Tensor(allocator, elementType, sizes);
+                writeTarget = new Tensor(this.allocator, this.elementType, this.sizes);
             }
 
-            fillAction(writeTarget);
+            this.fillAction(writeTarget);
 
             return writeTarget;
         }
@@ -195,11 +195,11 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor s = src.Evaluate(null))
-            using (Tensor m1Val = m1.Evaluate(null))
-            using (Tensor m2Val = m2.Evaluate(null))
+            using (var s = this.src.Evaluate(null))
+            using (var m1Val = this.m1.Evaluate(null))
+            using (var m2Val = this.m2.Evaluate(null))
             {
-                return Ops.Addmm(writeTarget, beta, s, alpha, m1Val, m2Val);
+                return Ops.Addmm(writeTarget, this.beta, s, this.alpha, m1Val, m2Val);
             }
         }
     }
@@ -219,11 +219,11 @@ namespace TensorSharp.Expression
         {
             if (writeTarget == null)
             {
-                return value.CopyRef();
+                return this.value.CopyRef();
             }
             else
             {
-                Ops.Copy(writeTarget, value);
+                Ops.Copy(writeTarget, this.value);
                 return writeTarget;
             }
         }
@@ -243,10 +243,10 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor lhs = left.Evaluate(null))
-            using (Tensor rhs = right.Evaluate(null))
+            using (var lhs = this.left.Evaluate(null))
+            using (var rhs = this.right.Evaluate(null))
             {
-                return evaluate(writeTarget, lhs, rhs);
+                return this.evaluate(writeTarget, lhs, rhs);
             }
         }
     }
@@ -264,9 +264,9 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor s = src.Evaluate(null))
+            using (var s = this.src.Evaluate(null))
             {
-                return evaluate(writeTarget, s);
+                return this.evaluate(writeTarget, s);
             }
         }
     }
@@ -286,9 +286,9 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor rhs = right.Evaluate(null))
+            using (var rhs = this.right.Evaluate(null))
             {
-                return evaluate(writeTarget, left.Evaluate(), rhs);
+                return this.evaluate(writeTarget, this.left.Evaluate(), rhs);
             }
         }
     }
@@ -308,9 +308,9 @@ namespace TensorSharp.Expression
 
         public override Tensor Evaluate(Tensor writeTarget)
         {
-            using (Tensor lhs = left.Evaluate(null))
+            using (var lhs = this.left.Evaluate(null))
             {
-                return evaluate(writeTarget, lhs, right.Evaluate());
+                return this.evaluate(writeTarget, lhs, this.right.Evaluate());
             }
         }
     }

@@ -10,39 +10,40 @@ namespace Seq2SeqSharp.Tools
 
         public WeightTensor CreateWeightTensor(int row, int column, int deviceId, bool cleanWeights = false, string name = "", bool isTrainable = false, IComputeGraph graphToBind = null)
         {
-            WeightTensor r = new WeightTensor(new long[2] { row, column }, deviceId, name: name, isTrainable: isTrainable, graphToBind: graphToBind);
+            var r = new WeightTensor(new long[2] { row, column }, deviceId, name: name, isTrainable: isTrainable, graphToBind: graphToBind);
 
             if (cleanWeights)
             {
                 r.CleanWeight();
             }
 
-            weights.Add(r);
+            this.weights.Add(r);
 
             return r;
         }
 
         public WeightTensor CreateWeightTensor(long[] sizes, int deviceId, bool cleanWeights = false, string name = "", IComputeGraph graphToBind = null)
         {
-            WeightTensor r = new WeightTensor(sizes, deviceId, name, graphToBind: graphToBind);
+            var r = new WeightTensor(sizes, deviceId, name, graphToBind: graphToBind);
 
             if (cleanWeights)
             {
                 r.CleanWeight();
             }
 
-            weights.Add(r);
+            this.weights.Add(r);
 
             return r;
         }
 
         public void Dispose()
         {
-            foreach (WeightTensor item in weights)
+            foreach (var item in this.weights)
             {
                 item.Dispose();
             }
-            weights.Clear();
+
+            this.weights.Clear();
         }
     }
 }

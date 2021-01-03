@@ -15,11 +15,11 @@ namespace Seq2SeqSharp
 
         public BeamSearchStatus()
         {
-            OutputIds = new List<int>();
-            HTs = new List<IWeightTensor>();
-            CTs = new List<IWeightTensor>();
+            this.OutputIds = new List<int>();
+            this.HTs = new List<IWeightTensor>();
+            this.CTs = new List<IWeightTensor>();
 
-            Score = 1.0f;
+            this.Score = 1.0f;
         }
     }
 
@@ -27,9 +27,9 @@ namespace Seq2SeqSharp
     {
         public static List<BeamSearchStatus> GetTopNBSS(List<BeamSearchStatus> bssList, int topN)
         {
-            FixedSizePriorityQueue<ComparableItem<BeamSearchStatus>> q = new FixedSizePriorityQueue<ComparableItem<BeamSearchStatus>>(topN, new ComparableItemComparer<BeamSearchStatus>(false));
+            var q = new FixedSizePriorityQueue<ComparableItem<BeamSearchStatus>>(topN, new ComparableItemComparer<BeamSearchStatus>(false));
 
-            for (int i = 0; i < bssList.Count; i++)
+            for (var i = 0; i < bssList.Count; i++)
             {
                 q.Enqueue(new ComparableItem<BeamSearchStatus>(bssList[i].Score, bssList[i]));
             }

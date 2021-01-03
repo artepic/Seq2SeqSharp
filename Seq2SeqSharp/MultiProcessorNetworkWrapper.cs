@@ -15,22 +15,22 @@ namespace Seq2SeqSharp
 
         public MultiProcessorNetworkWrapper(T networkOnDefaultDevice, int[] deviceIds, bool isStaticWeights = false)
         {
-            m_networks = new T[deviceIds.Length];
-            m_defaultDeviceId = networkOnDefaultDevice.GetDeviceId();
-            m_deviceIds = deviceIds;
-            m_networkOnDefaultDevice = networkOnDefaultDevice;
-            m_isStaticWeights = isStaticWeights;
-            m_weightsSynced = false;
+            this.m_networks = new T[deviceIds.Length];
+            this.m_defaultDeviceId = networkOnDefaultDevice.GetDeviceId();
+            this.m_deviceIds = deviceIds;
+            this.m_networkOnDefaultDevice = networkOnDefaultDevice;
+            this.m_isStaticWeights = isStaticWeights;
+            this.m_weightsSynced = false;
 
-            for (int i = 0; i < deviceIds.Length; i++)
+            for (var i = 0; i < deviceIds.Length; i++)
             {
-                if (deviceIds[i] == m_defaultDeviceId)
+                if (deviceIds[i] == this.m_defaultDeviceId)
                 {
-                    m_networks[i] = networkOnDefaultDevice;
+                    this.m_networks[i] = networkOnDefaultDevice;
                 }
                 else
                 {
-                    m_networks[i] = (T)networkOnDefaultDevice.CloneToDeviceAt(deviceIds[i]);
+                    this.m_networks[i] = (T)networkOnDefaultDevice.CloneToDeviceAt(deviceIds[i]);
                 }
             }
         }
@@ -40,19 +40,20 @@ namespace Seq2SeqSharp
         /// </summary>
         public void SyncWeights()
         {
-            if (m_isStaticWeights && m_weightsSynced)
+            if (this.m_isStaticWeights &&
+                this.m_weightsSynced)
             {
                 return;
             }
 
-            List<Tools.IWeightTensor> tensorsOnDefaultDevice = m_networkOnDefaultDevice.GetParams();
-            Parallel.ForEach(m_networks, network =>
+            var tensorsOnDefaultDevice = this.m_networkOnDefaultDevice.GetParams();
+            Parallel.ForEach(this.m_networks, network =>
             {
-                if (network.Equals(m_networkOnDefaultDevice) == false)
+                if (network.Equals(this.m_networkOnDefaultDevice) == false)
                 {
-                    List<Tools.IWeightTensor> tensors = network.GetParams();
+                    var tensors = network.GetParams();
 
-                    for (int j = 0; j < tensors.Count; j++)
+                    for (var j = 0; j < tensors.Count; j++)
                     {
                         tensors[j].CopyWeightsFrom(tensorsOnDefaultDevice[j]);
                     }
@@ -60,7 +61,7 @@ namespace Seq2SeqSharp
 
             });
 
-            m_weightsSynced = true;
+            this.m_weightsSynced = true;
         }
 
         /// <summary>
@@ -68,19 +69,19 @@ namespace Seq2SeqSharp
         /// </summary>
         public void SumGradientsToNetworkOnDefaultDevice()
         {
-            if (m_isStaticWeights)
+            if (this.m_isStaticWeights)
             {
                 return;
             }
 
-            List<Tools.IWeightTensor> tensorsOnDefaultDevice = m_networkOnDefaultDevice.GetParams();
-            Parallel.ForEach(m_networks, network =>
+            var tensorsOnDefaultDevice = this.m_networkOnDefaultDevice.GetParams();
+            Parallel.ForEach(this.m_networks, network =>
             {
-                if (network.Equals(m_networkOnDefaultDevice) == false)
+                if (network.Equals(this.m_networkOnDefaultDevice) == false)
                 {
-                    List<Tools.IWeightTensor> tensors = network.GetParams();
+                    var tensors = network.GetParams();
 
-                    for (int j = 0; j < tensors.Count; j++)
+                    for (var j = 0; j < tensors.Count; j++)
                     {
                         tensorsOnDefaultDevice[j].AddGradientFrom(tensors[j]);
                     }
@@ -95,15 +96,15 @@ namespace Seq2SeqSharp
         /// </summary>
         public void ZeroGradientsOnAllDevices()
         {
-            if (m_isStaticWeights)
+            if (this.m_isStaticWeights)
             {
                 return;
             }
 
-            Parallel.ForEach(m_networks, network =>
+            Parallel.ForEach(this.m_networks, network =>
             {
-                List<Tools.IWeightTensor> tensors = network.GetParams();
-                for (int j = 0; j < tensors.Count; j++)
+                var tensors = network.GetParams();
+                for (var j = 0; j < tensors.Count; j++)
                 {
                     tensors[j].ZeroGradient();
                 }
@@ -116,9 +117,9 @@ namespace Seq2SeqSharp
         /// <param name="stream"></param>
         public void Save(Stream stream)
         {
-            if (m_isStaticWeights == false)
+            if (this.m_isStaticWeights == false)
             {
-                m_networkOnDefaultDevice.Save(stream);
+                this.m_networkOnDefaultDevice.Save(stream);
             }
         }
 
@@ -128,20 +129,20 @@ namespace Seq2SeqSharp
         /// <param name="stream"></param>
         public void Load(Stream stream)
         {
-            if (m_isStaticWeights == false)
+            if (this.m_isStaticWeights == false)
             {
-                m_networkOnDefaultDevice.Load(stream);
+                this.m_networkOnDefaultDevice.Load(stream);
             }
         }
 
         public T GetNetworkOnDefaultDevice()
         {
-            return m_networkOnDefaultDevice;
+            return this.m_networkOnDefaultDevice;
         }
 
         public INeuralUnit GetNeuralUnitOnDefaultDevice()
         {
-            return GetNetworkOnDefaultDevice();
+            return this.GetNetworkOnDefaultDevice();
         }
 
         /// <summary>
@@ -153,9 +154,9 @@ namespace Seq2SeqSharp
         {
             if (deviceIdIdx == -1)
             {
-                return m_networkOnDefaultDevice;
+                return this.m_networkOnDefaultDevice;
             }
-            return m_networks[deviceIdIdx];
+            return this.m_networks[deviceIdIdx];
         }
     }
 }

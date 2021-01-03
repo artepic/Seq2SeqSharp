@@ -17,16 +17,16 @@ namespace Seq2SeqSharp
                 Return_V = false;
                 return V_Val;
             }
-            double u = 2 * random.NextDouble() - 1;
-            double v = 2 * random.NextDouble() - 1;
-            double r = (u * u) + (v * v);
+            var u = 2 * random.NextDouble() - 1;
+            var v = 2 * random.NextDouble() - 1;
+            var r = (u * u) + (v * v);
 
             if (r == 0 || r > 1)
             {
                 return GaussRandom();
             }
 
-            double c = Math.Sqrt(-2 * Math.Log(r) / r);
+            var c = Math.Sqrt(-2 * Math.Log(r) / r);
             V_Val = (float)(v * c);
             Return_V = true;
             return (float)(u * c);

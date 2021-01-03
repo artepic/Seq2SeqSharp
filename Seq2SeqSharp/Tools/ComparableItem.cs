@@ -11,8 +11,8 @@ namespace Seq2SeqSharp.Tools
 
         public ComparableItem(float score, T value)
         {
-            Score = score;
-            Value = value;
+            this.Score = score;
+            this.Value = value;
         }
     }
 
@@ -20,13 +20,13 @@ namespace Seq2SeqSharp.Tools
     {
         public ComparableItemComparer(bool fAscending)
         {
-            m_fAscending = fAscending;
+            this.m_fAscending = fAscending;
         }
 
         public int Compare(ComparableItem<T> x, ComparableItem<T> y)
         {
-            int iSign = Math.Sign(x.Score - y.Score);
-            if (!m_fAscending)
+            var iSign = Math.Sign(x.Score - y.Score);
+            if (!this.m_fAscending)
             {
                 iSign = -iSign;
             }

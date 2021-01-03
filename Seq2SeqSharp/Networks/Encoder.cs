@@ -17,11 +17,11 @@ namespace Seq2SeqSharp
 
         public Encoder(string name, int hdim, int dim, int depth, int deviceId, bool isTrainable)
         {
-            encoders.Add(new LSTMCell($"{name}.LSTM_0", hdim, dim, deviceId, isTrainable));
+            this.encoders.Add(new LSTMCell($"{name}.LSTM_0", hdim, dim, deviceId, isTrainable));
 
-            for (int i = 1; i < depth; i++)
+            for (var i = 1; i < depth; i++)
             {
-                encoders.Add(new LSTMCell($"{name}.LSTM_{i}", hdim, hdim, deviceId, isTrainable));
+                this.encoders.Add(new LSTMCell($"{name}.LSTM_{i}", hdim, hdim, deviceId, isTrainable));
 
             }
             this.hdim = hdim;
@@ -31,7 +31,7 @@ namespace Seq2SeqSharp
 
         public void Reset(IWeightFactory weightFactory, int batchSize)
         {
-            foreach (LSTMCell item in encoders)
+            foreach (var item in this.encoders)
             {
                 item.Reset(weightFactory, batchSize);
             }
@@ -40,9 +40,9 @@ namespace Seq2SeqSharp
 
         public IWeightTensor Encode(IWeightTensor V, IComputeGraph g)
         {
-            foreach (LSTMCell encoder in encoders)
+            foreach (var encoder in this.encoders)
             {
-                IWeightTensor e = encoder.Step(V, g);
+                var e = encoder.Step(V, g);
                 V = e;
             }
 
@@ -52,9 +52,9 @@ namespace Seq2SeqSharp
 
         public List<IWeightTensor> getParams()
         {
-            List<IWeightTensor> response = new List<IWeightTensor>();
+            var response = new List<IWeightTensor>();
 
-            foreach (LSTMCell item in encoders)
+            foreach (var item in this.encoders)
             {
                 response.AddRange(item.getParams());
 
@@ -65,7 +65,7 @@ namespace Seq2SeqSharp
 
         public void Save(Stream stream)
         {
-            foreach (LSTMCell item in encoders)
+            foreach (var item in this.encoders)
             {
                 item.Save(stream);
             }
@@ -73,7 +73,7 @@ namespace Seq2SeqSharp
 
         public void Load(Stream stream)
         {
-            foreach (LSTMCell item in encoders)
+            foreach (var item in this.encoders)
             {
                 item.Load(stream);
             }

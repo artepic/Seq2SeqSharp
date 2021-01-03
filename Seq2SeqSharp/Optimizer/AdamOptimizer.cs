@@ -23,19 +23,19 @@ namespace Seq2SeqSharp
         {
             Logger.WriteLine($"Creating Adam optimizer. GradClip = '{clipval}', Beta1 = '{beta1}', Beta2 = '{beta2}'");
 
-            m_cacheName2V = new ConcurrentDictionary<string, Tensor>();
-            m_cacheName2M = new ConcurrentDictionary<string, Tensor>();
+            this.m_cacheName2V = new ConcurrentDictionary<string, Tensor>();
+            this.m_cacheName2M = new ConcurrentDictionary<string, Tensor>();
 
-            m_clipval = clipval;
+            this.m_clipval = clipval;
             m_beta1 = beta1;
             m_beta2 = beta2;
         }
 
         public void UpdateWeights(List<IWeightTensor> model, int batchSize, float step_size, float regc, int iter)
         {
-            Dictionary<int, List<IWeightTensor>> id2Models = new Dictionary<int, List<IWeightTensor>>();
-            HashSet<string> setWeightsName = new HashSet<string>();
-            foreach (IWeightTensor item in model)
+            var id2Models = new Dictionary<int, List<IWeightTensor>>();
+            var setWeightsName = new HashSet<string>();
+            foreach (var item in model)
             {
                 if (!item.IsTrainable)
                 {
@@ -54,14 +54,14 @@ namespace Seq2SeqSharp
                 }
                 id2Models[item.DeviceId].Add(item);
 
-                if (m_cacheName2V.ContainsKey(item.Name) == false)
+                if (this.m_cacheName2V.ContainsKey(item.Name) == false)
                 {
-                    IAllocator allocator = TensorAllocator.Allocator(item.DeviceId);
-                    m_cacheName2V[item.Name] = new Tensor(allocator, DType.Float32, item.Sizes);
-                    Ops.Fill(m_cacheName2V[item.Name], 0.0f);
+                    var allocator = TensorAllocator.Allocator(item.DeviceId);
+                    this.m_cacheName2V[item.Name] = new Tensor(allocator, DType.Float32, item.Sizes);
+                    Ops.Fill(this.m_cacheName2V[item.Name], 0.0f);
 
-                    m_cacheName2M[item.Name] = new Tensor(allocator, DType.Float32, item.Sizes);
-                    Ops.Fill(m_cacheName2M[item.Name], 0.0f);
+                    this.m_cacheName2M[item.Name] = new Tensor(allocator, DType.Float32, item.Sizes);
+                    Ops.Fill(this.m_cacheName2M[item.Name], 0.0f);
 
                     Logger.WriteLine($"Added weight '{item.Name}' to optimizer.");
                 }
@@ -69,10 +69,10 @@ namespace Seq2SeqSharp
 
             Parallel.ForEach(id2Models, kv =>
             {
-                foreach (IWeightTensor item in kv.Value)
+                foreach (var item in kv.Value)
                 {
-                    WeightTensor m = item as WeightTensor;
-                    UpdateWeightsTensor(m, batchSize, step_size, m_clipval, regc, iter);
+                    var m = item as WeightTensor;
+                    this.UpdateWeightsTensor(m, batchSize, step_size, this.m_clipval, regc, iter);
                 }
             });
         }
@@ -81,7 +81,7 @@ namespace Seq2SeqSharp
         private void UpdateWeightsTensor(WeightTensor m, int batchSize, float step_size, float clipval, float regc, int iter)
         {
             // Ops.RMSProp(m.TWeight, m.TGradient, m.TV, batchSize, step_size, clipval, regc, decay_rate, smooth_eps);
-            Ops.Adam(m.TWeight, m.TGradient, m_cacheName2V[m.Name], m_cacheName2M[m.Name], batchSize, step_size, clipval, regc, m_beta2, m_beta1, iter, m_smoothEps);
+            Ops.Adam(m.TWeight, m.TGradient, this.m_cacheName2V[m.Name], this.m_cacheName2M[m.Name], batchSize, step_size, clipval, regc, m_beta2, m_beta1, iter, m_smoothEps);
         }
 
     }

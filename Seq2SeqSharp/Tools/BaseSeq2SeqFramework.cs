@@ -22,7 +22,7 @@ namespace Seq2SeqSharp.Tools
         public event EventHandler IterationDone;
 
         private readonly int[] m_deviceIds;
-        public int[] DeviceIds => m_deviceIds;
+        public int[] DeviceIds => this.m_deviceIds;
 
         private readonly string m_modelFilePath;
         private readonly float m_regc = 1e-10f; // L2 regularization strength
@@ -35,40 +35,40 @@ namespace Seq2SeqSharp.Tools
 
         public BaseSeq2SeqFramework(int[] deviceIds, ProcessorTypeEnums processorType, string modelFilePath, float memoryUsageRatio = 0.9f, string[] compilerOptions = null)
         {
-            m_deviceIds = deviceIds;
-            m_modelFilePath = modelFilePath;
-            TensorAllocator.InitDevices(processorType, m_deviceIds, memoryUsageRatio, compilerOptions);
+            this.m_deviceIds = deviceIds;
+            this.m_modelFilePath = modelFilePath;
+            TensorAllocator.InitDevices(processorType, this.m_deviceIds, memoryUsageRatio, compilerOptions);
         }
 
         public IComputeGraph CreateComputGraph(int deviceIdIdx, bool needBack = true)
         {
-            if (deviceIdIdx < 0 || deviceIdIdx >= DeviceIds.Length)
+            if (deviceIdIdx < 0 || deviceIdIdx >= this.DeviceIds.Length)
             {
-                throw new ArgumentOutOfRangeException($"Index '{deviceIdIdx}' is out of deviceId range. DeviceId length is '{DeviceIds.Length}'");
+                throw new ArgumentOutOfRangeException($"Index '{deviceIdIdx}' is out of deviceId range. DeviceId length is '{this.DeviceIds.Length}'");
             }
 
             // Create computing graph instance and return it
-            return new ComputeGraphTensor(new WeightTensorFactory(), DeviceIds[deviceIdIdx], needBack);
+            return new ComputeGraphTensor(new WeightTensorFactory(), this.DeviceIds[deviceIdIdx], needBack);
         }
 
         public bool SaveModel(IModelMetaData modelMetaData)
         {
             try
             {
-                Logger.WriteLine($"Saving model to '{m_modelFilePath}'");
+                Logger.WriteLine($"Saving model to '{this.m_modelFilePath}'");
 
-                if (File.Exists(m_modelFilePath))
+                if (File.Exists(this.m_modelFilePath))
                 {
-                    File.Copy(m_modelFilePath, $"{m_modelFilePath}.bak", true);
+                    File.Copy(this.m_modelFilePath, $"{this.m_modelFilePath}.bak", true);
                 }
 
-                BinaryFormatter bf = new BinaryFormatter();
-                using (FileStream fs = new FileStream(m_modelFilePath, FileMode.Create, FileAccess.Write))
+                var bf = new BinaryFormatter();
+                using (var fs = new FileStream(this.m_modelFilePath, FileMode.Create, FileAccess.Write))
                 {
                     // Save model meta data to the stream
                     bf.Serialize(fs, modelMetaData);
                     // All networks and tensors which are MultiProcessorNetworkWrapper<T> will be saved to given stream
-                    SaveParameters(fs);
+                    this.SaveParameters(fs);
                 }
 
                 return true;
@@ -87,10 +87,10 @@ namespace Seq2SeqSharp.Tools
         /// <returns></returns>
         public IModelMetaData LoadModel(Func<IModelMetaData, bool> InitializeParameters)
         {
-            Logger.WriteLine($"Loading model from '{m_modelFilePath}'...");
+            Logger.WriteLine($"Loading model from '{this.m_modelFilePath}'...");
             IModelMetaData modelMetaData = null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (FileStream fs = new FileStream(m_modelFilePath, FileMode.Open, FileAccess.Read))
+            var bf = new BinaryFormatter();
+            using (var fs = new FileStream(this.m_modelFilePath, FileMode.Open, FileAccess.Read))
             {
                 modelMetaData = bf.Deserialize(fs) as IModelMetaData;
 
@@ -99,7 +99,7 @@ namespace Seq2SeqSharp.Tools
 
                 // Load embedding and weights from given model
                 // All networks and tensors which are MultiProcessorNetworkWrapper<T> will be loaded from given stream
-                LoadParameters(fs);
+                this.LoadParameters(fs);
             }
 
             return modelMetaData;
@@ -108,57 +108,58 @@ namespace Seq2SeqSharp.Tools
         internal void TrainOneEpoch(int ep, IEnumerable<SntPairBatch> trainCorpus, IEnumerable<SntPairBatch> validCorpus, ILearningRate learningRate, AdamOptimizer solver, List<IMetric> metrics, IModelMetaData modelMetaData,
             Func<IComputeGraph, List<List<string>>, List<List<string>>, int, bool, float> ForwardOnSingleDevice)
         {
-            int processedLineInTotal = 0;
-            DateTime startDateTime = DateTime.Now;
-            double costInTotal = 0.0;
+            var processedLineInTotal = 0;
+            var startDateTime = DateTime.Now;
+            var costInTotal = 0.0;
             long srcWordCntsInTotal = 0;
             long tgtWordCntsInTotal = 0;
-            double avgCostPerWordInTotal = 0.0;
+            var avgCostPerWordInTotal = 0.0;
 
             Logger.WriteLine($"Start to process training corpus.");
-            List<SntPairBatch> sntPairBatchs = new List<SntPairBatch>();
+            var sntPairBatchs = new List<SntPairBatch>();
 
-            foreach (SntPairBatch sntPairBatch in trainCorpus)
+            foreach (var sntPairBatch in trainCorpus)
             {
                 sntPairBatchs.Add(sntPairBatch);
-                if (sntPairBatchs.Count == m_deviceIds.Length)
+                if (sntPairBatchs.Count == this.m_deviceIds.Length)
                 {
                     // Copy weights from weights kept in default device to all other devices
-                    CopyWeightsFromDefaultDeviceToAllOtherDevices();
+                    this.CopyWeightsFromDefaultDeviceToAllOtherDevices();
 
-                    int batchSplitFactor = 1;
-                    bool runNetwordSuccssed = false;
+                    var batchSplitFactor = 1;
+                    var runNetwordSuccssed = false;
 
                     while (runNetwordSuccssed == false)
                     {
                         try
                         {
-                            (float cost, int sWordCnt, int tWordCnt, int processedLine) = RunNetwork(ForwardOnSingleDevice, sntPairBatchs, batchSplitFactor);
+                            (var cost, var sWordCnt, var tWordCnt, var processedLine) = this.RunNetwork(ForwardOnSingleDevice, sntPairBatchs, batchSplitFactor);
                             processedLineInTotal += processedLine;
                             srcWordCntsInTotal += sWordCnt;
                             tgtWordCntsInTotal += tWordCnt;
 
                             //Sum up gradients in all devices, and kept it in default device for parameters optmization
-                            SumGradientsToTensorsInDefaultDevice();
+                            this.SumGradientsToTensorsInDefaultDevice();
 
                             //Optmize parameters
-                            float lr = learningRate.GetCurrentLearningRate();
-                            List<IWeightTensor> models = GetParametersFromDefaultDevice();
-                            solver.UpdateWeights(models, processedLine, lr, m_regc, m_weightsUpdateCount + 1);
+                            var lr = learningRate.GetCurrentLearningRate();
+                            var models = this.GetParametersFromDefaultDevice();
+                            solver.UpdateWeights(models, processedLine, lr, this.m_regc, this.m_weightsUpdateCount + 1);
 
 
                             costInTotal += cost;
                             avgCostPerWordInTotal = costInTotal / tgtWordCntsInTotal;
-                            m_weightsUpdateCount++;
-                            if (IterationDone != null && m_weightsUpdateCount % 100 == 0)
+                            this.m_weightsUpdateCount++;
+                            if (this.IterationDone != null &&
+                                this.m_weightsUpdateCount % 100 == 0)
                             {
-                                IterationDone(this, new CostEventArg()
+                                this.IterationDone(this, new CostEventArg()
                                 {
                                     LearningRate = lr,
                                     CostPerWord = cost / tWordCnt,
                                     AvgCostInTotal = avgCostPerWordInTotal,
                                     Epoch = ep,
-                                    Update = m_weightsUpdateCount,
+                                    Update = this.m_weightsUpdateCount,
                                     ProcessedSentencesInTotal = processedLineInTotal,
                                     ProcessedWordsInTotal = srcWordCntsInTotal + tgtWordCntsInTotal,
                                     StartDateTime = startDateTime
@@ -171,9 +172,9 @@ namespace Seq2SeqSharp.Tools
                         {
                             if (err.InnerExceptions != null)
                             {
-                                string oomMessage = String.Empty;
-                                bool isOutOfMemException = false;
-                                bool isArithmeticException = false;
+                                var oomMessage = String.Empty;
+                                var isOutOfMemException = false;
+                                var isArithmeticException = false;
                                 foreach (var excep in err.InnerExceptions)
                                 {
                                     if (excep is OutOfMemoryException)
@@ -243,49 +244,49 @@ namespace Seq2SeqSharp.Tools
                     }
 
                     // Evaluate model every hour and save it if we could get a better one.
-                    TimeSpan ts = DateTime.Now - m_lastCheckPointDateTime;
-                    if (ts.TotalHours > 1.0)
+                    var ts = DateTime.Now - this.m_lastCheckPointDateTime;
+                    if (ts.TotalMinutes > 1.0)
                     {
-                        CreateCheckPoint(validCorpus, metrics, modelMetaData, ForwardOnSingleDevice, avgCostPerWordInTotal);
-                        m_lastCheckPointDateTime = DateTime.Now;
+                        this.CreateCheckPoint(validCorpus, metrics, modelMetaData, ForwardOnSingleDevice, avgCostPerWordInTotal);
+                        this.m_lastCheckPointDateTime = DateTime.Now;
                     }
 
                     sntPairBatchs.Clear();
                 }
             }
 
-            Logger.WriteLine(Logger.Level.info, ConsoleColor.Green, $"Epoch '{ep}' took '{DateTime.Now - startDateTime}' time to finish. AvgCost = {avgCostPerWordInTotal.ToString("F6")}, AvgCostInLastEpoch = {m_avgCostPerWordInTotalInLastEpoch.ToString("F6")}");
+            Logger.WriteLine(Logger.Level.info, ConsoleColor.Green, $"Epoch '{ep}' took '{DateTime.Now - startDateTime}' time to finish. AvgCost = {avgCostPerWordInTotal.ToString("F6")}, AvgCostInLastEpoch = {this.m_avgCostPerWordInTotalInLastEpoch.ToString("F6")}");
 
             //  CreateCheckPoint(validCorpus, metrics, modelMetaData, ForwardOnSingleDevice, avgCostPerWordInTotal);
-            m_avgCostPerWordInTotalInLastEpoch = avgCostPerWordInTotal;
+            this.m_avgCostPerWordInTotalInLastEpoch = avgCostPerWordInTotal;
         }
 
         private (float, int, int, int) RunNetwork(Func<IComputeGraph, List<List<string>>, List<List<string>>, int, bool, float> ForwardOnSingleDevice, List<SntPairBatch> sntPairBatchs, int batchSplitFactor)
         {
-            float cost = 0.0f;
-            int processedLine = 0;
-            int srcWordCnts = 0;
-            int tgtWordCnts = 0;
+            var cost = 0.0f;
+            var processedLine = 0;
+            var srcWordCnts = 0;
+            var tgtWordCnts = 0;
 
             //Clear gradient over all devices
-            ZeroGradientOnAllDevices();
+            this.ZeroGradientOnAllDevices();
 
             // Run forward and backward on all available processors
-            Parallel.For(0, m_deviceIds.Length, i =>
+            Parallel.For(0, this.m_deviceIds.Length, i =>
             {
                 try
                 {
-                    SntPairBatch sntPairBatch_i = sntPairBatchs[i];
-                    int batchSegSize = sntPairBatch_i.BatchSize / batchSplitFactor;
+                    var sntPairBatch_i = sntPairBatchs[i];
+                    var batchSegSize = sntPairBatch_i.BatchSize / batchSplitFactor;
 
-                    for (int k = 0; k < batchSplitFactor; k++)
+                    for (var k = 0; k < batchSplitFactor; k++)
                     {
                         // Construct sentences for encoding and decoding
-                        List<List<string>> srcTkns = new List<List<string>>();
-                        List<List<string>> tgtTkns = new List<List<string>>();
-                        int sLenInBatch = 0;
-                        int tLenInBatch = 0;
-                        for (int j = k * batchSegSize; j < (k + 1) * batchSegSize; j++)
+                        var srcTkns = new List<List<string>>();
+                        var tgtTkns = new List<List<string>>();
+                        var sLenInBatch = 0;
+                        var tLenInBatch = 0;
+                        for (var j = k * batchSegSize; j < (k + 1) * batchSegSize; j++)
                         {
                             srcTkns.Add(sntPairBatch_i.SntPairs[j].SrcSnt.ToList());
                             sLenInBatch += sntPairBatch_i.SntPairs[j].SrcSnt.Length;
@@ -294,9 +295,9 @@ namespace Seq2SeqSharp.Tools
                             tLenInBatch += sntPairBatch_i.SntPairs[j].TgtSnt.Length;
                         }
 
-                        float lcost = 0.0f;
+                        var lcost = 0.0f;
                         // Create a new computing graph instance
-                        using (IComputeGraph computeGraph_i = CreateComputGraph(i))
+                        using (var computeGraph_i = this.CreateComputGraph(i))
                         {
                             // Run forward part
                             lcost = ForwardOnSingleDevice(computeGraph_i, srcTkns, tgtTkns, i, true);
@@ -304,7 +305,7 @@ namespace Seq2SeqSharp.Tools
                             computeGraph_i.Backward();
                         }
 
-                        lock (locker)
+                        lock (this.locker)
                         {
                             cost += lcost;
                             srcWordCnts += sLenInBatch;
@@ -334,31 +335,31 @@ namespace Seq2SeqSharp.Tools
             if (validCorpus != null)
             {
                 // The valid corpus is provided, so evaluate the model.
-                if (RunValid(validCorpus, ForwardOnSingleDevice, metrics) == true)
+                if (this.RunValid(validCorpus, ForwardOnSingleDevice, metrics) == true)
                 {
-                    SaveModel(modelMetaData);
+                    this.SaveModel(modelMetaData);
                 }
             }
-            else if (m_avgCostPerWordInTotalInLastEpoch > avgCostPerWordInTotal)
+            else if (this.m_avgCostPerWordInTotalInLastEpoch > avgCostPerWordInTotal)
             {
                 // We don't have valid corpus, so if we could have lower cost, save the model
-                SaveModel(modelMetaData);
+                this.SaveModel(modelMetaData);
             }
         }
 
         internal List<List<string>> RunTest(List<List<string>> inputTokens, Func<IComputeGraph, List<List<string>>, List<List<string>>, int, bool, float> ForwardOnSingleDevice)
         {
-            List<List<string>> hypTkns = new List<List<string>>();
+            var hypTkns = new List<List<string>>();
             hypTkns.Add(new List<string>());
             hypTkns[0].Add(ParallelCorpus.BOS);
 
             try
             {
                 // Create a new computing graph instance
-                using (IComputeGraph computeGraph = CreateComputGraph(DeviceIds[0], needBack: false))
+                using (var computeGraph = this.CreateComputGraph(this.DeviceIds[0], needBack: false))
                 {
                     // Run forward part
-                    ForwardOnSingleDevice(computeGraph, inputTokens, hypTkns, DeviceIds[0], false);
+                    ForwardOnSingleDevice(computeGraph, inputTokens, hypTkns, this.DeviceIds[0], false);
                 }
             }
             catch (Exception err)
@@ -379,34 +380,34 @@ namespace Seq2SeqSharp.Tools
         /// <returns>true if we get a better result on primary metric, otherwise, false</returns>
         internal bool RunValid(IEnumerable<SntPairBatch> validCorpus, Func<IComputeGraph, List<List<string>>, List<List<string>>, int, bool, float> RunNetwork, List<IMetric> metrics, bool outputToFile = false)
         {
-            List<string> srcSents = new List<string>();
-            List<string> refSents = new List<string>();
-            List<string> hypSents = new List<string>();
+            var srcSents = new List<string>();
+            var refSents = new List<string>();
+            var hypSents = new List<string>();
 
 
             // Clear inner status of each metrics
-            foreach (IMetric metric in metrics)
+            foreach (var metric in metrics)
             {
                 metric.ClearStatus();
             }
 
-            List<SntPairBatch> sntPairBatchs = new List<SntPairBatch>();
-            foreach (SntPairBatch item in validCorpus)
+            var sntPairBatchs = new List<SntPairBatch>();
+            foreach (var item in validCorpus)
             {
                 sntPairBatchs.Add(item);
-                if (sntPairBatchs.Count == DeviceIds.Length)
+                if (sntPairBatchs.Count == this.DeviceIds.Length)
                 {
 
                     // Run forward on all available processors
-                    Parallel.For(0, m_deviceIds.Length, i =>
+                    Parallel.For(0, this.m_deviceIds.Length, i =>
                     {
-                        SntPairBatch sntPairBatch = sntPairBatchs[i];
+                        var sntPairBatch = sntPairBatchs[i];
 
                         // Construct sentences for encoding and decoding
-                        List<List<string>> srcTkns = new List<List<string>>();
-                        List<List<string>> refTkns = new List<List<string>>();
-                        List<List<string>> hypTkns = new List<List<string>>();
-                        for (int j = 0; j < sntPairBatch.BatchSize; j++)
+                        var srcTkns = new List<List<string>>();
+                        var refTkns = new List<List<string>>();
+                        var hypTkns = new List<List<string>>();
+                        for (var j = 0; j < sntPairBatch.BatchSize; j++)
                         {
                             srcTkns.Add(sntPairBatch.SntPairs[j].SrcSnt.ToList());
                             refTkns.Add(sntPairBatch.SntPairs[j].TgtSnt.ToList());
@@ -414,18 +415,18 @@ namespace Seq2SeqSharp.Tools
                         }
 
                         // Create a new computing graph instance
-                        using (IComputeGraph computeGraph = CreateComputGraph(i, needBack: false))
+                        using (var computeGraph = this.CreateComputGraph(i, needBack: false))
                         {
                             // Run forward part
                             RunNetwork(computeGraph, srcTkns, hypTkns, i, false);
                         }
 
-                        lock (locker)
+                        lock (this.locker)
                         {
 
-                            for (int j = 0; j < hypTkns.Count; j++)
+                            for (var j = 0; j < hypTkns.Count; j++)
                             {
-                                foreach (IMetric metric in metrics)
+                                foreach (var metric in metrics)
                                 {
                                     if (j < 0 || j >= refTkns.Count)
                                     {
@@ -443,7 +444,7 @@ namespace Seq2SeqSharp.Tools
 
                             if (outputToFile)
                             {
-                                for (int j = 0; j < srcTkns.Count; j++)
+                                for (var j = 0; j < srcTkns.Count; j++)
                                 {
                                     srcSents.Add(string.Join(" ", srcTkns[j]));
                                     refSents.Add(string.Join(" ", refTkns[j]));
@@ -462,7 +463,7 @@ namespace Seq2SeqSharp.Tools
 
 
             Logger.WriteLine($"Metrics result:");
-            foreach (IMetric metric in metrics)
+            foreach (var metric in metrics)
             {
                 Logger.WriteLine(Logger.Level.info, ConsoleColor.DarkGreen, $"{metric.Name} = {metric.GetScoreStr()}");
             }
@@ -476,11 +477,11 @@ namespace Seq2SeqSharp.Tools
 
             if (metrics.Count > 0)
             {
-                if (metrics[0].GetPrimaryScore() > m_bestPrimaryScore)
+                if (metrics[0].GetPrimaryScore() > this.m_bestPrimaryScore)
                 {
-                    Logger.WriteLine(Logger.Level.info, ConsoleColor.Green, $"We got a better score '{metrics[0].GetPrimaryScore().ToString("F")}' on primary metric '{metrics[0].Name}'. The previous score is '{m_bestPrimaryScore.ToString("F")}'");
+                    Logger.WriteLine(Logger.Level.info, ConsoleColor.Green, $"We got a better score '{metrics[0].GetPrimaryScore().ToString("F")}' on primary metric '{metrics[0].Name}'. The previous score is '{this.m_bestPrimaryScore.ToString("F")}'");
                     //We have a better primary score on valid set
-                    m_bestPrimaryScore = metrics[0].GetPrimaryScore();
+                    this.m_bestPrimaryScore = metrics[0].GetPrimaryScore();
                     return true;
                 }
             }
@@ -490,8 +491,8 @@ namespace Seq2SeqSharp.Tools
 
         internal virtual void SaveParameters(Stream stream)
         {
-            RegisterTrainableParameters(this);
-            foreach (KeyValuePair<string, IMultiProcessorNetworkWrapper> pair in m_name2network)
+            this.RegisterTrainableParameters(this);
+            foreach (var pair in this.m_name2network)
             {
                 pair.Value.Save(stream);
             }
@@ -499,8 +500,8 @@ namespace Seq2SeqSharp.Tools
 
         internal virtual void LoadParameters(Stream stream)
         {
-            RegisterTrainableParameters(this);
-            foreach (KeyValuePair<string, IMultiProcessorNetworkWrapper> pair in m_name2network)
+            this.RegisterTrainableParameters(this);
+            foreach (var pair in this.m_name2network)
             {
                 Logger.WriteLine($"Loading parameter '{pair.Key}'");
                 pair.Value.Load(stream);
@@ -512,8 +513,8 @@ namespace Seq2SeqSharp.Tools
         /// </summary>
         internal void CopyWeightsFromDefaultDeviceToAllOtherDevices()
         {
-            RegisterTrainableParameters(this);
-            foreach (KeyValuePair<string, IMultiProcessorNetworkWrapper> pair in m_name2network)
+            this.RegisterTrainableParameters(this);
+            foreach (var pair in this.m_name2network)
             {
                 pair.Value.SyncWeights();
             }
@@ -525,8 +526,8 @@ namespace Seq2SeqSharp.Tools
         /// </summary>
         internal void SumGradientsToTensorsInDefaultDevice()
         {
-            RegisterTrainableParameters(this);
-            foreach (KeyValuePair<string, IMultiProcessorNetworkWrapper> pair in m_name2network)
+            this.RegisterTrainableParameters(this);
+            foreach (var pair in this.m_name2network)
             {
                 pair.Value.SumGradientsToNetworkOnDefaultDevice();
             }
@@ -534,9 +535,9 @@ namespace Seq2SeqSharp.Tools
 
         internal List<IWeightTensor> GetParametersFromDefaultDevice()
         {
-            RegisterTrainableParameters(this);
-            List<IWeightTensor> result = new List<IWeightTensor>();
-            foreach (KeyValuePair<string, IMultiProcessorNetworkWrapper> pair in m_name2network)
+            this.RegisterTrainableParameters(this);
+            var result = new List<IWeightTensor>();
+            foreach (var pair in this.m_name2network)
             {
                 result.AddRange(pair.Value.GetNeuralUnitOnDefaultDevice().GetParams());
             }
@@ -546,8 +547,8 @@ namespace Seq2SeqSharp.Tools
 
         internal void ZeroGradientOnAllDevices()
         {
-            RegisterTrainableParameters(this);
-            foreach (KeyValuePair<string, IMultiProcessorNetworkWrapper> pair in m_name2network)
+            this.RegisterTrainableParameters(this);
+            foreach (var pair in this.m_name2network)
             {
                 pair.Value.ZeroGradientsOnAllDevices();
             }
@@ -555,33 +556,33 @@ namespace Seq2SeqSharp.Tools
 
         internal void RegisterTrainableParameters(object obj)
         {
-            if (m_name2network != null)
+            if (this.m_name2network != null)
             {
                 return;
             }
             Logger.WriteLine($"Registering trainable parameters.");
-            m_name2network = new SortedList<string, IMultiProcessorNetworkWrapper>();
+            this.m_name2network = new SortedList<string, IMultiProcessorNetworkWrapper>();
 
-            foreach (FieldInfo childFieldInfo in obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (var childFieldInfo in obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                object childValue = childFieldInfo.GetValue(obj);
-                string name = childFieldInfo.Name;
-                Register(childValue, name);
+                var childValue = childFieldInfo.GetValue(obj);
+                var name = childFieldInfo.Name;
+                this.Register(childValue, name);
             }
-            foreach (PropertyInfo childPropertyInfo in obj.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (var childPropertyInfo in obj.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                object childValue = childPropertyInfo.GetValue(obj);
-                string name = childPropertyInfo.Name;
-                Register(childValue, name);
+                var childValue = childPropertyInfo.GetValue(obj);
+                var name = childPropertyInfo.Name;
+                this.Register(childValue, name);
             }
         }
 
         private void Register(object childValue, string name)
         {
-            IMultiProcessorNetworkWrapper networks = childValue as IMultiProcessorNetworkWrapper;
+            var networks = childValue as IMultiProcessorNetworkWrapper;
             if (networks != null)
             {
-                m_name2network.Add(name, networks);
+                this.m_name2network.Add(name, networks);
                 Logger.WriteLine($"Register network '{name}'");
             }
         }

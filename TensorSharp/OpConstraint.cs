@@ -15,7 +15,7 @@ namespace TensorSharp
 
         public override bool SatisfiedFor(object[] args)
         {
-            return args.Length == argCount;
+            return args.Length == this.argCount;
         }
     }
 
@@ -32,7 +32,7 @@ namespace TensorSharp
 
         public override bool SatisfiedFor(object[] args)
         {
-            return requiredType.IsAssignableFrom(args[argIndex].GetType());
+            return this.requiredType.IsAssignableFrom(args[this.argIndex].GetType());
         }
     }
 
@@ -51,17 +51,17 @@ namespace TensorSharp
 
         public override bool SatisfiedFor(object[] args)
         {
-            if (allowNull && args[argIndex] == null)
+            if (this.allowNull && args[this.argIndex] == null)
             {
                 return true;
             }
-            else if (!allowNull && args[argIndex] == null)
+            else if (!this.allowNull && args[this.argIndex] == null)
             {
                 return false;
             }
 
-            Storage argStorage = ((Tensor)args[argIndex]).Storage;
-            return requiredType.IsAssignableFrom(argStorage.GetType());
+            var argStorage = ((Tensor)args[this.argIndex]).Storage;
+            return this.requiredType.IsAssignableFrom(argStorage.GetType());
         }
     }
 }

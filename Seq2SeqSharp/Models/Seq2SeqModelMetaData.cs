@@ -22,15 +22,15 @@ namespace Seq2SeqSharp
 
         public Seq2SeqModelMetaData(int hiddenDim, int embeddingDim, int encoderLayerDepth, int decoderLayerDepth, int multiHeadNum, EncoderTypeEnums encoderType, DecoderTypeEnums decoderType, Vocab vocab, bool enableCoverageModel)
         {
-            HiddenDim = hiddenDim;
-            EmbeddingDim = embeddingDim;
-            EncoderLayerDepth = encoderLayerDepth;
-            DecoderLayerDepth = decoderLayerDepth;
-            MultiHeadNum = multiHeadNum;
-            EncoderType = encoderType;
-            DecoderType = decoderType;
-            Vocab = vocab;
-            EnableCoverageModel = enableCoverageModel;
+            this.HiddenDim = hiddenDim;
+            this.EmbeddingDim = embeddingDim;
+            this.EncoderLayerDepth = encoderLayerDepth;
+            this.DecoderLayerDepth = decoderLayerDepth;
+            this.MultiHeadNum = multiHeadNum;
+            this.EncoderType = encoderType;
+            this.DecoderType = decoderType;
+            this.Vocab = vocab;
+            this.EnableCoverageModel = enableCoverageModel;
         }
     }
 }

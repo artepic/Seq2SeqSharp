@@ -21,7 +21,7 @@ namespace Seq2SeqSharp
             {
                 m_deviceIds = ids;
 
-                foreach (int id in m_deviceIds)
+                foreach (var id in m_deviceIds)
                 {
                     Logger.WriteLine($"Initialize device '{id}'");
                 }
@@ -42,7 +42,7 @@ namespace Seq2SeqSharp
         {
             if (m_archType == ProcessorTypeEnums.GPU)
             {
-                int idx = GetDeviceIdIndex(deviceId);
+                var idx = GetDeviceIdIndex(deviceId);
                 if (m_allocator[idx] == null)
                 {
                     m_allocator[idx] = new CudaAllocator(m_cudaContext, deviceId);
@@ -63,7 +63,7 @@ namespace Seq2SeqSharp
 
         private static int GetDeviceIdIndex(int id)
         {
-            for (int i = 0; i < m_deviceIds.Length; i++)
+            for (var i = 0; i < m_deviceIds.Length; i++)
             {
                 if (m_deviceIds[i] == id)
                 {
@@ -71,7 +71,7 @@ namespace Seq2SeqSharp
                 }
             }
 
-            string strIds = String.Empty;
+            var strIds = String.Empty;
             foreach (var item in m_deviceIds)
             {
                 strIds = strIds + " " + item.ToString();

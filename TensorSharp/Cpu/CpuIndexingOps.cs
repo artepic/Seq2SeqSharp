@@ -44,9 +44,9 @@ namespace TensorSharp.Cpu
                 throw new InvalidOperationException("result and src must be the same size except in dimension dim");
             }
 
-            Tensor writeTarget = TensorResultBuilder.GetWriteTarget(result, indices.Allocator, src.ElementType, false, indices.Sizes);
+            var writeTarget = TensorResultBuilder.GetWriteTarget(result, indices.Allocator, src.ElementType, false, indices.Sizes);
 
-            NativeWrapper.InvokeTypeMatch(gather_func, writeTarget, src, dim, indices);
+            NativeWrapper.InvokeTypeMatch(this.gather_func, writeTarget, src, dim, indices);
             return writeTarget;
         }
 
@@ -83,9 +83,9 @@ namespace TensorSharp.Cpu
                 throw new InvalidOperationException("result and src must be the same size except in dimension dim");
             }
 
-            Tensor writeTarget = result;
+            var writeTarget = result;
 
-            NativeWrapper.InvokeTypeMatch(scatter_func, writeTarget, src, dim, indices);
+            NativeWrapper.InvokeTypeMatch(this.scatter_func, writeTarget, src, dim, indices);
             return writeTarget;
         }
 
@@ -112,9 +112,9 @@ namespace TensorSharp.Cpu
                 throw new InvalidOperationException("result and indices must be the same size except in dimension dim");
             }
 
-            Tensor writeTarget = result;
+            var writeTarget = result;
 
-            NativeWrapper.InvokeTypeMatch(scatterFill_func, writeTarget, value, dim, indices);
+            NativeWrapper.InvokeTypeMatch(this.scatterFill_func, writeTarget, value, dim, indices);
             return writeTarget;
         }
     }

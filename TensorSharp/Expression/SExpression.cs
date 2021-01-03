@@ -19,7 +19,7 @@ namespace TensorSharp.Expression
 
         public override float Evaluate()
         {
-            return value;
+            return this.value;
         }
     }
 
@@ -34,7 +34,7 @@ namespace TensorSharp.Expression
 
         public override float Evaluate()
         {
-            return evaluate();
+            return this.evaluate();
         }
     }
 
@@ -52,7 +52,7 @@ namespace TensorSharp.Expression
 
         public override float Evaluate()
         {
-            return evaluate(src.Evaluate());
+            return this.evaluate(this.src.Evaluate());
         }
     }
 
@@ -72,7 +72,7 @@ namespace TensorSharp.Expression
 
         public override float Evaluate()
         {
-            return evaluate(left.Evaluate(), right.Evaluate());
+            return this.evaluate(this.left.Evaluate(), this.right.Evaluate());
         }
     }
 }
