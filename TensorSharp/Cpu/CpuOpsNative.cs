@@ -53,6 +53,9 @@ namespace TensorSharp.Cpu
         [DllImport(dll, CallingConvention = cc)] public static extern int TS_Frac(IntPtr result, IntPtr src);
 
         [DllImport(dll, CallingConvention = cc)] public static extern int TS_Relu(IntPtr result, IntPtr src);
+
+        [DllImport(dll, CallingConvention = cc)] public static extern int TS_ReluD(IntPtr result, IntPtr srcW, IntPtr srcG);
+
         [DllImport(dll, CallingConvention = cc)] public static extern int TS_Sin(IntPtr result, IntPtr src);
         [DllImport(dll, CallingConvention = cc)] public static extern int TS_Cos(IntPtr result, IntPtr src);
         [DllImport(dll, CallingConvention = cc)] public static extern int TS_Tan(IntPtr result, IntPtr src);

@@ -220,7 +220,10 @@ namespace TensorSharp.Cpu
         [RegisterOpStorageType("relu", typeof(CpuStorage))]
         public Tensor Relu(Tensor result, Tensor src) { return NativeWrapper.InvokeNullableResultElementwise(relu_func, result, src); }
 
-
+        private readonly MethodInfo relud_func = NativeWrapper.GetMethod("TS_ReluD");
+        [RegisterOpStorageType("relud", typeof(CpuStorage))]
+        public Tensor ReluD(Tensor result, Tensor w, Tensor g) { return NativeWrapper.InvokeNullableResultElementwise(relud_func, result, w, g); }
+        
         private readonly MethodInfo sin_func = NativeWrapper.GetMethod("TS_Sin");
         [RegisterOpStorageType("sin", typeof(CpuStorage))]
         public Tensor Sin(Tensor result, Tensor src) { return NativeWrapper.InvokeNullableResultElementwise(sin_func, result, src); }

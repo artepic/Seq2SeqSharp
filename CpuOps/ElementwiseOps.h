@@ -19,6 +19,7 @@ OPS_API int TS_Trunc(TensorRef* result, TensorRef* src);
 OPS_API int TS_Frac(TensorRef* result, TensorRef* src);
 
 OPS_API int TS_Relu(TensorRef* result, TensorRef* src);
+OPS_API int TS_ReluD(TensorRef* result, TensorRef* srcW, TensorRef* srcG);
 OPS_API int TS_Sin(TensorRef* result, TensorRef* src);
 OPS_API int TS_Cos(TensorRef* result, TensorRef* src);
 OPS_API int TS_Tan(TensorRef* result, TensorRef* src);
