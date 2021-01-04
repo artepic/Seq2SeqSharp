@@ -329,19 +329,19 @@ namespace TensorSharp
             if (dimension < 0 ||
                 dimension >= this.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dimension");
+                throw new ArgumentOutOfRangeException(nameof(dimension));
             }
 
             if (startIndex < 0 ||
                 startIndex >= this.Sizes[dimension])
             {
-                throw new ArgumentOutOfRangeException("startIndex", $"startIndex = '{startIndex}', sizes[dimension] = '{this.Sizes[dimension]}', dimension = '{dimension}', size = '{size}'");
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"startIndex = '{startIndex}', sizes[dimension] = '{this.Sizes[dimension]}', dimension = '{dimension}', size = '{size}'");
             }
 
             if (size <= 0 ||
                 startIndex + size > this.Sizes[dimension])
             {
-                throw new ArgumentOutOfRangeException("size", $"startIndex = '{startIndex}', sizes[dimension] = '{this.Sizes[dimension]}', dimension = '{dimension}', size = '{size}'");
+                throw new ArgumentOutOfRangeException(nameof(size), $"startIndex = '{startIndex}', sizes[dimension] = '{this.Sizes[dimension]}', dimension = '{dimension}', size = '{size}'");
             }
 
             var newOffset = this.StorageOffset + startIndex * this.Strides[dimension];
@@ -435,13 +435,13 @@ namespace TensorSharp
             if (dimension < 0 ||
                 dimension >= this.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dimension");
+                throw new ArgumentOutOfRangeException(nameof(dimension));
             }
 
             if (index < 0 ||
                 index >= this.Sizes[dimension])
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
 
             var result = this.Narrow(dimension, index, 1);
@@ -554,7 +554,7 @@ namespace TensorSharp
             if (dimension < 0 ||
                 dimension >= this.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dimension");
+                throw new ArgumentOutOfRangeException(nameof(dimension));
             }
 
             var newSizes = ArrayRemove(this.Sizes, dimension);
@@ -592,13 +592,13 @@ namespace TensorSharp
             if (dimension1 < 0 ||
                 dimension1 >= this.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dimension1");
+                throw new ArgumentOutOfRangeException(nameof(dimension1));
             }
 
             if (dimension2 < 0 ||
                 dimension2 >= this.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dimension2");
+                throw new ArgumentOutOfRangeException(nameof(dimension2));
             }
 
             if (dimension1 == dimension2)

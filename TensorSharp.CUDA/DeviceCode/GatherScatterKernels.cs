@@ -257,7 +257,7 @@ __global__ void scatterFill_kernel(
 
             if (result != null && dim < 0 && dim >= result.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dim");
+                throw new ArgumentOutOfRangeException(nameof(dim));
             }
 
             if (indices.DimensionCount != src.DimensionCount)
@@ -307,7 +307,7 @@ __global__ void scatterFill_kernel(
 
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             if (result.DimensionCount != src.DimensionCount)
@@ -317,7 +317,7 @@ __global__ void scatterFill_kernel(
 
             if (dim < 0 && dim >= result.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dim");
+                throw new ArgumentOutOfRangeException(nameof(dim));
             }
 
             if (indices.DimensionCount != src.DimensionCount)
@@ -367,12 +367,12 @@ __global__ void scatterFill_kernel(
 
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
 
             if (dim < 0 && dim >= result.DimensionCount)
             {
-                throw new ArgumentOutOfRangeException("dim");
+                throw new ArgumentOutOfRangeException(nameof(dim));
             }
 
             if (indices.DimensionCount != result.DimensionCount)

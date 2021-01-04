@@ -38,7 +38,7 @@ namespace TensorSharp.Cpu
         {
             if (dimension < 0 || dimension >= src.Sizes.Length)
             {
-                throw new ArgumentOutOfRangeException("dimension");
+                throw new ArgumentOutOfRangeException(nameof(dimension));
             }
 
             var desiredSize = (long[])src.Sizes.Clone();

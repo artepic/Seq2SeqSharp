@@ -424,17 +424,17 @@ namespace TensorSharp.CUDA.MatrixMul
             CudaHelpers.ThrowIfDifferentDevices(result, lhs, rhs);
             if (result != null && !(result.Storage is CudaStorage))
             {
-                throw new ArgumentException("result must be a CUDA tensor", "result");
+                throw new ArgumentException("result must be a CUDA tensor", nameof(result));
             }
 
             if (!(lhs.Storage is CudaStorage))
             {
-                throw new ArgumentException("lhs must be a CUDA tensor", "lhs");
+                throw new ArgumentException("lhs must be a CUDA tensor", nameof(lhs));
             }
 
             if (!(rhs.Storage is CudaStorage))
             {
-                throw new ArgumentException("rhs must be a CUDA tensor", "rhs");
+                throw new ArgumentException("rhs must be a CUDA tensor", nameof(rhs));
             }
 
             var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes[0], rhs.Sizes[1]);

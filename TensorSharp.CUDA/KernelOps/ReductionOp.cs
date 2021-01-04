@@ -159,7 +159,7 @@ namespace TensorSharp.CUDA.KernelOps
         {
             if (gridTiles > MaxGridSize * MaxGridSize * MaxGridSize)
             {
-                throw new ArgumentException("gridTiles exceeds the maximum allowed tile count", "gridTiles");
+                throw new ArgumentException("gridTiles exceeds the maximum allowed tile count", nameof(gridTiles));
             }
 
             var gridX = gridTiles > MaxGridSize ? MaxGridSize : gridTiles;

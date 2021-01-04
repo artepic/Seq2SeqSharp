@@ -39,32 +39,32 @@ namespace TensorSharp.Cpu
 
             if (result != null && !(result.Storage is CpuStorage))
             {
-                throw new ArgumentException("result must be a CPU tensor", "result");
+                throw new ArgumentException("result must be a CPU tensor", nameof(result));
             }
 
             if (!(m1.Storage is CpuStorage))
             {
-                throw new ArgumentException("m1 must be a CPU tensor", "m1");
+                throw new ArgumentException("m1 must be a CPU tensor", nameof(m1));
             }
 
             if (!(m2.Storage is CpuStorage))
             {
-                throw new ArgumentException("m2 must be a CPU tensor", "m2");
+                throw new ArgumentException("m2 must be a CPU tensor", nameof(m2));
             }
 
             if (src.DimensionCount != 2)
             {
-                throw new ArgumentException("src must be a matrix", "src");
+                throw new ArgumentException("src must be a matrix", nameof(src));
             }
 
             if (m1.DimensionCount != 2)
             {
-                throw new ArgumentException("m1 must be a matrix", "m1");
+                throw new ArgumentException("m1 must be a matrix", nameof(m1));
             }
 
             if (m2.DimensionCount != 2)
             {
-                throw new ArgumentException("m2 must be a matrix", "m2");
+                throw new ArgumentException("m2 must be a matrix", nameof(m2));
             }
 
             if (src.Sizes[0] != m1.Sizes[0] || src.Sizes[1] != m2.Sizes[1] || m1.Sizes[1] != m2.Sizes[0])
@@ -97,32 +97,32 @@ namespace TensorSharp.Cpu
 
             if (result != null && !(result.Storage is CpuStorage))
             {
-                throw new ArgumentException("result must be a CPU tensor", "result");
+                throw new ArgumentException("result must be a CPU tensor", nameof(result));
             }
 
             if (!(m1.Storage is CpuStorage))
             {
-                throw new ArgumentException("m1 must be a CPU tensor", "m1");
+                throw new ArgumentException("m1 must be a CPU tensor", nameof(m1));
             }
 
             if (!(m2.Storage is CpuStorage))
             {
-                throw new ArgumentException("m2 must be a CPU tensor", "m2");
+                throw new ArgumentException("m2 must be a CPU tensor", nameof(m2));
             }
 
             if (src.DimensionCount != 3)
             {
-                throw new ArgumentException("src must be a matrix", "src");
+                throw new ArgumentException("src must be a matrix", nameof(src));
             }
 
             if (m1.DimensionCount != 3)
             {
-                throw new ArgumentException("m1 must be a matrix", "m1");
+                throw new ArgumentException("m1 must be a matrix", nameof(m1));
             }
 
             if (m2.DimensionCount != 3)
             {
-                throw new ArgumentException("m2 must be a matrix", "m2");
+                throw new ArgumentException("m2 must be a matrix", nameof(m2));
             }
 
             if (src.Sizes[1] != m1.Sizes[1] || src.Sizes[2] != m2.Sizes[2] || m1.Sizes[2] != m2.Sizes[1])

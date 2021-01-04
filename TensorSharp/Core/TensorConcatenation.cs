@@ -10,7 +10,7 @@ namespace TensorSharp.Core
         {
             if (inputs.Length < 2)
             {
-                throw new ArgumentException("Concat: at least two tensors required", "inputs");
+                throw new ArgumentException("Concat: at least two tensors required", nameof(inputs));
             }
 
             for (var i = 0; i < inputs.Length; i++)

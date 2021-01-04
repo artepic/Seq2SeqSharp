@@ -14,7 +14,7 @@ namespace TensorSharp.CUDA.Util
         {
             if (onDispose == null)
             {
-                throw new ArgumentNullException("onDispose");
+                throw new ArgumentNullException(nameof(onDispose));
             }
 
             this.onDispose = onDispose;
@@ -60,12 +60,12 @@ namespace TensorSharp.CUDA.Util
         {
             if (constructor == null)
             {
-                throw new ArgumentNullException("constructor");
+                throw new ArgumentNullException(nameof(constructor));
             }
 
             if (destructor == null)
             {
-                throw new ArgumentNullException("destructor");
+                throw new ArgumentNullException(nameof(destructor));
             }
 
             this.constructor = constructor;

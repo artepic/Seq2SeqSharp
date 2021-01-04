@@ -23,27 +23,27 @@ namespace TensorSharp.Cpu
 
             if (result != null && !(result.Storage is CpuStorage))
             {
-                throw new ArgumentException("result must be a CPU tensor", "result");
+                throw new ArgumentException("result must be a CPU tensor", nameof(result));
             }
 
             if (!(lhs.Storage is CpuStorage))
             {
-                throw new ArgumentException("lhs must be a CPU tensor", "lhs");
+                throw new ArgumentException("lhs must be a CPU tensor", nameof(lhs));
             }
 
             if (!(rhs.Storage is CpuStorage))
             {
-                throw new ArgumentException("rhs must be a CPU tensor", "rhs");
+                throw new ArgumentException("rhs must be a CPU tensor", nameof(rhs));
             }
 
             if (lhs.DimensionCount != 1)
             {
-                throw new ArgumentException("lhs must have 1 dimension (ie. be a vector)", "lhs");
+                throw new ArgumentException("lhs must have 1 dimension (ie. be a vector)", nameof(lhs));
             }
 
             if (rhs.DimensionCount != 1)
             {
-                throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", "rhs");
+                throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", nameof(rhs));
             }
 
             var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, 1);
@@ -105,27 +105,27 @@ namespace TensorSharp.Cpu
             // ReSharper disable once ArrangeRedundantParentheses
             if (result?.Storage is CpuStorage)
             {
-                throw new ArgumentException("result must be a CPU tensor", "result");
+                throw new ArgumentException("result must be a CPU tensor", nameof(result));
             }
 
             if (!(lhs.Storage is CpuStorage))
             {
-                throw new ArgumentException("lhs must be a CPU tensor", "lhs");
+                throw new ArgumentException("lhs must be a CPU tensor", nameof(lhs));
             }
 
             if (!(rhs.Storage is CpuStorage))
             {
-                throw new ArgumentException("rhs must be a CPU tensor", "rhs");
+                throw new ArgumentException("rhs must be a CPU tensor", nameof(rhs));
             }
 
             if (lhs.DimensionCount != 2)
             {
-                throw new ArgumentException("lhs must have 2 dimensions", "lhs");
+                throw new ArgumentException("lhs must have 2 dimensions", nameof(lhs));
             }
 
             if (rhs.DimensionCount != 1)
             {
-                throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", "rhs");
+                throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", nameof(rhs));
             }
 
             Tensor lhsClone;
@@ -231,17 +231,17 @@ namespace TensorSharp.Cpu
 
             if (result != null && !(result.Storage is CpuStorage))
             {
-                throw new ArgumentException("result must be a CPU tensor", "result");
+                throw new ArgumentException("result must be a CPU tensor", nameof(result));
             }
 
             if (!(lhs.Storage is CpuStorage))
             {
-                throw new ArgumentException("lhs must be a CPU tensor", "lhs");
+                throw new ArgumentException("lhs must be a CPU tensor", nameof(lhs));
             }
 
             if (!(rhs.Storage is CpuStorage))
             {
-                throw new ArgumentException("rhs must be a CPU tensor", "rhs");
+                throw new ArgumentException("rhs must be a CPU tensor", nameof(rhs));
             }
 
             var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, lhs.Sizes[0], rhs.Sizes[1]);

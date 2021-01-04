@@ -19,27 +19,27 @@ namespace TensorSharp.CUDA.MatrixMul
 
             if (result != null && !(result.Storage is CudaStorage))
             {
-                throw new ArgumentException("result must be a CUDA tensor", "result");
+                throw new ArgumentException("result must be a CUDA tensor", nameof(result));
             }
 
             if (!(lhs.Storage is CudaStorage))
             {
-                throw new ArgumentException("lhs must be a CUDA tensor", "lhs");
+                throw new ArgumentException("lhs must be a CUDA tensor", nameof(lhs));
             }
 
             if (!(rhs.Storage is CudaStorage))
             {
-                throw new ArgumentException("rhs must be a CUDA tensor", "rhs");
+                throw new ArgumentException("rhs must be a CUDA tensor", nameof(rhs));
             }
 
             if (lhs.DimensionCount != 1)
             {
-                throw new ArgumentException("lhs must have 1 dimension (ie. be a vector)", "lhs");
+                throw new ArgumentException("lhs must have 1 dimension (ie. be a vector)", nameof(lhs));
             }
 
             if (rhs.DimensionCount != 1)
             {
-                throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", "rhs");
+                throw new ArgumentException("rhs must have 1 dimension (ie. be a vector)", nameof(rhs));
             }
 
             var writeTarget = TensorResultBuilder.GetWriteTarget(result, lhs, false, 1);

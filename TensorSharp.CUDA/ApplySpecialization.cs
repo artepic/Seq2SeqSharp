@@ -97,7 +97,7 @@ namespace TensorSharp.CUDA
         {
             if (count < 1)
             {
-                throw new ArgumentOutOfRangeException("count");
+                throw new ArgumentOutOfRangeException(nameof(count));
             }
 
             if (count == 1)

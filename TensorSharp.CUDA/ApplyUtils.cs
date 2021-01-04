@@ -163,7 +163,7 @@ namespace TensorSharp.CUDA
             {
                 if (excludeDim != -1)
                 {
-                    throw new ArgumentException("excludeDim must equal -1 if all dims are of size 1", "excludeDim");
+                    throw new ArgumentException("excludeDim must equal -1 if all dims are of size 1", nameof(excludeDim));
                 }
 
                 info.sizes = new long[] { 1 };
