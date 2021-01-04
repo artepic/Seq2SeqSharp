@@ -112,7 +112,7 @@ namespace TensorSharp.CUDA
             Array.Sort(info);
 
             // Base case: innermost dimension must have stride >= 1
-            if (info[info.Length - 1].stride < 1)
+            if (info[^1].stride < 1)
             {
                 return true;
             }

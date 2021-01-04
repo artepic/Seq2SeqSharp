@@ -655,7 +655,7 @@ namespace Seq2SeqSharp
                 for (var i = 0; i < bssList.Count; i++)
                 {
                     bss = bssList[i];
-                    if (bss.OutputIds[bss.OutputIds.Count - 1] == (int)SENTTAGS.END)
+                    if (bss.OutputIds[^1] == (int)SENTTAGS.END)
                     {
                         newBSSList.Add(bss);
                     }
@@ -666,7 +666,7 @@ namespace Seq2SeqSharp
                     else
                     {
                         finished = false;
-                        var ix_input = bss.OutputIds[bss.OutputIds.Count - 1];
+                        var ix_input = bss.OutputIds[^1];
                         rnnDecoder.SetCTs(bss.CTs);
                         rnnDecoder.SetHTs(bss.HTs);
 

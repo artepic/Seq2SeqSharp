@@ -151,7 +151,7 @@ namespace Seq2SeqSharp.Tools
         {
             if (this.m_needsBackprop)
             {
-                this.m_backprop[this.m_backprop.Count - 1]();
+                this.m_backprop[^1]();
                 this.m_backprop.RemoveLastItem();
             }
         }
