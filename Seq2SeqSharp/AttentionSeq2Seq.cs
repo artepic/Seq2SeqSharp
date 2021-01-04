@@ -307,9 +307,9 @@ namespace Seq2SeqSharp
                             this.DecodeTransformer(tgtSnts, g, encOutput, decoder as TransformerDecoder, tgtEmbedding, posEmbedding, batchSize, this.DeviceIds[deviceIdIdx], originalSrcLengths, isTraining);
 
                             var allSntsEnd = true;
-                            for (var j = 0; j < tgtSnts.Count; j++)
+                            foreach (var t in tgtSnts)
                             {
-                                if (tgtSnts[j][tgtSnts[j].Count - 1] != ParallelCorpus.EOS)
+                                if (t[^1] != ParallelCorpus.EOS)
                                 {
                                     allSntsEnd = false;
                                     break;
@@ -649,9 +649,9 @@ namespace Seq2SeqSharp
             while (finished == false && outputLength < maxOutputLength)
             {
                 finished = true;
-                for (var i = 0; i < bssList.Count; i++)
+                foreach (var t in bssList)
                 {
-                    bss = bssList[i];
+                    bss = t;
                     if (bss.OutputIds[^1] == (int)SENTTAGS.END)
                     {
                         newBSSList.Add(bss);
@@ -702,9 +702,9 @@ namespace Seq2SeqSharp
 
             // Convert output target word ids to real string
             var results = new List<List<string>>();
-            for (var i = 0; i < bssList.Count; i++)
+            foreach (var status in bssList)
             {
-                results.Add(this.m_modelMetaData.Vocab.ConvertTargetIdsToString(bssList[i].OutputIds));
+                results.Add(this.m_modelMetaData.Vocab.ConvertTargetIdsToString(status.OutputIds));
             }
 
             return results;

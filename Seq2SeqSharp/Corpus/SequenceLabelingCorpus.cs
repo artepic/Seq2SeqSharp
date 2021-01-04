@@ -336,14 +336,14 @@ namespace Seq2SeqSharp.Tools
                 }
             }
 
-            for (var i = 0; i < s.Count; i++)
+            foreach (var t in s)
             {
-                var count = s[i].Count;
+                var count = t.Count;
                 originalLengths.Add(count);
 
                 for (var j = 0; j < maxLen - count; j++)
                 {
-                    s[i].Add(ParallelCorpus.EOS);
+                    t.Add(ParallelCorpus.EOS);
                 }
             }
 

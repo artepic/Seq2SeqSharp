@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
+using Seq2SeqSharp.Tools;
+
 namespace Seq2SeqSharp
 {
     public class MultiProcessorNetworkWrapper<T> : IMultiProcessorNetworkWrapper where T : INeuralUnit
@@ -103,9 +105,9 @@ namespace Seq2SeqSharp
             Parallel.ForEach(this.m_networks, network =>
             {
                 var tensors = network.GetParams();
-                for (var j = 0; j < tensors.Count; j++)
+                foreach (var t in tensors)
                 {
-                    tensors[j].ZeroGradient();
+                    t.ZeroGradient();
                 }
             });
         }

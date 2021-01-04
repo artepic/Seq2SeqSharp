@@ -29,9 +29,9 @@ namespace Seq2SeqSharp
         {
             var q = new FixedSizePriorityQueue<ComparableItem<BeamSearchStatus>>(topN, new ComparableItemComparer<BeamSearchStatus>(false));
 
-            for (var i = 0; i < bssList.Count; i++)
+            foreach (var status in bssList)
             {
-                q.Enqueue(new ComparableItem<BeamSearchStatus>(bssList[i].Score, bssList[i]));
+                q.Enqueue(new ComparableItem<BeamSearchStatus>(status.Score, status));
             }
 
             return q.Select(x => x.Value).ToList();

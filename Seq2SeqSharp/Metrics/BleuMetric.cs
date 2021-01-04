@@ -164,9 +164,9 @@ namespace Seq2SeqSharp.Metrics
         private List<string> ToLowerCase(List<string> tokens)
         {
             var output = new List<string>();
-            for (var i = 0; i < tokens.Count; i++)
+            foreach (var t in tokens)
             {
-                output.Add(tokens[i].ToLower());
+                output.Add(t.ToLower());
             }
             return output;
         }

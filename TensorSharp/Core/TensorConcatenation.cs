@@ -31,12 +31,12 @@ namespace TensorSharp.Core
             // Select each region of the result corresponding to each input tensor,
             // and copy into the result
             long offset = 0;
-            for (var j = 0; j < inputs.Length; ++j)
+            foreach (var t in inputs)
             {
-                var dimSize = GetDimSize(inputs[j], dimension);
+                var dimSize = GetDimSize(t, dimension);
                 using (var nt = writeTarget.Narrow(dimension, offset, dimSize))
                 {
-                    Ops.Copy(nt, inputs[j]);
+                    Ops.Copy(nt, t);
                 }
                 offset += dimSize;
             }
