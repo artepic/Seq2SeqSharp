@@ -162,7 +162,7 @@ extern ""C"" {
 
         private static string GetMangledNameSuffix(bool normByN, bool applySqrt)
         {
-            return string.Format("_{0}_{1}", normByN, applySqrt).ToLower();
+            return $"_{normByN}_{applySqrt}".ToLower();
         }
 
 

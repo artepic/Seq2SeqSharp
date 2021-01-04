@@ -161,13 +161,7 @@ __device__ void indexSelectLargeIndex(TensorInfo<IndexType> dst,
         private static string GetMacroInvocation(bool isSmall, bool is32, int dstDims, int srcDims, int idxDims)
         {
             var kernelName = MakeKernelName(isSmall, is32, dstDims, srcDims, idxDims);
-            return string.Format("{0}({1}, {2}, {3}, {4}, {5})",
-                isSmall ? "DECLARE_SMALL" : "DECLARE_LARGE",
-                kernelName,
-                is32 ? ApplySpecialization.IndexType32 : ApplySpecialization.IndexType64,
-                dstDims,
-                srcDims,
-                idxDims);
+            return $"{(isSmall ? "DECLARE_SMALL" : "DECLARE_LARGE")}({kernelName}, {(is32 ? ApplySpecialization.IndexType32 : ApplySpecialization.IndexType64)}, {dstDims}, {srcDims}, {idxDims})";
         }
 
         public Tensor IndexSelect(Tensor result, Tensor src, int dim, Tensor indices)
@@ -259,13 +253,7 @@ __device__ void indexSelectLargeIndex(TensorInfo<IndexType> dst,
 
         private static string MakeKernelName(bool isSmall, bool is32, int dstDims, int srcDims, int idxDims)
         {
-            return string.Format("{0}{1}_{2}_{3}_{4}",
-                isSmall ? SmallBaseName : LargeBaseName,
-                is32 ? "__int32" : "__int64",
-                dstDims.ToString().Replace('-', 'M'),
-                srcDims.ToString().Replace('-', 'M'),
-                idxDims.ToString().Replace('-', 'M')
-                );
+            return $"{(isSmall ? SmallBaseName : LargeBaseName)}{(is32 ? "__int32" : "__int64")}_{dstDims.ToString().Replace('-', 'M')}_{srcDims.ToString().Replace('-', 'M')}_{idxDims.ToString().Replace('-', 'M')}";
         }
     }
 }

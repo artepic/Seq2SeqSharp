@@ -227,20 +227,15 @@ __global__ void scatterFill_kernel(
         {
             var indexType = is32 ? ApplySpecialization.IndexType32 : ApplySpecialization.IndexType64;
 
-            return
-                string.Format("DECLARE_GATHER({0}, {1}, {2})\n", MakeKernelName(GatherBaseName, is32, dims), indexType, dims) +
-                string.Format("DECLARE_SCATTER({0}, {1}, {2})\n", MakeKernelName(ScatterBaseName, is32, dims), indexType, dims) +
-                string.Format("DECLARE_SCATTERFILL({0}, {1}, {2})\n", MakeKernelName(ScatterFillBaseName, is32, dims), indexType, dims);
+            return $"DECLARE_GATHER({MakeKernelName(GatherBaseName, is32, dims)}, {indexType}, {dims})\n" +
+                   $"DECLARE_SCATTER({MakeKernelName(ScatterBaseName, is32, dims)}, {indexType}, {dims})\n" +
+                   $"DECLARE_SCATTERFILL({MakeKernelName(ScatterFillBaseName, is32, dims)}, {indexType}, {dims})\n";
         }
 
 
         private static string MakeKernelName(string baseName, bool is32, int dims)
         {
-            return string.Format("{0}{1}_{2}",
-                baseName,
-                is32 ? "__int32" : "__int64",
-                dims.ToString().Replace('-', 'M')
-                );
+            return $"{baseName}{(is32 ? "__int32" : "__int64")}_{dims.ToString().Replace('-', 'M')}";
         }
 
 

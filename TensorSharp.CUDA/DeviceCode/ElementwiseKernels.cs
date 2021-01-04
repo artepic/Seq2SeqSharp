@@ -48,20 +48,20 @@
 
         private static void AppendTTFunc(PermutationGenerator pg, string kernelBaseName, string func)
         {
-            pg.AddApplyT("t1_" + kernelBaseName, string.Format("*v = {0}(*v);", func));
-            pg.AddApplyTT("t2_" + kernelBaseName, string.Format("*a = {0}(*b);", func));
+            pg.AddApplyT("t1_" + kernelBaseName, $"*v = {func}(*v);");
+            pg.AddApplyTT("t2_" + kernelBaseName, $"*a = {func}(*b);");
         }
 
         private static void AppendTTSFunc(PermutationGenerator pg, string kernelBaseName, string func)
         {
-            pg.AddApplyTS("t1_" + kernelBaseName, string.Format("*a = {0}(*a, b);", func));
-            pg.AddApplyTTS("t2_" + kernelBaseName, string.Format("*a = {0}(*b, c);", func));
+            pg.AddApplyTS("t1_" + kernelBaseName, $"*a = {func}(*a, b);");
+            pg.AddApplyTTS("t2_" + kernelBaseName, $"*a = {func}(*b, c);");
         }
 
         private static void AppendTTTSFunc(PermutationGenerator pg, string kernelBaseName, string func)
         {
-            pg.AddApplyTTS("t1_" + kernelBaseName, string.Format("*a = {0}(*a, *b, c);", func));
-            pg.AddApplyTTTS("t2_" + kernelBaseName, string.Format("*a = {0}(*b, *c, d);", func));
+            pg.AddApplyTTS("t1_" + kernelBaseName, $"*a = {func}(*a, *b, c);");
+            pg.AddApplyTTTS("t2_" + kernelBaseName, $"*a = {func}(*b, *c, d);");
         }
 
         //private static void AppendTTTTSFunc(PermutationGenerator pg, string kernelBaseName, string func)
@@ -84,20 +84,20 @@
 
         private static void AppendTTTFunc(PermutationGenerator pg, string kernelBaseName, string func)
         {
-            pg.AddApplyTT("t1_" + kernelBaseName, string.Format("*a = {0}(*a, *b);", func));
-            pg.AddApplyTTT("t2_" + kernelBaseName, string.Format("*a = {0}(*b, *c);", func));
+            pg.AddApplyTT("t1_" + kernelBaseName, $"*a = {func}(*a, *b);");
+            pg.AddApplyTTT("t2_" + kernelBaseName, $"*a = {func}(*b, *c);");
         }
 
         private static void AppendTTTTFunc(PermutationGenerator pg, string kernelBaseName, string func)
         {
-            pg.AddApplyTTT("t1_" + kernelBaseName, string.Format("*a = {0}(*a, *b, *c);", func));
-            pg.AddApplyTTTT("t2_" + kernelBaseName, string.Format("*a = {0}(*b, *c, *d);", func));
+            pg.AddApplyTTT("t1_" + kernelBaseName, $"*a = {func}(*a, *b, *c);");
+            pg.AddApplyTTTT("t2_" + kernelBaseName, $"*a = {func}(*b, *c, *d);");
         }
 
         private static void AppendTTTTTFunc(PermutationGenerator pg, string kernelBaseName, string func)
         {
-            pg.AddApplyTTTT("t1_" + kernelBaseName, string.Format("*a = {0}(*a, *b, *c, *d);", func));
-            pg.AddApplyTTTTT("t2_" + kernelBaseName, string.Format("*a = {0}(*b, *c, *d, *e);", func));
+            pg.AddApplyTTTT("t1_" + kernelBaseName, $"*a = {func}(*a, *b, *c, *d);");
+            pg.AddApplyTTTTT("t2_" + kernelBaseName, $"*a = {func}(*b, *c, *d, *e);");
         }
     }
 }
