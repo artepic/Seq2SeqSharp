@@ -103,7 +103,7 @@ namespace TensorSharp.Cpu
             }
 
             // ReSharper disable once ArrangeRedundantParentheses
-            if (result != null && (result.Storage is CpuStorage))
+            if (result?.Storage is CpuStorage)
             {
                 throw new ArgumentException("result must be a CPU tensor", "result");
             }
