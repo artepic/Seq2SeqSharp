@@ -56,12 +56,7 @@ namespace Seq2SeqSharp.Tools
                     throw new Exception($"The weight '{this.Name}' has been released, you cannot access it.");
                 }
 
-                if (this.m_TWeight == null)
-                {
-                    this.m_TWeight = new Tensor(this.m_allocator, DType.Float32, this.Sizes);
-                }
-
-                return this.m_TWeight;
+                return this.m_TWeight ??= new Tensor(this.m_allocator, DType.Float32, this.Sizes);
             }
             set
             {
