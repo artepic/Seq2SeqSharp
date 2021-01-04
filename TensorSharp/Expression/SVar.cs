@@ -29,7 +29,7 @@ namespace TensorSharp.Expression
         public static SVar operator %(SVar lhs, SVar rhs) { return new(new BinaryScalarExpression(lhs.expression, rhs.expression, (l, r) => l % r)); }
 
 
-        public SVar Abs() { return new(new UnaryScalarExpression(this.expression, val => Math.Abs(val))); }
+        public SVar Abs() { return new(new UnaryScalarExpression(this.expression, Math.Abs)); }
         public SVar Sign() { return new(new UnaryScalarExpression(this.expression, val => Math.Sign(val))); }
 
         public SVar Sqrt() { return new(new UnaryScalarExpression(this.expression, val => (float)Math.Sqrt(val))); }
