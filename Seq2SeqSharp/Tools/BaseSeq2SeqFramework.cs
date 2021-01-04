@@ -577,8 +577,7 @@ namespace Seq2SeqSharp.Tools
 
         private void Register(object childValue, string name)
         {
-            var networks = childValue as IMultiProcessorNetworkWrapper;
-            if (networks != null)
+            if (childValue is IMultiProcessorNetworkWrapper networks)
             {
                 this.m_name2network.Add(name, networks);
                 Logger.WriteLine($"Register network '{name}'");
