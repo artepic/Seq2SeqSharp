@@ -30,6 +30,7 @@ namespace TensorSharp.CUDA.KernelOps
 
 
             return
+                // ReSharper disable once ArrangeRedundantParentheses
                 (result.IsContiguous() && src.IsContiguous()) || totalElements == 1;
         }
 

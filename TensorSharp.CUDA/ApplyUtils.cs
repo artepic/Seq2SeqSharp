@@ -198,7 +198,9 @@ namespace TensorSharp.CUDA
                 // dimension (i) with the preceding dimension (i + 1), we can only
                 // perform collapsing if the preceding dimension can be collapsed
                 // (i.e., not excludeDim)
+                // ReSharper disable ArrangeRedundantParentheses
                 if ((excludeDim != i) && (excludeDim != i + 1))
+                    // ReSharper restore ArrangeRedundantParentheses
                 {
                     // The next outermost dimension can be skipped if size 1
                     if (sizeOuter == 1)
@@ -252,7 +254,9 @@ namespace TensorSharp.CUDA
                 var sizeOuter = tensor.Sizes[i];
                 var strideOuter = tensor.Strides[i];
 
+                // ReSharper disable ArrangeRedundantParentheses
                 if ((excludeDim != i) && (excludeDim != i + 1))
+                    // ReSharper restore ArrangeRedundantParentheses
                 {
                     if (sizeOuter == 1)
                     {

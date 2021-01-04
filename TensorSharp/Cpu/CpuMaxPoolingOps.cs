@@ -15,12 +15,16 @@ namespace TensorSharp.Cpu
             long oheight, owidth;
             if (ceilMode)
             {
+                // ReSharper disable once ArrangeRedundantParentheses
                 oheight = (long)(Math.Ceiling((float)(iheight - cd.kH + 2 * cd.padH) / cd.dH)) + 1;
+                // ReSharper disable once ArrangeRedundantParentheses
                 owidth = (long)(Math.Ceiling((float)(iwidth - cd.kW + 2 * cd.padW) / cd.dW)) + 1;
             }
             else
             {
+                // ReSharper disable once ArrangeRedundantParentheses
                 oheight = (long)(Math.Floor((float)(iheight - cd.kH + 2 * cd.padH) / cd.dH)) + 1;
+                // ReSharper disable once ArrangeRedundantParentheses
                 owidth = (long)(Math.Floor((float)(iwidth - cd.kW + 2 * cd.padW) / cd.dW)) + 1;
             }
 
@@ -59,12 +63,16 @@ namespace TensorSharp.Cpu
 
             if (ceilMode)
             {
+                // ReSharper disable once ArrangeRedundantParentheses
                 oheight = (long)(Math.Ceiling((float)(iheight - cd.kH + 2 * cd.padH) / cd.dH)) + 1;
+                // ReSharper disable once ArrangeRedundantParentheses
                 owidth = (long)(Math.Ceiling((float)(iwidth - cd.kW + 2 * cd.padW) / cd.dW)) + 1;
             }
             else
             {
+                // ReSharper disable once ArrangeRedundantParentheses
                 oheight = (long)(Math.Floor((float)(iheight - cd.kH + 2 * cd.padH) / cd.dH)) + 1;
+                // ReSharper disable once ArrangeRedundantParentheses
                 owidth = (long)(Math.Floor((float)(iwidth - cd.kW + 2 * cd.padW) / cd.dW)) + 1;
             }
 

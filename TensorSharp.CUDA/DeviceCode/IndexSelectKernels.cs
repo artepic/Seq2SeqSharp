@@ -191,10 +191,10 @@ __device__ void indexSelectLargeIndex(TensorInfo<IndexType> dst,
             var sliceSize = dstTotalSize / numIndices;
 
             var mpc = context.DeviceInfoForContext(cudaContext).MultiProcessorCount;
-            var smallIndexGrid = new dim3((uint)Math.Min(ApplyUtils.CeilDiv(sliceSize, 128), (mpc * 8)));
+            var smallIndexGrid = new dim3((uint)Math.Min(ApplyUtils.CeilDiv(sliceSize, 128), mpc * 8));
             var smallIndexBlock = new dim3((uint)Math.Min(sliceSize, 128));
 
-            var largeIndexGrid = new dim3((uint)Math.Min(ApplyUtils.CeilDiv(dstTotalSize, 128), (mpc * 8)));
+            var largeIndexGrid = new dim3((uint)Math.Min(ApplyUtils.CeilDiv(dstTotalSize, 128), mpc * 8));
             var largeIndexBlock = new dim3((uint)Math.Min(dstTotalSize, 128));
 
 

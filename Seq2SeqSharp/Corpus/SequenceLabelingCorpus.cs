@@ -281,7 +281,10 @@ namespace Seq2SeqSharp.Tools
                         sntPair.TgtSnt = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
 
-                        if ((lastSrcSntLen > 0 && lastSrcSntLen != sntPair.SrcSnt.Length) ||
+                        if (
+                            // ReSharper disable ArrangeRedundantParentheses
+                            (lastSrcSntLen > 0 && lastSrcSntLen != sntPair.SrcSnt.Length) ||
+                            // ReSharper restore ArrangeRedundantParentheses
                             outputs.Count > maxOutputsSize)
                         {
                             // InnerShuffle(outputs);

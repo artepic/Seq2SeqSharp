@@ -116,7 +116,7 @@ namespace TensorSharp.CUDA.KernelOps
 
         private static bool isTwoPassReductionSize(long elements)
         {
-            return (elements > TwoPassReductionSize);
+            return elements > TwoPassReductionSize;
         }
 
         private static long getTwoPassBlocks(TSCudaContext context, int deviceId, long elements)

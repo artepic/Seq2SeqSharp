@@ -19,7 +19,9 @@ namespace Seq2SeqSharp
             }
             var u = 2 * random.NextDouble() - 1;
             var v = 2 * random.NextDouble() - 1;
+            // ReSharper disable ArrangeRedundantParentheses
             var r = (u * u) + (v * v);
+            // ReSharper restore ArrangeRedundantParentheses
 
             if (r == 0 || r > 1)
             {
@@ -41,8 +43,10 @@ namespace Seq2SeqSharp
 
         public static float IntegarRandom(float a, float b)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             return (float)(Math.Floor(random.NextDouble() * (b - a) + a));
         }
+
         ////public static float NormalRandom(float mu, float std)
         ////{
         ////    return mu + GaussRandom() * std;

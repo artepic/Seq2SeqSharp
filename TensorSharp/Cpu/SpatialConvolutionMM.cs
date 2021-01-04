@@ -64,6 +64,7 @@ namespace TensorSharp.Cpu
             var outputWidth = (inputWidth + 2 * cd.padW - cd.kW) / cd.dW + 1;
             var outputHeight = (inputHeight + 2 * cd.padH - cd.kH) / cd.dH + 1;
 
+            // ReSharper disable once ArrangeRedundantParentheses
             if (bias != null && (bias.Sizes[0] != nOutputPlane))
             {
                 throw new InvalidOperationException("bias has incorrect size. Expected 1D tensor of size " + nOutputPlane);
@@ -76,7 +77,7 @@ namespace TensorSharp.Cpu
 
             if (nInputPlane * cd.kW * cd.kH != weight.Sizes[1])
             {
-                throw new InvalidOperationException($"Input has incorrect number of channels. Got {nInputPlane}, expected {weight.Sizes[1] / ((float)(cd.kW * cd.kH))}");
+                throw new InvalidOperationException($"Input has incorrect number of channels. Got {nInputPlane}, expected {weight.Sizes[1] / (float)(cd.kW * cd.kH)}");
             }
 
             if (input.DimensionCount != 4)

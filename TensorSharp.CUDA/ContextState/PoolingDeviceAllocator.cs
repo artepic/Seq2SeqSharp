@@ -118,6 +118,7 @@ namespace TensorSharp.CUDA.ContextState
 
         private static ulong PadToAlignment(long size, long alignment)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             return (ulong)(((size + alignment - 1) / alignment) * alignment);
         }
     }

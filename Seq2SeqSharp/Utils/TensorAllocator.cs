@@ -8,73 +8,71 @@ namespace Seq2SeqSharp
 {
     public static class TensorAllocator
     {
-        private static IAllocator[] m_allocator;
-        private static TSCudaContext m_cudaContext;
-        private static int[] m_deviceIds;
-        private static ProcessorTypeEnums m_archType;
+        private static IAllocator[] allocator;
+
+        private static TSCudaContext context;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static int[] deviceIds;
+
+        /// <summary>
+        /// The architecture type
+        /// </summary>
+        private static ProcessorTypeEnums architectureType;
 
 
         public static void InitDevices(ProcessorTypeEnums archType, int[] ids, float memoryUsageRatio = 0.9f, string[] compilerOptions = null)
         {
-            m_archType = archType;
-            if (m_archType == ProcessorTypeEnums.GPU)
-            {
-                m_deviceIds = ids;
+            architectureType = archType;
 
-                foreach (var id in m_deviceIds)
+            if (architectureType == ProcessorTypeEnums.GPU)
+            {
+                deviceIds = ids;
+
+                foreach (var id in deviceIds)
                 {
                     Logger.WriteLine($"Initialize device '{id}'");
                 }
 
-                m_cudaContext = new TSCudaContext(m_deviceIds, memoryUsageRatio, compilerOptions);
-                m_cudaContext.Precompile(Console.Write);
-                m_cudaContext.CleanUnusedPTX();
+                context = new TSCudaContext(deviceIds, memoryUsageRatio, compilerOptions);
+                context.Precompile(Console.Write);
+                context.CleanUnusedPTX();
 
-                m_allocator = new IAllocator[m_deviceIds.Length];
+                allocator = new IAllocator[deviceIds.Length];
             }
             else
             {
-                m_allocator = new IAllocator[1];
+                allocator = new IAllocator[1];
             }
         }
 
         public static IAllocator Allocator(int deviceId)
         {
-            if (m_archType == ProcessorTypeEnums.GPU)
+            if (architectureType == ProcessorTypeEnums.GPU)
             {
-                var idx = GetDeviceIdIndex(deviceId);
-                if (m_allocator[idx] == null)
-                {
-                    m_allocator[idx] = new CudaAllocator(m_cudaContext, deviceId);
-                }
-
-                return m_allocator[idx];
+                var index = GetDeviceIdIndex(deviceId);
+                return allocator[index] ?? (allocator[index] = new CudaAllocator(context, deviceId));
             }
-            else
-            {
-                if (m_allocator[0] == null)
-                {
-                    m_allocator[0] = new CpuAllocator();
-                }
 
-                return m_allocator[0];
-            }
+            return allocator[0] ?? (allocator[0] = new CpuAllocator());
         }
 
         private static int GetDeviceIdIndex(int id)
         {
-            for (var i = 0; i < m_deviceIds.Length; i++)
+            for (var i = 0; i < deviceIds.Length; i++)
             {
-                if (m_deviceIds[i] == id)
+                if (deviceIds[i] == id)
                 {
                     return i;
                 }
             }
 
             var strIds = string.Empty;
-            foreach (var item in m_deviceIds)
+            foreach (var item in deviceIds)
             {
-                strIds = strIds + " " + item.ToString();
+                strIds += $"{strIds} {item}";
             }
 
             throw new ArgumentException($"Failed to get deviceId '{id}', deviceId List = {strIds}");

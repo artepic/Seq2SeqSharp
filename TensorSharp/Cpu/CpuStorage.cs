@@ -27,6 +27,7 @@ namespace TensorSharp.Cpu
 
         public IntPtr PtrAtElement(long index)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             return new IntPtr(this.buffer.ToInt64() + (index * this.ElementType.Size()));
         }
 
@@ -36,7 +37,7 @@ namespace TensorSharp.Cpu
             {
                 if (this.ElementType == DType.Int32)
                 {
-                    var p = ((int*)this.buffer.ToPointer());
+                    var p = (int*)this.buffer.ToPointer();
                     var array = new int[length];
 
                     for (var i = 0; i < length; i++)
@@ -81,7 +82,7 @@ namespace TensorSharp.Cpu
             {
                 if (this.ElementType == DType.Float32)
                 {
-                    var p = ((float*)this.buffer.ToPointer());
+                    var p = (float*)this.buffer.ToPointer();
                     var array = new float[length];
 
                     for (var i = 0; i < length; i++)

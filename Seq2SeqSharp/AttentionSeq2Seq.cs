@@ -686,7 +686,7 @@ namespace Seq2SeqSharp
 
                                 var score = probs.GetWeightAt(preds[j]);
                                 newBSS.Score = bss.Score;
-                                newBSS.Score += (float)(-Math.Log(score));
+                                newBSS.Score += (float)-Math.Log(score);
 
                                 //var lengthPenalty = Math.Pow((5.0f + newBSS.OutputIds.Count) / 6, 0.6);
                                 //newBSS.Score /= (float)lengthPenalty;

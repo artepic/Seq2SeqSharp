@@ -89,7 +89,7 @@ namespace Seq2SeqSharp
 
                 var inputQNorm = this.layerNormQ.Norm(inputQ, g);
                 //Input projections
-                var scale = 1.0f / (float)(this.m_inputDim);
+                var scale = 1.0f / (float)this.m_inputDim;
                 var allQ = g.View(g.Affine(inputQNorm, this.Q, this.Qb, scale), dims: new long[] { batchSize, seqLenQ, this.m_multiHeadNum, this.m_d });
                 var allK = g.View(g.Affine(inputK, this.K, this.Kb, scale), dims: new long[] { batchSize, seqLenK, this.m_multiHeadNum, this.m_d });
                 var allV = g.View(g.Affine(inputV, this.V, this.Vb, scale), dims: new long[] { batchSize, seqLenV, this.m_multiHeadNum, this.m_d });
@@ -100,7 +100,7 @@ namespace Seq2SeqSharp
                 var Vs = g.View(g.Permute(allV, 2, 0, 1, 3), dims: new long[] { this.m_multiHeadNum * batchSize, seqLenV, this.m_d });
 
                 // Scaled softmax
-                scale = 1.0f / (float)(this.m_d);
+                scale = 1.0f / (float)this.m_d;
                 var attn = g.MulBatch(Qs, Ks, this.m_multiHeadNum * batchSize, scale);
                 var softmax = g.Softmax(attn, keyMask, inPlace: true);
                 var o = g.View(g.MulBatch(softmax, Vs, this.m_multiHeadNum * batchSize), dims: new long[] { this.m_multiHeadNum, batchSize, seqLenQ, this.m_d });
@@ -128,7 +128,7 @@ namespace Seq2SeqSharp
                 var inputQNorm = this.layerNormQ.Norm(inputQ, g);
 
                 //Input projections
-                var scale = 1.0f / (float)(this.m_inputDim);
+                var scale = 1.0f / (float)this.m_inputDim;
                 IWeightTensor mulQ, mulK, mulV;
 
                 using (var inputQNormView = g.View(inputQNorm, dims: new long[] { 1, inputQ.Rows, inputQ.Columns }))
@@ -154,7 +154,7 @@ namespace Seq2SeqSharp
                 var Vs = g.View(g.Permute(allV, 2, 0, 1, 3), dims: new long[] { this.m_multiHeadNum * batchSize, seqLenQ, this.m_d });
 
                 // Scaled softmax
-                scale = 1.0f / (float)(this.m_d);
+                scale = 1.0f / (float)this.m_d;
                 var attn = g.MulBatch(Qs, Ks, this.m_multiHeadNum * batchSize, scale);
                 var softmax = g.Softmax(attn, keyMask, inPlace: true);
                 var o = g.View(g.MulBatch(softmax, Vs, this.m_multiHeadNum * batchSize), dims: new long[] { this.m_multiHeadNum, batchSize, seqLenQ, this.m_d });

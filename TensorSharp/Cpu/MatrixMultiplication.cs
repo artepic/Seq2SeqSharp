@@ -15,6 +15,7 @@ namespace TensorSharp.Cpu
     {
         public static Tensor Dot(Tensor result, Tensor lhs, Tensor rhs)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             if (lhs.ElementType != rhs.ElementType || (result != null && result.ElementType != lhs.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");
@@ -95,11 +96,13 @@ namespace TensorSharp.Cpu
 
         public static Tensor Mul_M_V(Tensor result, Tensor lhs, Tensor rhs)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             if (lhs.ElementType != rhs.ElementType || (result != null && result.ElementType != lhs.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");
             }
 
+            // ReSharper disable once ArrangeRedundantParentheses
             if (result != null && (result.Storage is CpuStorage))
             {
                 throw new ArgumentException("result must be a CPU tensor", "result");
@@ -220,6 +223,7 @@ namespace TensorSharp.Cpu
 
         public static Tensor Mul_M_M(Tensor result, Tensor lhs, Tensor rhs)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             if (lhs.ElementType != rhs.ElementType || (result != null && result.ElementType != lhs.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");

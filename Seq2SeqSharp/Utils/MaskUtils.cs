@@ -21,6 +21,7 @@ namespace Seq2SeqSharp.Utils
                 {
                     for (var j = 0; j < originalLengths[k]; j++)
                     {
+                        // ReSharper disable once ArrangeRedundantParentheses
                         buf[k * (paddedLength * paddedLength) + i * paddedLength + j] = 0.0f;
                     }
                 }
@@ -39,6 +40,7 @@ namespace Seq2SeqSharp.Utils
 
             for (var k = 0; k < originalLengths.Count; k++)
             {
+                // ReSharper disable once ArrangeRedundantParentheses
                 var offset_k = k * (paddedLength * paddedLength);
                 for (var i = 0; i < originalLengths[k]; i++)
                 {
@@ -80,6 +82,7 @@ namespace Seq2SeqSharp.Utils
 
             for (var k = 0; k < tgtOriginalLengths.Count; k++) // batch size
             {
+                // ReSharper disable once ArrangeRedundantParentheses
                 var offset_k = k * (tgtPaddedLength * srcPaddedLength);
                 for (var i = 0; i < tgtOriginalLengths[k]; i++)
                 {

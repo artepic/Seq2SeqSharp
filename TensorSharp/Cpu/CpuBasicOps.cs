@@ -31,6 +31,7 @@ namespace TensorSharp.Cpu
         {
             //Console.WriteLine($"src0 = {src.Sizes[0]}, src1 = {src.Sizes[1]}, m1_0 = {m1.Sizes[0]}, m1_1 = {m1.Sizes[1]}, m2_0 = {m2.Sizes[0]}, m2_1 = {m2.Sizes[1]}");
 
+            // ReSharper disable once ArrangeRedundantParentheses
             if (src.ElementType != m1.ElementType || src.ElementType != m2.ElementType || (result != null && result.ElementType != src.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");
@@ -88,6 +89,7 @@ namespace TensorSharp.Cpu
         [RegisterOpStorageType("addmmbatch", typeof(CpuStorage))]
         public Tensor AddmmBatch(Tensor result, float beta, Tensor src, float alpha, Tensor m1, Tensor m2)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             if (src.ElementType != m1.ElementType || src.ElementType != m2.ElementType || (result != null && result.ElementType != src.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");

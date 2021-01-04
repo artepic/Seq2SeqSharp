@@ -18,6 +18,7 @@ namespace TensorSharp
         public IAllocator Allocator { get; private set; }
 
         public DType ElementType { get; private set; }
+
         public long ElementCount { get; private set; }
 
         public long ByteLength => this.ElementCount * this.ElementType.Size();
@@ -29,17 +30,22 @@ namespace TensorSharp
 
 
         public abstract int[] GetElementsAsInt(long index, int length);
+
         public abstract void SetElementsAsInt(long index, int[] value);
 
 
         public abstract string LocationDescription();
 
         public abstract float GetElementAsFloat(long index);
+
         public abstract float[] GetElementsAsFloat(long index, int length);
+
         public abstract void SetElementAsFloat(long index, float value);
+
         public abstract void SetElementsAsFloat(long index, float[] value);
 
         public abstract void CopyToStorage(long storageIndex, IntPtr src, long byteCount);
+
         public abstract void CopyFromStorage(IntPtr dst, long storageIndex, long byteCount);
 
     }

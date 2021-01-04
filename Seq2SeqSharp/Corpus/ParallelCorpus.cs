@@ -375,8 +375,11 @@ namespace Seq2SeqSharp.Tools
                         sntPair.TgtSnt = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
 
-                        if ((lastTgtSntLen > 0 && this.m_shuffleEnums == ShuffleEnums.NoPaddingInTgt && lastTgtSntLen != sntPair.TgtSnt.Length) || 
-                            (lastSrcSntLen > 0 && this.m_shuffleEnums == ShuffleEnums.NoPaddingInSrc && lastSrcSntLen != sntPair.SrcSnt.Length) ||                            
+                        if (
+                            // ReSharper disable ArrangeRedundantParentheses
+                            (lastTgtSntLen > 0 && this.m_shuffleEnums == ShuffleEnums.NoPaddingInTgt && lastTgtSntLen != sntPair.TgtSnt.Length) || 
+                            (lastSrcSntLen > 0 && this.m_shuffleEnums == ShuffleEnums.NoPaddingInSrc && lastSrcSntLen != sntPair.SrcSnt.Length) ||
+                            // ReSharper restore ArrangeRedundantParentheses
                             outputs.Count > maxOutputsSize)
                         {
                            // InnerShuffle(outputs);
@@ -395,7 +398,7 @@ namespace Seq2SeqSharp.Tools
                         lastTgtSntLen = sntPair.TgtSnt.Length;
                     }
 
-                   // InnerShuffle(outputs);
+                    // InnerShuffle(outputs);
                     for (var i = 0; i < outputs.Count; i += this.m_batchSize)
                     {
                         var size = Math.Min(this.m_batchSize, outputs.Count - i);

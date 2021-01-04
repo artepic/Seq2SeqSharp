@@ -9,6 +9,7 @@ namespace TensorSharp.CUDA.MatrixMul
     {
         public static Tensor Dot(TSCudaContext context, Tensor result, Tensor lhs, Tensor rhs)
         {
+            // ReSharper disable once ArrangeRedundantParentheses
             if (lhs.ElementType != rhs.ElementType || (result != null && result.ElementType != lhs.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");

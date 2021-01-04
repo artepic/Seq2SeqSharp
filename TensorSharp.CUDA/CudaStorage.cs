@@ -15,8 +15,8 @@ namespace TensorSharp.CUDA
         private readonly CUdeviceptr deviceBuffer;
 
 
-        public CudaStorage(IAllocator allocator, TSCudaContext tsContext, CudaContext context, DType ElementType, long elementCount)
-            : base(allocator, ElementType, elementCount)
+        public CudaStorage(IAllocator allocator, TSCudaContext tsContext, CudaContext context, DType elementType, long elementCount)
+            : base(allocator, elementType, elementCount)
         {
             this.TSContext = tsContext;
             this.context = context;

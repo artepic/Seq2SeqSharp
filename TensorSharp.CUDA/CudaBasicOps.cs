@@ -180,6 +180,7 @@ namespace TensorSharp.CUDA
         public Tensor Addmm(Tensor result, float beta, Tensor src, float alpha, Tensor m1, Tensor m2)
         {
             var context = CudaHelpers.TSContextForTensor(src);
+            // ReSharper disable once ArrangeRedundantParentheses
             if (src.ElementType != m1.ElementType || src.ElementType != m2.ElementType || (result != null && result.ElementType != src.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");
@@ -239,6 +240,7 @@ namespace TensorSharp.CUDA
         public Tensor AddmmBatch(Tensor result, float beta, Tensor src, float alpha, Tensor m1, Tensor m2)
         {
             var context = CudaHelpers.TSContextForTensor(src);
+            // ReSharper disable once ArrangeRedundantParentheses
             if (src.ElementType != m1.ElementType || src.ElementType != m2.ElementType || (result != null && result.ElementType != src.ElementType))
             {
                 throw new InvalidOperationException("All tensors must have the same element type");
