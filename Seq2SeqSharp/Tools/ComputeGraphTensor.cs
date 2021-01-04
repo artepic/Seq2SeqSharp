@@ -1422,15 +1422,9 @@ namespace Seq2SeqSharp.Tools
             // We only dispose root computing graph, For sub graph, we don't do it.
             if (this.m_isSubGraph == false)
             {
-                if (this.m_backprop != null)
-                {
-                    this.m_backprop.Clear();
-                }
+                this.m_backprop?.Clear();
 
-                if (this.m_weightTensorFactory != null)
-                {
-                    this.m_weightTensorFactory.Dispose();
-                }
+                this.m_weightTensorFactory?.Dispose();
 
                 //if (m_setEdges != null)
                 //{

@@ -285,10 +285,7 @@ namespace Seq2SeqSharp
             // Encoding input source sentences
             var encOutput = this.Encode(computeGraph, srcSnts, encoder, srcEmbedding, srcSelfMask, posEmbedding, originalSrcLengths);
 
-            if (srcSelfMask != null)
-            {
-                srcSelfMask.Dispose();
-            }
+            srcSelfMask?.Dispose();
 
             // Generate output decoder sentences
             if (decoder is AttentionDecoder)

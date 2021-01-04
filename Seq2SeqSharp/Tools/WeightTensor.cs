@@ -155,10 +155,7 @@ namespace Seq2SeqSharp.Tools
 
         public void UnbindFromComputeGraph()
         {
-            if (this.m_computeGraphToBind != null)
-            {
-                this.m_computeGraphToBind.Unbind(this);
-            }
+            this.m_computeGraphToBind?.Unbind(this);
         }
 
         public int GetDeviceId()
@@ -206,10 +203,7 @@ namespace Seq2SeqSharp.Tools
         {
             var m = src as WeightTensor;
 
-            if (this.m_TGradient != null)
-            {
-                this.m_TGradient.Dispose();
-            }
+            this.m_TGradient?.Dispose();
 
             this.m_TGradient = m.TWeight.CopyRef();
 
