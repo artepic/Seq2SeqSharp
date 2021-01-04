@@ -12,12 +12,7 @@ namespace TensorSharp.CUDA.Util
 
         public PooledObject(T value, Action<PooledObject<T>> onDispose)
         {
-            if (onDispose == null)
-            {
-                throw new ArgumentNullException(nameof(onDispose));
-            }
-
-            this.onDispose = onDispose;
+            this.onDispose = onDispose ?? throw new ArgumentNullException(nameof(onDispose));
             this.value = value;
         }
 
@@ -58,18 +53,8 @@ namespace TensorSharp.CUDA.Util
 
         public ObjectPool(int initialSize, Func<T> constructor, Action<T> destructor)
         {
-            if (constructor == null)
-            {
-                throw new ArgumentNullException(nameof(constructor));
-            }
-
-            if (destructor == null)
-            {
-                throw new ArgumentNullException(nameof(destructor));
-            }
-
-            this.constructor = constructor;
-            this.destructor = destructor;
+            this.constructor = constructor ?? throw new ArgumentNullException(nameof(constructor));
+            this.destructor = destructor ?? throw new ArgumentNullException(nameof(destructor));
 
             for (var i = 0; i < initialSize; ++i)
             {
