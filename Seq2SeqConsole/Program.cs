@@ -69,7 +69,7 @@ namespace Seq2SeqConsole
                 var cudaCompilerOptions = string.IsNullOrEmpty(opts.CompilerOptions) ? null : opts.CompilerOptions.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 //Parse device ids from options          
-                var deviceIds = opts.DeviceIds.Split(',').Select(x => int.Parse(x)).ToArray();
+                var deviceIds = opts.DeviceIds.Split(',').Select(int.Parse).ToArray();
                 if (mode == ModeEnums.Train)
                 {
                     // Load train corpus
