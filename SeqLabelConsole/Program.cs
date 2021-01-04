@@ -64,7 +64,7 @@ namespace SeqLabelConsole
             var mode = (ModeEnums)Enum.Parse(typeof(ModeEnums), opts.TaskName);
 
             //Parse device ids from options          
-            var deviceIds = opts.DeviceIds.Split(',').Select(x => int.Parse(x)).ToArray();
+            var deviceIds = opts.DeviceIds.Split(',').Select(int.Parse).ToArray();
             if (mode == ModeEnums.Train)
             {
                 // Load train corpus
