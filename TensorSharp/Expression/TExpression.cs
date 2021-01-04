@@ -247,11 +247,11 @@ namespace TensorSharp.Expression
 
     public class BinaryScalarTensorExpression : TExpression
     {
-        public readonly SExpression left;
+        public readonly ScalarExpression left;
         public readonly TExpression right;
         public readonly Func<Tensor, float, Tensor, Tensor> evaluate;
 
-        public BinaryScalarTensorExpression(SExpression left, TExpression right, Func<Tensor, float, Tensor, Tensor> evaluate)
+        public BinaryScalarTensorExpression(ScalarExpression left, TExpression right, Func<Tensor, float, Tensor, Tensor> evaluate)
         {
             this.left = left;
             this.right = right;
@@ -268,10 +268,10 @@ namespace TensorSharp.Expression
     public class BinaryTensorScalarExpression : TExpression
     {
         public readonly TExpression left;
-        public readonly SExpression right;
+        public readonly ScalarExpression right;
         public readonly Func<Tensor, Tensor, float, Tensor> evaluate;
 
-        public BinaryTensorScalarExpression(TExpression left, SExpression right, Func<Tensor, Tensor, float, Tensor> evaluate)
+        public BinaryTensorScalarExpression(TExpression left, ScalarExpression right, Func<Tensor, Tensor, float, Tensor> evaluate)
         {
             this.left = left;
             this.right = right;

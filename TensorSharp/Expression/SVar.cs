@@ -4,10 +4,10 @@ namespace TensorSharp.Expression
 {
     public class SVar
     {
-        private readonly SExpression expression;
+        private readonly ScalarExpression expression;
 
 
-        public SVar(SExpression expression)
+        public SVar(ScalarExpression expression)
         {
             this.expression = expression;
         }
@@ -17,9 +17,6 @@ namespace TensorSharp.Expression
         {
             return this.expression.Evaluate();
         }
-
-        public SExpression Expression => this.expression;
-
 
         public static implicit operator SVar(float value) { return new SVar(new ConstScalarExpression(value)); }
 
