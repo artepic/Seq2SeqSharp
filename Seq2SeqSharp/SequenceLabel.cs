@@ -65,14 +65,7 @@ namespace Seq2SeqSharp
             //      m_crfDecoder = new CRFDecoder(modelMetaData.Vocab.TargetWordSize);
 
 
-            if (modelMetaData.EncoderType == EncoderTypeEnums.Transformer)
-            {
-                this.m_posEmbedding = new MultiProcessorNetworkWrapper<IWeightTensor>(this.BuildPositionWeightTensor(Math.Max(this.m_maxSntSize, this.m_maxSntSize) + 2, modelMetaData.EmbeddingDim, raDeviceIds.GetNextItem(), "PosEmbedding", false), this.DeviceIds, true);
-            }
-            else
-            {
-                this.m_posEmbedding = null;
-            }
+            this.m_posEmbedding = modelMetaData.EncoderType == EncoderTypeEnums.Transformer ? new MultiProcessorNetworkWrapper<IWeightTensor>(this.BuildPositionWeightTensor(Math.Max(this.m_maxSntSize, this.m_maxSntSize) + 2, modelMetaData.EmbeddingDim, raDeviceIds.GetNextItem(), "PosEmbedding", false), this.DeviceIds, true) : null;
 
             return true;
         }

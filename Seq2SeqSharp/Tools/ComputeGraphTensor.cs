@@ -485,14 +485,7 @@ namespace Seq2SeqSharp.Tools
         {
             var m = w as WeightTensor;
             WeightTensor res = null;
-            if (inPlace)
-            {
-                res = m.CopyWeightsRef($"{this.GetHashString(w.Name)}.Relu");
-            }
-            else
-            {
-                res = this.m_weightTensorFactory.CreateWeightTensor(m.Sizes, this.m_deviceId, name: $"{this.GetHashString(w.Name)}.Relu", graphToBind: this);
-            }
+            res = inPlace ? m.CopyWeightsRef($"{this.GetHashString(w.Name)}.Relu") : this.m_weightTensorFactory.CreateWeightTensor(m.Sizes, this.m_deviceId, name: $"{this.GetHashString(w.Name)}.Relu", graphToBind: this);
 
             this.VisualizeNodes(w, res);
 
@@ -717,14 +710,7 @@ namespace Seq2SeqSharp.Tools
             var t = w as WeightTensor;
             WeightTensor res = null;
 
-            if (inPlace)
-            {
-                res = t.CopyWeightsRef($"{this.GetHashString(w.Name)}.SoftmaxMask");
-            }
-            else
-            {
-                res = this.m_weightTensorFactory.CreateWeightTensor(t.Sizes, this.m_deviceId, name: $"{this.GetHashString(w.Name)}.SoftmaxMask");
-            }
+            res = inPlace ? t.CopyWeightsRef($"{this.GetHashString(w.Name)}.SoftmaxMask") : this.m_weightTensorFactory.CreateWeightTensor(t.Sizes, this.m_deviceId, name: $"{this.GetHashString(w.Name)}.SoftmaxMask");
 
             this.VisualizeNodes(w, res);
 
@@ -1380,14 +1366,7 @@ namespace Seq2SeqSharp.Tools
 
             var w = V as WeightTensor;
             WeightTensor res = null;
-            if (inPlace)
-            {
-                res = w.CopyWeightsRef($"{this.GetHashString(V.Name)}.Dropout");
-            }
-            else
-            {
-                res = this.m_weightTensorFactory.CreateWeightTensor(w.Sizes, this.m_deviceId, name: $"{this.GetHashString(V.Name)}.Dropout", graphToBind: this);
-            }
+            res = inPlace ? w.CopyWeightsRef($"{this.GetHashString(V.Name)}.Dropout") : this.m_weightTensorFactory.CreateWeightTensor(w.Sizes, this.m_deviceId, name: $"{this.GetHashString(V.Name)}.Dropout", graphToBind: this);
 
             this.VisualizeNodes(V, res);
 
