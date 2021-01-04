@@ -503,7 +503,7 @@ namespace Seq2SeqSharp.Tools
             Ops.Relu(res.TWeight, m.TWeight);
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     res.ReleaseWeight();
 
@@ -516,9 +516,11 @@ namespace Seq2SeqSharp.Tools
                     {
                         Ops.AddReluD(m.TGradient, m.TGradient, m.TWeight, res.TGradient);
                     }
+
                     res.Dispose();
-                };
-                this.m_backprop.Add(backward);
+                }
+
+                this.m_backprop.Add(Action);
 
                 m.UnbindFromComputeGraph();
             }
@@ -541,7 +543,7 @@ namespace Seq2SeqSharp.Tools
 
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     res.ReleaseWeight();
 
@@ -556,9 +558,9 @@ namespace Seq2SeqSharp.Tools
                     }
 
                     res.Dispose();
+                }
 
-                };
-                this.m_backprop.Add(backward);
+                this.m_backprop.Add(Action);
 
                 t1.UnbindFromComputeGraph();
                 t2.UnbindFromComputeGraph();
@@ -581,7 +583,7 @@ namespace Seq2SeqSharp.Tools
             Ops.Addmm(res.TWeight, 0.0f, res.TWeight, 1.0f, t1.TWeight, t2.TWeight);
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     res.ReleaseWeight();
 
@@ -596,8 +598,9 @@ namespace Seq2SeqSharp.Tools
                     }
 
                     res.Dispose();
-                };
-                this.m_backprop.Add(backward);
+                }
+
+                this.m_backprop.Add(Action);
 
                 t1.UnbindFromComputeGraph();
                 t2.UnbindFromComputeGraph();
@@ -639,7 +642,7 @@ namespace Seq2SeqSharp.Tools
 
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     res.ReleaseWeight();
 
@@ -659,8 +662,9 @@ namespace Seq2SeqSharp.Tools
                     }
 
                     res.Dispose();
-                };
-                this.m_backprop.Add(backward);
+                }
+
+                this.m_backprop.Add(Action);
 
                 t1.UnbindFromComputeGraph();
                 t2.UnbindFromComputeGraph();
@@ -679,7 +683,7 @@ namespace Seq2SeqSharp.Tools
             res.TWeight = m.TWeight.Transpose();
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     res.ReleaseWeight();
                     using (var gT = res.TGradient.Transpose())
@@ -688,8 +692,9 @@ namespace Seq2SeqSharp.Tools
                     }
 
                     res.Dispose();
-                };
-                this.m_backprop.Add(backward);
+                }
+
+                this.m_backprop.Add(Action);
             }
 
             return res;
@@ -736,7 +741,7 @@ namespace Seq2SeqSharp.Tools
             
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     if (runGradients)
                     {
@@ -744,12 +749,14 @@ namespace Seq2SeqSharp.Tools
                         {
                             t.TGradient = res.TGradient.CopyRef();
                         }
+
                         t.AddSoftmaxGradient(res, inPlace);
                     }
 
                     res.Dispose();
-                };
-                this.m_backprop.Add(backward);
+                }
+
+                this.m_backprop.Add(Action);
             }
 
             return res;
@@ -766,11 +773,12 @@ namespace Seq2SeqSharp.Tools
 
             if (this.m_needsBackprop)
             {
-                Action backward = () =>
+                void Action()
                 {
                     res.Dispose();
-                };
-                this.m_backprop.Add(backward);
+                }
+
+                this.m_backprop.Add(Action);
             }
 
             return res;
