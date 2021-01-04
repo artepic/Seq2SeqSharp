@@ -7,9 +7,6 @@ namespace TensorSharp.CUDA
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class PrecompileAttribute : Attribute
     {
-        public PrecompileAttribute()
-        {
-        }
     }
 
     public interface IPrecompilable

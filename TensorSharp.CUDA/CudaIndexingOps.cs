@@ -9,10 +9,6 @@ namespace TensorSharp.CUDA
         private readonly GatherScatterKernels gather = new();
 
 
-        public CudaIndexingOps()
-        {
-        }
-
         [RegisterOpStorageType("index_select", typeof(CudaStorage))]
         public Tensor IndexSelect(Tensor result, Tensor src, int dimension, Tensor indices) { return this.indexSelect.IndexSelect(result, src, dimension, indices); }
 

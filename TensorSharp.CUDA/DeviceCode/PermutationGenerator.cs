@@ -6,10 +6,6 @@ namespace TensorSharp.CUDA.DeviceCode
     {
         public readonly StringBuilder sb = new();
 
-        public PermutationGenerator()
-        {
-        }
-
         public override string ToString()
         {
             return this.sb.ToString();

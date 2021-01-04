@@ -10,10 +10,6 @@ namespace TensorSharp.CUDA.ContextState
     {
         private readonly Dictionary<Tuple<CudaContext, byte[], string>, CudaKernel> activeKernels = new();
 
-        public CudaKernelCache()
-        {
-        }
-
         private readonly object locker = new();
 
         public void Dispose()

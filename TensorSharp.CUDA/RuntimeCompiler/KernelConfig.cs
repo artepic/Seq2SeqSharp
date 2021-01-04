@@ -8,10 +8,6 @@ namespace TensorSharp.CUDA.RuntimeCompiler
         private readonly SortedDictionary<string, string> values = new();
 
 
-        public KernelConfig()
-        {
-        }
-
         public IEnumerable<string> Keys => this.values.Keys;
 
         public IEnumerable<KeyValuePair<string, string>> AllValues()
