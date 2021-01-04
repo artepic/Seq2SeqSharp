@@ -123,7 +123,7 @@ namespace Seq2SeqSharp
         /// <returns></returns>
         private (IEncoder, IWeightTensor, IWeightTensor, FeedForwardLayer) GetNetworksOnDeviceAt(int deviceIdIdx)
         {
-            return (this.m_encoder.GetNetworkOnDevice(deviceIdIdx), this.m_srcEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_posEmbedding == null ? null : this.m_posEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_decoderFFLayer.GetNetworkOnDevice(deviceIdIdx));
+            return (this.m_encoder.GetNetworkOnDevice(deviceIdIdx), this.m_srcEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_posEmbedding?.GetNetworkOnDevice(deviceIdIdx), this.m_decoderFFLayer.GetNetworkOnDevice(deviceIdIdx));
         }
 
         /// <summary>

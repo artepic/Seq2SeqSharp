@@ -77,7 +77,7 @@ namespace Seq2SeqSharp.Tools
 
         public ComputeGraphTensor(IWeightFactory weightFactory, int deviceId, bool needBack = true, ConcurrentList<Action> backprop = null, bool isSubGraph = false)
         {
-            this.m_backprop = backprop != null ? backprop : new ConcurrentList<Action>();
+            this.m_backprop = backprop ?? new ConcurrentList<Action>();
             this.m_weightTensorFactory = weightFactory as WeightTensorFactory;
             this.m_needsBackprop = needBack;
             this.m_deviceId = deviceId;

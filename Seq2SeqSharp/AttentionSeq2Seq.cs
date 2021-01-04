@@ -241,7 +241,7 @@ namespace Seq2SeqSharp
         /// <returns></returns>
         private (IEncoder, IDecoder, IWeightTensor, IWeightTensor, IWeightTensor) GetNetworksOnDeviceAt(int deviceIdIdx)
         {
-            return (this.m_encoder.GetNetworkOnDevice(deviceIdIdx), this.m_decoder.GetNetworkOnDevice(deviceIdIdx), this.m_srcEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_tgtEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_posEmbedding == null ? null : this.m_posEmbedding.GetNetworkOnDevice(deviceIdIdx));
+            return (this.m_encoder.GetNetworkOnDevice(deviceIdIdx), this.m_decoder.GetNetworkOnDevice(deviceIdIdx), this.m_srcEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_tgtEmbedding.GetNetworkOnDevice(deviceIdIdx), this.m_posEmbedding?.GetNetworkOnDevice(deviceIdIdx));
         }
 
         private void RemoveDuplicatedEOS(List<List<string>> snts)
