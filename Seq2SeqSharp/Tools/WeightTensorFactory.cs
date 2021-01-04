@@ -8,7 +8,7 @@ namespace Seq2SeqSharp.Tools
 
         public WeightTensor CreateWeightTensor(int row, int column, int deviceId, bool cleanWeights = false, string name = "", bool isTrainable = false, IComputeGraph graphToBind = null)
         {
-            var r = new WeightTensor(new long[2] { row, column }, deviceId, name: name, isTrainable: isTrainable, graphToBind: graphToBind);
+            var r = new WeightTensor(new long[2] { row, column }, deviceId, name, isTrainable, graphToBind: graphToBind);
 
             if (cleanWeights)
             {

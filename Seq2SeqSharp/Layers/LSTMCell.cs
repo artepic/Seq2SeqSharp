@@ -26,14 +26,14 @@ namespace Seq2SeqSharp
             this.m_name = name;
 
             this.m_Wxh = new WeightTensor(new long[2] { dim + hdim, hdim * 4 }, deviceId, normal: NormType.Uniform, name: $"{name}.{nameof(this.m_Wxh)}", isTrainable: isTrainable);
-            this.m_b = new WeightTensor(new long[2] { 1, hdim * 4 }, 0, deviceId, name: $"{name}.{nameof(this.m_b)}", isTrainable: isTrainable);
+            this.m_b = new WeightTensor(new long[2] { 1, hdim * 4 }, 0, deviceId, $"{name}.{nameof(this.m_b)}", isTrainable);
 
             this.m_hdim = hdim;
             this.m_dim = dim;
             this.m_deviceId = deviceId;
 
-            this.m_layerNorm1 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm1)}", hdim * 4, deviceId, isTrainable: isTrainable);
-            this.m_layerNorm2 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm2)}", hdim, deviceId, isTrainable: isTrainable);
+            this.m_layerNorm1 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm1)}", hdim * 4, deviceId, isTrainable);
+            this.m_layerNorm2 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm2)}", hdim, deviceId, isTrainable);
         }
 
         public IWeightTensor Step(IWeightTensor input, IComputeGraph g)
@@ -91,8 +91,8 @@ namespace Seq2SeqSharp
                 this.m_cell = null;
             }
 
-            this.m_hidden = weightFactory.CreateWeightTensor(batchSize, this.m_hdim, this.m_deviceId, true, name: $"{this.m_name}.{nameof(this.m_hidden)}", isTrainable: true);
-            this.m_cell = weightFactory.CreateWeightTensor(batchSize, this.m_hdim, this.m_deviceId, true, name: $"{this.m_name}.{nameof(this.m_cell)}", isTrainable: true);
+            this.m_hidden = weightFactory.CreateWeightTensor(batchSize, this.m_hdim, this.m_deviceId, true, $"{this.m_name}.{nameof(this.m_hidden)}", true);
+            this.m_cell = weightFactory.CreateWeightTensor(batchSize, this.m_hdim, this.m_deviceId, true, $"{this.m_name}.{nameof(this.m_cell)}", true);
         }
 
         public void Save(Stream stream)

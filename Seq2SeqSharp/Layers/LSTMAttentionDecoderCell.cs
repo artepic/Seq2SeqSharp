@@ -31,7 +31,7 @@ namespace Seq2SeqSharp
             Logger.WriteLine($"Create LSTM attention decoder cell '{name}' HiddemDim = '{hiddenDim}', InputDim = '{inputDim}', ContextDim = '{contextDim}', DeviceId = '{deviceId}'");
 
             this.m_Wxhc = new WeightTensor(new long[2] { inputDim + hiddenDim + contextDim, hiddenDim * 4 }, deviceId, normal: NormType.Uniform, name: $"{name}.{nameof(this.m_Wxhc)}", isTrainable: isTrainable);
-            this.m_b = new WeightTensor(new long[2] { 1, hiddenDim * 4 }, 0, deviceId, name: $"{name}.{nameof(this.m_b)}", isTrainable: isTrainable);
+            this.m_b = new WeightTensor(new long[2] { 1, hiddenDim * 4 }, 0, deviceId, $"{name}.{nameof(this.m_b)}", isTrainable);
 
             this.m_layerNorm1 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm1)}", hiddenDim * 4, deviceId, isTrainable);
             this.m_layerNorm2 = new LayerNormalization($"{name}.{nameof(this.m_layerNorm2)}", hiddenDim, deviceId, isTrainable);
@@ -87,8 +87,8 @@ namespace Seq2SeqSharp
 
         public void Reset(IWeightFactory weightFactory, int batchSize)
         {
-            this.Hidden = weightFactory.CreateWeightTensor(batchSize, this.m_hiddenDim, this.m_deviceId, true, name: $"{this.m_name}.{nameof(this.Hidden)}", isTrainable: true);
-            this.Cell = weightFactory.CreateWeightTensor(batchSize, this.m_hiddenDim, this.m_deviceId, true, name: $"{this.m_name}.{nameof(this.Cell)}", isTrainable: true);
+            this.Hidden = weightFactory.CreateWeightTensor(batchSize, this.m_hiddenDim, this.m_deviceId, true, $"{this.m_name}.{nameof(this.Hidden)}", true);
+            this.Cell = weightFactory.CreateWeightTensor(batchSize, this.m_hiddenDim, this.m_deviceId, true, $"{this.m_name}.{nameof(this.Cell)}", true);
         }
 
         public void Save(Stream stream)

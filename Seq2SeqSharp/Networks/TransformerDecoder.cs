@@ -43,16 +43,16 @@ namespace Seq2SeqSharp
                 throw new ArgumentException($"hiddenDim is not equal to inputDim in TransformerEncoder.");
             }
 
-            this.m_selfAttns.Add(new MultiHeadAttention($"{name}.SelfAttn_0", multiHeadNum, hiddenDim, inputDim, this.m_dropoutRatio, deviceId, isTrainable: isTrainable, sharedQKV: true));
+            this.m_selfAttns.Add(new MultiHeadAttention($"{name}.SelfAttn_0", multiHeadNum, hiddenDim, inputDim, this.m_dropoutRatio, deviceId, isTrainable, true));
             for (var i = 1; i < depth; i++)
             {
-                this.m_selfAttns.Add(new MultiHeadAttention($"{name}.SelfAttn_{i}", multiHeadNum, hiddenDim, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable: isTrainable, sharedQKV: true));
+                this.m_selfAttns.Add(new MultiHeadAttention($"{name}.SelfAttn_{i}", multiHeadNum, hiddenDim, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable, true));
             }
 
-            this.m_encAttns.Add(new MultiHeadAttention($"{name}.EncAttn_0", multiHeadNum, hiddenDim, inputDim, this.m_dropoutRatio, deviceId, isTrainable: isTrainable));
+            this.m_encAttns.Add(new MultiHeadAttention($"{name}.EncAttn_0", multiHeadNum, hiddenDim, inputDim, this.m_dropoutRatio, deviceId, isTrainable));
             for (var i = 1; i < depth; i++)
             {
-                this.m_encAttns.Add(new MultiHeadAttention($"{name}.EncAttn_{i}", multiHeadNum, hiddenDim, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable: isTrainable));
+                this.m_encAttns.Add(new MultiHeadAttention($"{name}.EncAttn_{i}", multiHeadNum, hiddenDim, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable));
             }
 
             for (var i = 0; i < depth; i++)
@@ -62,7 +62,7 @@ namespace Seq2SeqSharp
 
             this.layerNorm = new LayerNormalization($"{name}.{nameof(this.layerNorm)}", hiddenDim, deviceId, isTrainable);
 
-            this.m_decoderFFLayer = new FeedForwardLayer($"{name}.FeedForward", hiddenDim, outputDim, 0.0f, deviceId: deviceId, isTrainable: isTrainable);
+            this.m_decoderFFLayer = new FeedForwardLayer($"{name}.FeedForward", hiddenDim, outputDim, 0.0f, deviceId, isTrainable);
 
         }
 

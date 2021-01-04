@@ -41,23 +41,23 @@ namespace Seq2SeqSharp
             this.m_dropoutRatio = dropoutRatio;
             this.m_sharedQKV = sharedQKV;
 
-            this.W0 = new WeightTensor(new long[2] { hiddenDim, hiddenDim }, deviceId, name: $"{name}.{nameof(this.W0)}", isTrainable: isTrainable, normal: NormType.Uniform);
-            this.b0 = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, name: $"{name}.{nameof(this.b0)}", isTrainable: isTrainable);
+            this.W0 = new WeightTensor(new long[2] { hiddenDim, hiddenDim }, deviceId, $"{name}.{nameof(this.W0)}", isTrainable, NormType.Uniform);
+            this.b0 = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, $"{name}.{nameof(this.b0)}", isTrainable);
 
             if (this.m_sharedQKV == false)
             {
-                this.Q = new WeightTensor(new long[2] { inputDim, hiddenDim }, deviceId, name: $"{name}.{nameof(this.Q)}", isTrainable: isTrainable, normal: NormType.Uniform);
-                this.Qb = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, name: $"{name}.{nameof(this.Qb)}", isTrainable: isTrainable);
+                this.Q = new WeightTensor(new long[2] { inputDim, hiddenDim }, deviceId, $"{name}.{nameof(this.Q)}", isTrainable, NormType.Uniform);
+                this.Qb = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, $"{name}.{nameof(this.Qb)}", isTrainable);
 
-                this.K = new WeightTensor(new long[2] { inputDim, hiddenDim }, deviceId, name: $"{name}.{nameof(this.K)}", isTrainable: isTrainable, normal: NormType.Uniform);
-                this.Kb = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, name: $"{name}.{nameof(this.Kb)}", isTrainable: isTrainable);
+                this.K = new WeightTensor(new long[2] { inputDim, hiddenDim }, deviceId, $"{name}.{nameof(this.K)}", isTrainable, NormType.Uniform);
+                this.Kb = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, $"{name}.{nameof(this.Kb)}", isTrainable);
 
-                this.V = new WeightTensor(new long[2] { inputDim, hiddenDim }, deviceId, name: $"{name}.{nameof(this.V)}", isTrainable: isTrainable, normal: NormType.Uniform);
-                this.Vb = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, name: $"{name}.{nameof(this.Vb)}", isTrainable: isTrainable);
+                this.V = new WeightTensor(new long[2] { inputDim, hiddenDim }, deviceId, $"{name}.{nameof(this.V)}", isTrainable, NormType.Uniform);
+                this.Vb = new WeightTensor(new long[2] { 1, hiddenDim }, 0, deviceId, $"{name}.{nameof(this.Vb)}", isTrainable);
             }
             else
             {
-                this.QKV = new WeightTensor(new long[] { 3, inputDim, hiddenDim }, deviceId, name: $"{name}.{nameof(this.QKV)}", isTrainable: isTrainable, normal: NormType.Uniform);
+                this.QKV = new WeightTensor(new long[] { 3, inputDim, hiddenDim }, deviceId, $"{name}.{nameof(this.QKV)}", isTrainable, NormType.Uniform);
             }
 
             this.layerNormQ = new LayerNormalization($"{name}.{nameof(this.layerNormQ)}", this.m_hiddenDim, deviceId, isTrainable);
@@ -108,7 +108,7 @@ namespace Seq2SeqSharp
                 var W = g.View(g.Permute(o, 1, 2, 0, 3), dims: new long[] { batchSize * seqLenQ, this.m_multiHeadNum * this.m_d });
 
                 // Output projection
-                var finalAttResults = g.Dropout(g.Affine(W, this.W0, this.b0), batchSize, this.m_dropoutRatio, inPlace: true);
+                var finalAttResults = g.Dropout(g.Affine(W, this.W0, this.b0), batchSize, this.m_dropoutRatio, true);
 
                 return graph.Add(finalAttResults, inputQ);
             }
@@ -162,7 +162,7 @@ namespace Seq2SeqSharp
                 var W = g.View(g.Permute(o, 1, 2, 0, 3), dims: new long[] { batchSize * seqLenQ, this.m_multiHeadNum * this.m_d });
 
                 // Output projection
-                var finalAttResults = g.Dropout(g.Affine(W, this.W0, this.b0), batchSize, this.m_dropoutRatio, inPlace: true);
+                var finalAttResults = g.Dropout(g.Affine(W, this.W0, this.b0), batchSize, this.m_dropoutRatio, true);
 
                 return graph.Add(finalAttResults, inputQ);
             }

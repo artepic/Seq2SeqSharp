@@ -68,10 +68,10 @@ namespace SeqLabelConsole
             if (mode == ModeEnums.Train)
             {
                 // Load train corpus
-                var trainCorpus = new SequenceLabelingCorpus(opts.TrainCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, maxSentLength: opts.MaxSentLength);
+                var trainCorpus = new SequenceLabelingCorpus(opts.TrainCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, opts.MaxSentLength);
 
                 // Load valid corpus
-                var validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new SequenceLabelingCorpus(opts.ValidCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, maxSentLength: opts.MaxSentLength);
+                var validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new SequenceLabelingCorpus(opts.ValidCorpusPath, opts.BatchSize, opts.ShuffleBlockSize, opts.MaxSentLength);
 
                 // Load or build vocabulary
                 Vocab vocab = null;
@@ -102,22 +102,22 @@ namespace SeqLabelConsole
                 if (File.Exists(opts.ModelFilePath) == false)
                 {
                     //New training
-                    sl = new SequenceLabel(hiddenDim: opts.HiddenSize, embeddingDim: opts.WordVectorSize, encoderLayerDepth: opts.EncoderLayerDepth, multiHeadNum: opts.MultiHeadNum,
-                        encoderType: encoderType,
-                        dropoutRatio: opts.DropoutRatio, deviceIds: deviceIds, processorType: processorType, modelFilePath: opts.ModelFilePath, vocab: vocab, maxSntSize: opts.MaxSentLength);
+                    sl = new SequenceLabel(opts.HiddenSize, opts.WordVectorSize, opts.EncoderLayerDepth, opts.MultiHeadNum,
+                        encoderType,
+                        opts.DropoutRatio, deviceIds: deviceIds, processorType: processorType, modelFilePath: opts.ModelFilePath, vocab: vocab, maxSntSize: opts.MaxSentLength);
                 }
                 else
                 {
                     //Incremental training
                     Logger.WriteLine($"Loading model from '{opts.ModelFilePath}'...");
-                    sl = new SequenceLabel(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, dropoutRatio: opts.DropoutRatio, maxSntSize: opts.MaxSentLength);
+                    sl = new SequenceLabel(opts.ModelFilePath, processorType, deviceIds, opts.DropoutRatio, opts.MaxSentLength);
                 }
 
                 // Add event handler for monitoring
                 sl.IterationDone += ss_IterationDone;
 
                 // Kick off training
-                sl.Train(maxTrainingEpoch: opts.MaxEpochNum, trainCorpus: trainCorpus, validCorpus: validCorpus, learningRate: learningRate, optimizer: optimizer, metrics: metrics);
+                sl.Train(opts.MaxEpochNum, trainCorpus, validCorpus, learningRate, optimizer: optimizer, metrics: metrics);
 
 
             }
@@ -136,15 +136,15 @@ namespace SeqLabelConsole
                     metrics.Add(new SequenceLabelFscoreMetric(word));
                 }
 
-                sl = new SequenceLabel(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, maxSntSize: opts.MaxSentLength);
-                sl.Valid(validCorpus: validCorpus, metrics: metrics);
+                sl = new SequenceLabel(opts.ModelFilePath, processorType, deviceIds, maxSntSize: opts.MaxSentLength);
+                sl.Valid(validCorpus, metrics);
             }
             else if (mode == ModeEnums.Test)
             {
                 Logger.WriteLine($"Test model '{opts.ModelFilePath}' by input corpus '{opts.InputTestFile}'");
 
                 //Test trained model
-                sl = new SequenceLabel(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, maxSntSize: opts.MaxSentLength);
+                sl = new SequenceLabel(opts.ModelFilePath, processorType, deviceIds, maxSntSize: opts.MaxSentLength);
 
                 var outputLines = new List<string>();
                 var data_sents_raw1 = File.ReadAllLines(opts.InputTestFile);

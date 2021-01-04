@@ -102,7 +102,7 @@ namespace Seq2SeqSharp.Tools
 
         public IComputeGraph CreateSubGraph(string name)
         {
-            var subGraph = new ComputeGraphTensor(this.m_weightTensorFactory, this.m_deviceId, this.m_needsBackprop, this.m_backprop, isSubGraph: true);
+            var subGraph = new ComputeGraphTensor(this.m_weightTensorFactory, this.m_deviceId, this.m_needsBackprop, this.m_backprop, true);
             //if (m_visNeuralNetwork)
             //{
             //    // Create parameters for neural network visualization

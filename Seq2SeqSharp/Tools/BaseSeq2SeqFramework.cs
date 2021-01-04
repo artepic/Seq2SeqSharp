@@ -354,7 +354,7 @@ namespace Seq2SeqSharp.Tools
             try
             {
                 // Create a new computing graph instance
-                using (var computeGraph = this.CreateComputGraph(this.DeviceIds[0], needBack: false))
+                using (var computeGraph = this.CreateComputGraph(this.DeviceIds[0], false))
                 {
                     // Run forward part
                     ForwardOnSingleDevice(computeGraph, inputTokens, hypTkns, this.DeviceIds[0], false);
@@ -413,7 +413,7 @@ namespace Seq2SeqSharp.Tools
                         }
 
                         // Create a new computing graph instance
-                        using (var computeGraph = this.CreateComputGraph(i, needBack: false))
+                        using (var computeGraph = this.CreateComputGraph(i, false))
                         {
                             // Run forward part
                             RunNetwork(computeGraph, srcTkns, hypTkns, i, false);

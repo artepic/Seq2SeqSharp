@@ -15,8 +15,8 @@ namespace Seq2SeqSharp
         public LayerNormalization(string name, int dim, int deviceId, bool isTrainable)
         {
             this.m_name = name;
-            this.m_alpha = new WeightTensor(new long[2] { 1, dim }, 1.0f, deviceId, name: $"{name}.{nameof(this.m_alpha)}", isTrainable: isTrainable);
-            this.m_beta = new WeightTensor(new long[2] { 1, dim }, 0, deviceId, name: $"{name}.{nameof(this.m_beta)}", isTrainable: isTrainable);
+            this.m_alpha = new WeightTensor(new long[2] { 1, dim }, 1.0f, deviceId, $"{name}.{nameof(this.m_alpha)}", isTrainable);
+            this.m_beta = new WeightTensor(new long[2] { 1, dim }, 0, deviceId, $"{name}.{nameof(this.m_beta)}", isTrainable);
         }
 
         public IWeightTensor Norm(IWeightTensor input, IComputeGraph g)

@@ -26,7 +26,7 @@ namespace Seq2SeqSharp.Utils
                 }
             }
 
-            var tensor = new WeightTensor(new long[] { originalLengths.Count, paddedLength, paddedLength }, 0.0f, deviceId, $"TriMask_{deviceId}", isTrainable: false);
+            var tensor = new WeightTensor(new long[] { originalLengths.Count, paddedLength, paddedLength }, 0.0f, deviceId, $"TriMask_{deviceId}", false);
             tensor.SetWeightArray(buf);
 
             return tensor;
@@ -57,7 +57,7 @@ namespace Seq2SeqSharp.Utils
                 }
             }
 
-            var tensor = new WeightTensor(new long[] { originalLengths.Count, paddedLength, paddedLength }, deviceId, $"TriMask_{deviceId}", isTrainable: false);
+            var tensor = new WeightTensor(new long[] { originalLengths.Count, paddedLength, paddedLength }, deviceId, $"TriMask_{deviceId}", false);
             tensor.SetWeightArray(buf);
 
 
@@ -91,7 +91,7 @@ namespace Seq2SeqSharp.Utils
                 }
             }
 
-            var tensor = new WeightTensor(new long[] { tgtOriginalLengths.Count, tgtPaddedLength, srcPaddedLength }, deviceId, $"SrcTgtMask_{deviceId}", isTrainable: false);
+            var tensor = new WeightTensor(new long[] { tgtOriginalLengths.Count, tgtPaddedLength, srcPaddedLength }, deviceId, $"SrcTgtMask_{deviceId}", false);
             tensor.SetWeightArray(buf);
 
             return tensor;

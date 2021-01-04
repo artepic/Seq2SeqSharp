@@ -39,10 +39,10 @@ namespace Seq2SeqSharp
                 throw new ArgumentException($"hiddenDim is not equal to inputDim in TransformerEncoder.");
             }
 
-            this.m_encoders.Add(new MultiHeadAttention($"{name}.SelfAttn_0", multiHeadNum, hiddenDim, inputDim, this.m_dropoutRatio, deviceId, isTrainable: isTrainable, sharedQKV: true));
+            this.m_encoders.Add(new MultiHeadAttention($"{name}.SelfAttn_0", multiHeadNum, hiddenDim, inputDim, this.m_dropoutRatio, deviceId, isTrainable, true));
             for (var i = 1; i < depth; i++)
             {
-                this.m_encoders.Add(new MultiHeadAttention($"{name}.SelfAttn_{i}", multiHeadNum, hiddenDim, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable: isTrainable, sharedQKV: true));              
+                this.m_encoders.Add(new MultiHeadAttention($"{name}.SelfAttn_{i}", multiHeadNum, hiddenDim, hiddenDim, this.m_dropoutRatio, deviceId, isTrainable, true));              
             }
 
             for (var i = 0; i < depth; i++)

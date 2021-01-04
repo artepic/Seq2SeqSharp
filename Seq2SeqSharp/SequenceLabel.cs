@@ -51,14 +51,14 @@ namespace Seq2SeqSharp
             if (modelMetaData.EncoderType == EncoderTypeEnums.BiLSTM)
             {
                 this.m_encoder = new MultiProcessorNetworkWrapper<IEncoder>(
-                                                                            new BiEncoder("BiLSTMEncoder", modelMetaData.HiddenDim, modelMetaData.EmbeddingDim, modelMetaData.EncoderLayerDepth, raDeviceIds.GetNextItem(), isTrainable: true), this.DeviceIds);
-                this.m_decoderFFLayer = new MultiProcessorNetworkWrapper<FeedForwardLayer>(new FeedForwardLayer("FeedForward", modelMetaData.HiddenDim * 2, modelMetaData.Vocab.TargetWordSize, dropoutRatio: 0.0f, deviceId: raDeviceIds.GetNextItem(), isTrainable: true), this.DeviceIds);
+                                                                            new BiEncoder("BiLSTMEncoder", modelMetaData.HiddenDim, modelMetaData.EmbeddingDim, modelMetaData.EncoderLayerDepth, raDeviceIds.GetNextItem(), true), this.DeviceIds);
+                this.m_decoderFFLayer = new MultiProcessorNetworkWrapper<FeedForwardLayer>(new FeedForwardLayer("FeedForward", modelMetaData.HiddenDim * 2, modelMetaData.Vocab.TargetWordSize, 0.0f, raDeviceIds.GetNextItem(), true), this.DeviceIds);
             }
             else
             {
                 this.m_encoder = new MultiProcessorNetworkWrapper<IEncoder>(
-                                                                            new TransformerEncoder("TransformerEncoder", modelMetaData.MultiHeadNum, modelMetaData.HiddenDim, modelMetaData.EmbeddingDim, modelMetaData.EncoderLayerDepth, this.m_dropoutRatio, raDeviceIds.GetNextItem(), isTrainable: true), this.DeviceIds);
-                this.m_decoderFFLayer = new MultiProcessorNetworkWrapper<FeedForwardLayer>(new FeedForwardLayer("FeedForward", modelMetaData.HiddenDim, modelMetaData.Vocab.TargetWordSize, dropoutRatio: 0.0f, deviceId: raDeviceIds.GetNextItem(), isTrainable: true), this.DeviceIds);
+                                                                            new TransformerEncoder("TransformerEncoder", modelMetaData.MultiHeadNum, modelMetaData.HiddenDim, modelMetaData.EmbeddingDim, modelMetaData.EncoderLayerDepth, this.m_dropoutRatio, raDeviceIds.GetNextItem(), true), this.DeviceIds);
+                this.m_decoderFFLayer = new MultiProcessorNetworkWrapper<FeedForwardLayer>(new FeedForwardLayer("FeedForward", modelMetaData.HiddenDim, modelMetaData.Vocab.TargetWordSize, 0.0f, raDeviceIds.GetNextItem(), true), this.DeviceIds);
             }
 
             this.m_srcEmbedding = new MultiProcessorNetworkWrapper<IWeightTensor>(new WeightTensor(new long[2] { modelMetaData.Vocab.SourceWordSize, modelMetaData.EmbeddingDim }, raDeviceIds.GetNextItem(), normal: NormType.Normal, name: "SrcEmbeddings", isTrainable: true), this.DeviceIds);
@@ -84,7 +84,7 @@ namespace Seq2SeqSharp
 
         private WeightTensor BuildPositionWeightTensor(int row, int column, int deviceId, string name = "", bool isTrainable = false)
         {
-            var t = new WeightTensor(new long[2] { row, column }, deviceId, name: name, isTrainable: isTrainable);
+            var t = new WeightTensor(new long[2] { row, column }, deviceId, name, isTrainable);
             var posWeights = new float[row * column];
 
             for (var p = 0; p < row; ++p)
@@ -252,7 +252,7 @@ namespace Seq2SeqSharp
                 var originalLength = originalSrcLengths[j];
                 for (var i = 0; i < seqLen; i++)
                 {
-                    var ix_source = this.m_modelMetaData.Vocab.GetSourceWordIndex(srcSnts[j][i], logUnk: true);
+                    var ix_source = this.m_modelMetaData.Vocab.GetSourceWordIndex(srcSnts[j][i], true);
 
                     var emb = g.PeekRow(Embedding, ix_source, runGradients: i < originalLength ? true : false);
 
@@ -276,9 +276,9 @@ namespace Seq2SeqSharp
         {
             using (var posEmbeddingPeek = g.PeekRow(posEmbedding, 0, seqLen, false))
             {
-                using (var posEmbeddingPeekView = g.View(posEmbeddingPeek, runGradient: false, dims: new long[] { 1, seqLen, this.m_modelMetaData.EmbeddingDim }))
+                using (var posEmbeddingPeekView = g.View(posEmbeddingPeek, false, new long[] { 1, seqLen, this.m_modelMetaData.EmbeddingDim }))
                 {
-                    using (var posEmbeddingPeekViewExp = g.Expand(posEmbeddingPeekView, runGradient: false, dims: new long[] { batchSize, seqLen, this.m_modelMetaData.EmbeddingDim }))
+                    using (var posEmbeddingPeekViewExp = g.Expand(posEmbeddingPeekView, false, new long[] { batchSize, seqLen, this.m_modelMetaData.EmbeddingDim }))
                     {
                         inputEmbs = g.View(inputEmbs, dims: new long[] { batchSize, seqLen, this.m_modelMetaData.EmbeddingDim });
                         inputEmbs = g.Add(inputEmbs, posEmbeddingPeekViewExp, true, false);
@@ -287,7 +287,7 @@ namespace Seq2SeqSharp
                 }
             }
 
-            inputEmbs = g.Dropout(inputEmbs, batchSize, this.m_dropoutRatio, inPlace: true);
+            inputEmbs = g.Dropout(inputEmbs, batchSize, this.m_dropoutRatio, true);
 
             return inputEmbs;
         }

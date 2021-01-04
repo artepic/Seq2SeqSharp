@@ -34,7 +34,7 @@ namespace Seq2SeqSharp
 
                 //Feed forward
                 var ffnResult = this.feedForwardLayer1.Process(inputNorm, batchSize, g);
-                var reluFFNResult = g.Relu(ffnResult, inPlace: true);
+                var reluFFNResult = g.Relu(ffnResult, true);
                 var ffn2Result = this.feedForwardLayer2.Process(reluFFNResult, batchSize, g);
 
                 //Skip connection and layer normaliztion

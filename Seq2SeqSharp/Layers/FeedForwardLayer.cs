@@ -27,8 +27,8 @@ namespace Seq2SeqSharp
             this.m_deviceId = deviceId;
             this.m_isTrainable = isTrainable;
 
-            this.m_Whd = new WeightTensor(new long[2] { inputDim, outputDim }, deviceId, name: $"{name}.{nameof(this.m_Whd)}", normal: NormType.Uniform, isTrainable: isTrainable);
-            this.m_Bd = new WeightTensor(new long[2] { 1, outputDim }, 0, deviceId, name: $"{name}.{nameof(this.m_Bd)}", isTrainable: isTrainable);
+            this.m_Whd = new WeightTensor(new long[2] { inputDim, outputDim }, deviceId, $"{name}.{nameof(this.m_Whd)}", normal: NormType.Uniform, isTrainable: isTrainable);
+            this.m_Bd = new WeightTensor(new long[2] { 1, outputDim }, 0, deviceId, $"{name}.{nameof(this.m_Bd)}", isTrainable);
         }
 
         public int GetDeviceId()
@@ -39,7 +39,7 @@ namespace Seq2SeqSharp
         public IWeightTensor Process(IWeightTensor inputT, int batchSize, IComputeGraph g)
         {            
             var res = g.Affine(inputT, this.m_Whd, this.m_Bd);
-            return g.Dropout(res, batchSize, this.m_dropoutRatio, inPlace: true);
+            return g.Dropout(res, batchSize, this.m_dropoutRatio, true);
         }
 
         public virtual List<IWeightTensor> GetParams()

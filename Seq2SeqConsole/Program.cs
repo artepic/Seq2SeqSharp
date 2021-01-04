@@ -73,8 +73,8 @@ namespace Seq2SeqConsole
                 if (mode == ModeEnums.Train)
                 {
                     // Load train corpus
-                    var trainCorpus = new ParallelCorpus(corpusFilePath: opts.TrainCorpusPath, srcLangName: opts.SrcLang, tgtLangName: opts.TgtLang, batchSize: opts.BatchSize, shuffleBlockSize: opts.ShuffleBlockSize,
-                                                         maxSrcSentLength: opts.MaxSrcSentLength, maxTgtSentLength: opts.MaxTgtSentLength, shuffleEnums: shuffleType);
+                    var trainCorpus = new ParallelCorpus(opts.TrainCorpusPath, opts.SrcLang, opts.TgtLang, opts.BatchSize, opts.ShuffleBlockSize,
+                                                         opts.MaxSrcSentLength, opts.MaxTgtSentLength, shuffleEnums: shuffleType);
                     // Load valid corpus
                     var validCorpus = string.IsNullOrEmpty(opts.ValidCorpusPath) ? null : new ParallelCorpus(opts.ValidCorpusPath, opts.SrcLang, opts.TgtLang, opts.ValBatchSize, opts.ShuffleBlockSize, opts.MaxSrcSentLength, opts.MaxTgtSentLength);
 
@@ -96,7 +96,7 @@ namespace Seq2SeqConsole
                     {
                         //Incremental training
                         Logger.WriteLine($"Loading model from '{opts.ModelFilePath}'...");
-                        ss = new AttentionSeq2Seq(modelFilePath: opts.ModelFilePath, processorType: processorType, dropoutRatio: opts.DropoutRatio, deviceIds: deviceIds,
+                        ss = new AttentionSeq2Seq(opts.ModelFilePath, processorType, dropoutRatio: opts.DropoutRatio, deviceIds: deviceIds,
                             isSrcEmbTrainable: opts.IsSrcEmbeddingTrainable, isTgtEmbTrainable: opts.IsTgtEmbeddingTrainable, isEncoderTrainable: opts.IsEncoderTrainable, isDecoderTrainable: opts.IsDecoderTrainable,
                             maxSrcSntSize: opts.MaxSrcSentLength, maxTgtSntSize: opts.MaxTgtSentLength, memoryUsageRatio: opts.MemoryUsageRatio, shuffleType: shuffleType, compilerOptions: cudaCompilerOptions);
                     }
@@ -116,7 +116,7 @@ namespace Seq2SeqConsole
                         }
 
                         //New training
-                        ss = new AttentionSeq2Seq(embeddingDim: opts.WordVectorSize, hiddenDim: opts.HiddenSize, encoderLayerDepth: opts.EncoderLayerDepth, decoderLayerDepth: opts.DecoderLayerDepth,
+                        ss = new AttentionSeq2Seq(opts.WordVectorSize, opts.HiddenSize, opts.EncoderLayerDepth, opts.DecoderLayerDepth,
                             srcEmbeddingFilePath: opts.SrcEmbeddingModelFilePath, tgtEmbeddingFilePath: opts.TgtEmbeddingModelFilePath, vocab: vocab, modelFilePath: opts.ModelFilePath,
                             dropoutRatio: opts.DropoutRatio, processorType: processorType, deviceIds: deviceIds, multiHeadNum: opts.MultiHeadNum, encoderType: encoderType, decoderType: decoderType,
                             maxSrcSntSize: opts.MaxSrcSentLength, maxTgtSntSize: opts.MaxTgtSentLength, enableCoverageModel: opts.EnableCoverageModel, memoryUsageRatio: opts.MemoryUsageRatio, shuffleType: shuffleType, compilerOptions: cudaCompilerOptions);
@@ -126,7 +126,7 @@ namespace Seq2SeqConsole
                     ss.IterationDone += ss_IterationDone;
 
                     // Kick off training
-                    ss.Train(maxTrainingEpoch: opts.MaxEpochNum, trainCorpus: trainCorpus, validCorpus: validCorpus, learningRate: learningRate, optimizer: optimizer, metrics: metrics);
+                    ss.Train(opts.MaxEpochNum, trainCorpus, validCorpus, learningRate, optimizer: optimizer, metrics: metrics);
                 }
                 else if (mode == ModeEnums.Valid)
                 {
@@ -142,15 +142,15 @@ namespace Seq2SeqConsole
                     // Load valid corpus
                     var validCorpus = new ParallelCorpus(opts.ValidCorpusPath, opts.SrcLang, opts.TgtLang, opts.ValBatchSize, opts.ShuffleBlockSize, opts.MaxSrcSentLength, opts.MaxTgtSentLength);
 
-                    ss = new AttentionSeq2Seq(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, memoryUsageRatio: opts.MemoryUsageRatio, shuffleType: shuffleType, compilerOptions: cudaCompilerOptions);
-                    ss.Valid(validCorpus: validCorpus, metrics: metrics);
+                    ss = new AttentionSeq2Seq(opts.ModelFilePath, processorType, deviceIds, memoryUsageRatio: opts.MemoryUsageRatio, shuffleType: shuffleType, compilerOptions: cudaCompilerOptions);
+                    ss.Valid(validCorpus, metrics);
                 }
                 else if (mode == ModeEnums.Test)
                 {
                     Logger.WriteLine($"Test model '{opts.ModelFilePath}' by input corpus '{opts.InputTestFile}'");
 
                     //Test trained model
-                    ss = new AttentionSeq2Seq(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, memoryUsageRatio: opts.MemoryUsageRatio, 
+                    ss = new AttentionSeq2Seq(opts.ModelFilePath, processorType, deviceIds, memoryUsageRatio: opts.MemoryUsageRatio, 
                         shuffleType: shuffleType, maxSrcSntSize: opts.MaxSrcSentLength, maxTgtSntSize: opts.MaxTgtSentLength, compilerOptions: cudaCompilerOptions);
 
                     var outputLines = new List<string>();
@@ -174,7 +174,7 @@ namespace Seq2SeqConsole
                 }
                 else if (mode == ModeEnums.DumpVocab)
                 {
-                    ss = new AttentionSeq2Seq(modelFilePath: opts.ModelFilePath, processorType: processorType, deviceIds: deviceIds, compilerOptions: cudaCompilerOptions);
+                    ss = new AttentionSeq2Seq(opts.ModelFilePath, processorType, deviceIds, compilerOptions: cudaCompilerOptions);
                     ss.DumpVocabToFiles(opts.SrcVocab, opts.TgtVocab);
                 }
                 else
