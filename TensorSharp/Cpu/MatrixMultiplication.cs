@@ -371,8 +371,6 @@ namespace TensorSharp.Cpu
                 throw new InvalidOperationException("Size mismatch");
             }
 
-            var aOp = default(BlasOp);
-            var bOp = default(BlasOp);
             var copyC = false;
 
             Tensor aClone = null;
@@ -414,6 +412,7 @@ namespace TensorSharp.Cpu
 
             try
             {
+                var aOp = default(BlasOp);
                 if (aClone.Strides[0] == 1 &&
                     aClone.Strides[1] != 0 && aClone.Strides[1] != 1)
                 {
@@ -440,6 +439,7 @@ namespace TensorSharp.Cpu
                     aOp = BlasOp.NonTranspose;
                 }
 
+                var bOp = default(BlasOp);
                 if (bClone.Strides[0] == 1 &&
                     bClone.Strides[1] != 0 && bClone.Strides[1] != 1)
                 {

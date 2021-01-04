@@ -219,9 +219,9 @@ namespace TensorSharp
 
             var nColumnPerLine = (int)Math.Floor((80 - indent.Length) / (double)(sz + 1));
             long firstColumn = 0;
-            long lastColumn = -1;
             while (firstColumn < tensor.Sizes[1])
             {
+                long lastColumn = -1;
                 if (firstColumn + nColumnPerLine - 2 < tensor.Sizes[1])
                 {
                     lastColumn = firstColumn + nColumnPerLine - 2;
