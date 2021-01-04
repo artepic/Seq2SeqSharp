@@ -31,7 +31,7 @@ namespace Seq2SeqSharp.Tools
         private SortedList<string, IMultiProcessorNetworkWrapper> m_name2network;
         DateTime m_lastCheckPointDateTime = DateTime.Now;
 
-        public BaseSeq2SeqFramework(int[] deviceIds, ProcessorTypeEnums processorType, string modelFilePath, float memoryUsageRatio = 0.9f, string[] compilerOptions = null)
+        protected BaseSeq2SeqFramework(int[] deviceIds, ProcessorTypeEnums processorType, string modelFilePath, float memoryUsageRatio = 0.9f, string[] compilerOptions = null)
         {
             this.m_deviceIds = deviceIds;
             this.m_modelFilePath = modelFilePath;

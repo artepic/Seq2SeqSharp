@@ -6,7 +6,7 @@ namespace TensorSharp.Expression
     {
         public bool IsValidLvalue { get; private set; }
 
-        public TExpression(bool isValidLvalue = false)
+        protected TExpression(bool isValidLvalue = false)
         {
             this.IsValidLvalue = isValidLvalue;
         }
