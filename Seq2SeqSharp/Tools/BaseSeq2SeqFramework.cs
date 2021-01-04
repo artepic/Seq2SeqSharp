@@ -347,8 +347,7 @@ namespace Seq2SeqSharp.Tools
 
         internal List<List<string>> RunTest(List<List<string>> inputTokens, Func<IComputeGraph, List<List<string>>, List<List<string>>, int, bool, float> ForwardOnSingleDevice)
         {
-            var hypTkns = new List<List<string>>();
-            hypTkns.Add(new List<string>());
+            var hypTkns = new List<List<string>> { new() };
             hypTkns[0].Add(ParallelCorpus.BOS);
 
             try
