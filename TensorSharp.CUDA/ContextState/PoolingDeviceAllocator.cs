@@ -11,7 +11,7 @@ namespace TensorSharp.CUDA.ContextState
         private const long MemoryAlignment = 256;
 
         private readonly CudaContext m_context;
-        private readonly object locker = new object();
+        private readonly object locker = new();
 
         private readonly ulong m_ulAvailMemByteInTotal;
         private CUdeviceptr m_memPoolPtr;

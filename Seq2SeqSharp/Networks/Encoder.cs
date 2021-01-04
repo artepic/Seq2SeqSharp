@@ -10,7 +10,7 @@ namespace Seq2SeqSharp
     [Serializable]
     public class Encoder
     {
-        public List<LSTMCell> encoders = new List<LSTMCell>();
+        public List<LSTMCell> encoders = new();
         public int hdim { get; set; }
         public int dim { get; set; }
         public int depth { get; set; }

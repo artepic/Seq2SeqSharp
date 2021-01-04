@@ -11,20 +11,20 @@ namespace TensorSharp.CUDA
     {
         private readonly CopyOps copyOps;
 
-        private readonly ElementwiseKernels elementwiseKernels = new ElementwiseKernels();
-        private readonly ElementwiseOpKernels elementwiseOpKernels = new ElementwiseOpKernels();
-        private readonly ElementwiseTriKernels elementwiseTriKernels = new ElementwiseTriKernels();
-        private readonly ElementwiseActKernels elementwiseActKernels = new ElementwiseActKernels();
+        private readonly ElementwiseKernels elementwiseKernels = new();
+        private readonly ElementwiseOpKernels elementwiseOpKernels = new();
+        private readonly ElementwiseTriKernels elementwiseTriKernels = new();
+        private readonly ElementwiseActKernels elementwiseActKernels = new();
 
-        private readonly FillCopyKernels fillCopyKernels = new FillCopyKernels();
+        private readonly FillCopyKernels fillCopyKernels = new();
 
-        private readonly CudaReduceKernels cudaReduceKernels = new CudaReduceKernels();
-        private readonly CudaReduceAllKernels cudaReduceAllKernels = new CudaReduceAllKernels();
+        private readonly CudaReduceKernels cudaReduceKernels = new();
+        private readonly CudaReduceAllKernels cudaReduceAllKernels = new();
 
-        private readonly VarStdKernels varStdKernels = new VarStdKernels();
-        private readonly ReduceDimIndexKernels reduceDimIndexKernels = new ReduceDimIndexKernels();
+        private readonly VarStdKernels varStdKernels = new();
+        private readonly ReduceDimIndexKernels reduceDimIndexKernels = new();
 
-        private readonly AdvFuncKernels advFuncKernels = new AdvFuncKernels();
+        private readonly AdvFuncKernels advFuncKernels = new();
 
         public CudaBasicOps()
         {

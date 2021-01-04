@@ -34,7 +34,7 @@ namespace Seq2SeqSharp.Tools
             return str == EOS || str == BOS || str == UNK;
         }
 
-        private readonly Random rnd = new Random(DateTime.Now.Millisecond);
+        private readonly Random rnd = new(DateTime.Now.Millisecond);
 
         private void Shuffle(List<RawSntPair> rawSntPairs)
         {

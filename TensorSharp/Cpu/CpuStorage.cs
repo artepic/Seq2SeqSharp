@@ -28,7 +28,7 @@ namespace TensorSharp.Cpu
         public IntPtr PtrAtElement(long index)
         {
             // ReSharper disable once ArrangeRedundantParentheses
-            return new IntPtr(this.buffer.ToInt64() + (index * this.ElementType.Size()));
+            return new(this.buffer.ToInt64() + (index * this.ElementType.Size()));
         }
 
         public override int[] GetElementsAsInt(long index, int length)

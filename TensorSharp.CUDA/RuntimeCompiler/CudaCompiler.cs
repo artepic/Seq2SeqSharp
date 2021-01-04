@@ -11,7 +11,7 @@ namespace TensorSharp.CUDA.RuntimeCompiler
     [Serializable]
     public class CudaCompiler
     {
-        private readonly Dictionary<string, string> includes = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> includes = new();
         private readonly KernelDiskCache diskCache;
         private readonly string[] m_options;
 

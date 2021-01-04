@@ -21,9 +21,9 @@ namespace Seq2SeqSharp
         public Dictionary<string, int> TgtWordToIndex;
 
         private Dictionary<int, string> m_srcIndexToWord;
-        private List<string> m_srcVocab = new List<string>();
+        private List<string> m_srcVocab = new();
         private Dictionary<int, string> m_tgtIndexToWord;
-        private List<string> m_tgtVocab = new List<string>();
+        private List<string> m_tgtVocab = new();
 
 
         public int SourceWordSize => this.m_srcIndexToWord.Count;
@@ -33,7 +33,7 @@ namespace Seq2SeqSharp
 
         public List<string> TgtVocab => this.m_tgtVocab.GetRange(3, this.m_tgtVocab.Count - 3);
 
-        private object locker = new object();
+        private object locker = new();
 
         public Vocab()
         {

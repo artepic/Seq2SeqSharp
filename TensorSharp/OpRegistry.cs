@@ -15,9 +15,9 @@ namespace TensorSharp
             public IEnumerable<OpConstraint> constraints;
         }
 
-        private static readonly Dictionary<string, List<OpInstance>> opInstances = new Dictionary<string, List<OpInstance>>();
+        private static readonly Dictionary<string, List<OpInstance>> opInstances = new();
         // Remember which assemblies have been registered to avoid accidental double-registering
-        private static readonly HashSet<Assembly> registeredAssemblies = new HashSet<Assembly>();
+        private static readonly HashSet<Assembly> registeredAssemblies = new();
 
         static OpRegistry()
         {

@@ -47,7 +47,7 @@ namespace Seq2SeqSharp.Tools
             System.Threading.Interlocked.Decrement(ref this.count);
         }
 
-        private readonly object locker = new object();
+        private readonly object locker = new();
         public void Clear()
         {
             lock (this.locker)

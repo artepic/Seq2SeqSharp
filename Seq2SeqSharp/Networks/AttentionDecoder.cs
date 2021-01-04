@@ -12,7 +12,7 @@ namespace Seq2SeqSharp
     [Serializable]
     public class AttentionDecoder : IDecoder
     {
-        private readonly List<LSTMAttentionDecoderCell> m_decoders = new List<LSTMAttentionDecoderCell>();
+        private readonly List<LSTMAttentionDecoderCell> m_decoders = new();
         private readonly FeedForwardLayer m_decoderFFLayer;
         private readonly int m_hdim;
         private readonly int m_embDim;

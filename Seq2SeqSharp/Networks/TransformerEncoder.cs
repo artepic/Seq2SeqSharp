@@ -8,8 +8,8 @@ namespace Seq2SeqSharp
 {
     internal class TransformerEncoder : IEncoder
     {
-        private readonly List<MultiHeadAttention> m_encoders = new List<MultiHeadAttention>();
-        private readonly List<PositionwiseFeedForward> m_posFFNs = new List<PositionwiseFeedForward>();
+        private readonly List<MultiHeadAttention> m_encoders = new();
+        private readonly List<PositionwiseFeedForward> m_posFFNs = new();
 
         private readonly int m_inputDim;
         private readonly float m_dropoutRatio;

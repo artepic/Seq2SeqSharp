@@ -6,7 +6,7 @@ namespace TensorSharp.Cpu
     [OpsClass]
     public class CpuRandom
     {
-        private static readonly Random seedGen = new Random();
+        private static readonly Random seedGen = new();
 
 
         // allArgs should start with a null placeholder for the RNG object

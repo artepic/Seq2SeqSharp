@@ -4,7 +4,7 @@ namespace Seq2SeqSharp.Tools
 {
     public class WeightTensorFactory : IWeightFactory
     {
-        private readonly List<WeightTensor> weights = new List<WeightTensor>();
+        private readonly List<WeightTensor> weights = new();
 
         public WeightTensor CreateWeightTensor(int row, int column, int deviceId, bool cleanWeights = false, string name = "", bool isTrainable = false, IComputeGraph graphToBind = null)
         {

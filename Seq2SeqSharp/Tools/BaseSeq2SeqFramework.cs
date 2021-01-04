@@ -27,7 +27,7 @@ namespace Seq2SeqSharp.Tools
         private int m_weightsUpdateCount;
         private double m_avgCostPerWordInTotalInLastEpoch = 10000.0;
         private double m_bestPrimaryScore;
-        private readonly object locker = new object();
+        private readonly object locker = new();
         private SortedList<string, IMultiProcessorNetworkWrapper> m_name2network;
         DateTime m_lastCheckPointDateTime = DateTime.Now;
 

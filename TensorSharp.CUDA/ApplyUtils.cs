@@ -20,7 +20,7 @@ namespace TensorSharp.CUDA
 
         public static dim3 GetApplyBlock()
         {
-            return new dim3(ApplyThreadsPerBlock);
+            return new(ApplyThreadsPerBlock);
         }
 
         // returns Ceil(x / y)

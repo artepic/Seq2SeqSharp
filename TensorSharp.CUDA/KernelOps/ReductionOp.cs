@@ -104,7 +104,7 @@ namespace TensorSharp.CUDA.KernelOps
 
         private static dim3 GetNonContigReduceBlock(CudaDeviceProperties deviceProps)
         {
-            return new dim3(GetNonContigReduceBlockSize(deviceProps));
+            return new(GetNonContigReduceBlockSize(deviceProps));
         }
 
         private static dim3 GetContigReduceBlock(CudaContext cudaContext, long numSlices, long reductionSize)

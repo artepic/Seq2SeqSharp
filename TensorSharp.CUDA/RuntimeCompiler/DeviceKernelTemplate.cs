@@ -8,8 +8,8 @@ namespace TensorSharp.CUDA.RuntimeCompiler
     {
         private readonly string templateCode;
         private readonly List<string> requiredHeaders;
-        private readonly HashSet<string> requiredConfigArgs = new HashSet<string>();
-        private readonly Dictionary<KernelConfig, byte[]> ptxCache = new Dictionary<KernelConfig, byte[]>();
+        private readonly HashSet<string> requiredConfigArgs = new();
+        private readonly Dictionary<KernelConfig, byte[]> ptxCache = new();
 
 
         public DeviceKernelTemplate(string templateCode, params string[] requiredHeaders)

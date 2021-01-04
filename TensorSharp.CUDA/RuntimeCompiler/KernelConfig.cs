@@ -5,7 +5,7 @@ namespace TensorSharp.CUDA.RuntimeCompiler
 {
     public class KernelConfig
     {
-        private readonly SortedDictionary<string, string> values = new SortedDictionary<string, string>();
+        private readonly SortedDictionary<string, string> values = new();
 
 
         public KernelConfig()

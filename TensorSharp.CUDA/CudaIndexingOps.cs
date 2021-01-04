@@ -5,8 +5,8 @@ namespace TensorSharp.CUDA
     [OpsClass]
     public class CudaIndexingOps
     {
-        private readonly IndexSelectKernels indexSelect = new IndexSelectKernels();
-        private readonly GatherScatterKernels gather = new GatherScatterKernels();
+        private readonly IndexSelectKernels indexSelect = new();
+        private readonly GatherScatterKernels gather = new();
 
 
         public CudaIndexingOps()

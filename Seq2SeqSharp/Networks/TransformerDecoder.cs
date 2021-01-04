@@ -8,9 +8,9 @@ namespace Seq2SeqSharp
 {
     internal class TransformerDecoder : IDecoder
     {
-        private readonly List<MultiHeadAttention> m_selfAttns = new List<MultiHeadAttention>();
-        private readonly List<MultiHeadAttention> m_encAttns = new List<MultiHeadAttention>();
-        private readonly List<PositionwiseFeedForward> m_posFFNs = new List<PositionwiseFeedForward>();
+        private readonly List<MultiHeadAttention> m_selfAttns = new();
+        private readonly List<MultiHeadAttention> m_encAttns = new();
+        private readonly List<PositionwiseFeedForward> m_posFFNs = new();
 
         private readonly FeedForwardLayer m_decoderFFLayer;
         private readonly int m_inputDim;

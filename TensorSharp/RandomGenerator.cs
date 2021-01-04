@@ -5,7 +5,7 @@ namespace TensorSharp
 {
     public class RandomGenerator
     {
-        static readonly Random rnd = new Random(DateTime.Now.Millisecond);
+        static readonly Random rnd = new(DateTime.Now.Millisecond);
 
         public int NextSeed()
         {

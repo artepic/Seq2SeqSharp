@@ -12,7 +12,7 @@ namespace TensorSharp.Cpu
 
         private static IntPtr PtrAdd(IntPtr ptr, long offset)
         {
-            return new IntPtr(ptr.ToInt64() + offset);
+            return new(ptr.ToInt64() + offset);
         }
 
     }

@@ -32,7 +32,7 @@ namespace TensorSharp.CUDA
         private readonly RuntimeCompiler.KernelDiskCache diskCache;
 
         private readonly RuntimeCompiler.CudaCompiler compiler;
-        private readonly CudaKernelCache kernelCache = new CudaKernelCache();
+        private readonly CudaKernelCache kernelCache = new();
 
 
         public TSCudaContext(int[] deviceIds, float memoryUsageRatio = 0.9f, string[] compilerOptions = null)

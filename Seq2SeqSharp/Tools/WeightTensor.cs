@@ -39,7 +39,7 @@ namespace Seq2SeqSharp.Tools
 
         private Tensor m_TWeight;
         private Tensor m_TGradient;
-        private static readonly object locker = new object();
+        private static readonly object locker = new();
 
         private bool releasedWeight;
         private bool releasedGradient;

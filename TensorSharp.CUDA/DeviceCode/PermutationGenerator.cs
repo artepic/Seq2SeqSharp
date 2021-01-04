@@ -4,7 +4,7 @@ namespace TensorSharp.CUDA.DeviceCode
 {
     public class PermutationGenerator
     {
-        public readonly StringBuilder sb = new StringBuilder();
+        public readonly StringBuilder sb = new();
 
         public PermutationGenerator()
         {

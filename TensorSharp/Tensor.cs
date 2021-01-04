@@ -134,7 +134,7 @@ namespace TensorSharp
         /// </summary>
         public Tensor CopyRef()
         {
-            return new Tensor(this.Sizes, this.Strides, this.Storage, this.StorageOffset);
+            return new(this.Sizes, this.Strides, this.Storage, this.StorageOffset);
         }
 
 

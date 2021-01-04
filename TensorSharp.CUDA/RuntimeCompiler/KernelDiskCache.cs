@@ -12,7 +12,7 @@ namespace TensorSharp.CUDA.RuntimeCompiler
     public class KernelDiskCache
     {
         private readonly string cacheDir;
-        private readonly Dictionary<string, byte[]> memoryCachedKernels = new Dictionary<string, byte[]>();
+        private readonly Dictionary<string, byte[]> memoryCachedKernels = new();
 
 
         public KernelDiskCache(string cacheDir)

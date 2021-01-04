@@ -52,7 +52,7 @@ namespace TensorSharp.CUDA.Util
     {
         private readonly Func<T> constructor;
         private readonly Action<T> destructor;
-        private readonly Stack<T> freeList = new Stack<T>();
+        private readonly Stack<T> freeList = new();
         private bool disposed = false;
 
 
